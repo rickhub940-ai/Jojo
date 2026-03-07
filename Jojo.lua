@@ -318,6 +318,9 @@ task.spawn(function()
 end)
 
 
+local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
+
+
 Tab:Toggle({
 	Title = "Auto Attack",
 	Icon = "swords",
