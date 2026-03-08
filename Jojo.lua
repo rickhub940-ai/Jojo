@@ -155,7 +155,6 @@ end)
 
 
 
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -163,18 +162,17 @@ local Workspace = game:GetService("Workspace")
 local player = Players.LocalPlayer
 local root
 
--- ค่าระบบ
 local running = false
 local radius = 13
 local hitbox = 35
-local segments = 30
+
+local segments = 16
 local dashLength = 5
 local rotation = 0
 
 local circleParts = {}
-local overlap = OverlapParams.new()
 
--- ===== วง =====
+local overlap = OverlapParams.new()
 
 local function clearCircle()
 	for _,data in ipairs(circleParts) do
@@ -187,6 +185,8 @@ end
 
 local function createCircle(char)
 
+	if #circleParts > 0 then return end
+
 	root = char:WaitForChild("HumanoidRootPart")
 
 	overlap.FilterType = Enum.RaycastFilterType.Blacklist
@@ -194,7 +194,7 @@ local function createCircle(char)
 
 	for i = 1,segments do
 		
-		if i % 4 == 0 then
+		if i % 2 == 0 then
 			
 			local p = Instance.new("Part")
 			p.Size = Vector3.new(0.6,0.2,dashLength)
@@ -211,18 +211,14 @@ end
 
 player.CharacterAdded:Connect(function(char)
 	task.wait(0.5)
-	clearCircle()
-	createCircle(char)
+	if running then
+		createCircle(char)
+	end
 end)
 
-if player.Character then
-	createCircle(player.Character)
-end
+RunService.Heartbeat:Connect(function(dt)
 
--- วงหมุน
-RunService.RenderStepped:Connect(function(dt)
-
-	if not root then return end
+	if not running or not root then return end
 
 	rotation += dt * 2
 
@@ -242,92 +238,101 @@ RunService.RenderStepped:Connect(function(dt)
 
 end)
 
--- ===== ระบบตี =====
-
 task.spawn(function()
 
 	while true do
-		task.wait(0.01)
 
-		if running and root then
+		if not running then
+			task.wait(0.3)
+			continue
+		end
 
-			local parts = Workspace:GetPartBoundsInRadius(root.Position,radius,overlap)
+		task.wait(0.05)
 
-			local closest
-			local closestDist = radius
+		if not root then continue end
 
-			for _,part in ipairs(parts) do
+		local parts = Workspace:GetPartBoundsInRadius(root.Position,radius,overlap)
 
-				local model = part:FindFirstAncestorOfClass("Model")
+		local closest
+		local closestDist = radius
 
-				if model and model ~= player.Character then
+		for _,part in ipairs(parts) do
 
-					local hum = model:FindFirstChildOfClass("Humanoid")
-					local hrp = model:FindFirstChild("HumanoidRootPart")
+			local model = part:FindFirstAncestorOfClass("Model")
 
-					if hum and hrp then
+			if model and model ~= player.Character then
 
-						local plr = Players:GetPlayerFromCharacter(model)
+				local hum = model:FindFirstChildOfClass("Humanoid")
+				local hrp = model:FindFirstChild("HumanoidRootPart")
 
-						if not plr then
+				if hum and hrp then
 
-							if model:FindFirstChildWhichIsA("ProximityPrompt",true) then
-								continue
-							end
+					local plr = Players:GetPlayerFromCharacter(model)
 
-							local dist = (hrp.Position-root.Position).Magnitude
+					if not plr then
 
-							if dist < closestDist then
-								closestDist = dist
-								closest = model
-							end
+						if model:FindFirstChildWhichIsA("ProximityPrompt",true) then
+							continue
+						end
 
+						local dist = (hrp.Position-root.Position).Magnitude
+
+						if dist < closestDist then
+							closestDist = dist
+							closest = model
+						end
+
+						if hrp.Size.X ~= hitbox then
 							hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
 							hrp.Transparency = 1
 							hrp.CanCollide = false
-
 						end
+
 					end
 				end
 			end
-
-			if closest then
-
-				local hrp = closest:FindFirstChild("HumanoidRootPart")
-
-				if hrp then
-
-					root.CFrame = CFrame.lookAt(
-						hrp.Position + Vector3.new(0,-7,0),
-						hrp.Position
-					)
-
-					local args = {true,false}
-
-					player.Character
-					:WaitForChild("client_character_controller")
-					:WaitForChild("M1")
-					:FireServer(unpack(args))
-
-				end
-			end
-
 		end
+
+		if closest then
+
+			local hrp = closest:FindFirstChild("HumanoidRootPart")
+
+			if hrp then
+
+				root.CFrame = CFrame.lookAt(
+					hrp.Position + Vector3.new(0,-7,0),
+					hrp.Position
+				)
+
+				player.Character
+				:WaitForChild("client_character_controller")
+				:WaitForChild("M1")
+				:FireServer(true,false)
+
+			end
+		end
+
 	end
 
 end)
 
-
-local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
-
-
 Tab:Toggle({
 	Title = "Auto Attack",
-	Icon = "swords",
 	Type = "Checkbox",
 	Value = false,
+
 	Callback = function(state)
+
 		running = state
+
+		if running then
+			if player.Character then
+				createCircle(player.Character)
+			end
+		else
+			clearCircle()
+		end
+
 	end
 })
 
@@ -336,9 +341,10 @@ Tab:Slider({
 	Step = 1,
 	Value = {
 		Min = 5,
-		Max = 60,
+		Max = 100,
 		Default = 13,
 	},
+
 	Callback = function(value)
 		radius = value
 	end
