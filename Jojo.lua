@@ -155,6 +155,7 @@ end)
 
 
 
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -171,13 +172,12 @@ local dashLength = 5
 local rotation = 0
 
 local circleParts = {}
-
 local overlap = OverlapParams.new()
 
 local function clearCircle()
-	for _,data in ipairs(circleParts) do
-		if data.part then
-			data.part:Destroy()
+	for _,v in ipairs(circleParts) do
+		if v.part then
+			v.part:Destroy()
 		end
 	end
 	table.clear(circleParts)
@@ -204,7 +204,7 @@ local function createCircle(char)
 			p.CanCollide = false
 			p.Parent = workspace
 			
-			table.insert(circleParts,{part = p,index = i})
+			table.insert(circleParts,{part=p,index=i})
 		end
 	end
 end
@@ -247,7 +247,7 @@ task.spawn(function()
 			continue
 		end
 
-		task.wait(0.05)
+		task.wait(0.01)
 
 		if not root then continue end
 
@@ -262,33 +262,32 @@ task.spawn(function()
 
 			if model and model ~= player.Character then
 
-				local hum = model:FindFirstChildOfClass("Humanoid")
 				local hrp = model:FindFirstChild("HumanoidRootPart")
+				local hum = model:FindFirstChildOfClass("Humanoid")
 
-				if hum and hrp then
+				if hrp and hum then
 
-					local plr = Players:GetPlayerFromCharacter(model)
-
-					if not plr then
-
-						if model:FindFirstChildWhichIsA("ProximityPrompt",true) then
-							continue
-						end
-
-						local dist = (hrp.Position-root.Position).Magnitude
-
-						if dist < closestDist then
-							closestDist = dist
-							closest = model
-						end
-
-						if hrp.Size.X ~= hitbox then
-							hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
-							hrp.Transparency = 1
-							hrp.CanCollide = false
-						end
-
+					if Players:GetPlayerFromCharacter(model) then
+						continue
 					end
+
+					if model:FindFirstChildWhichIsA("ProximityPrompt",true) then
+						continue
+					end
+
+					local dist = (hrp.Position-root.Position).Magnitude
+
+					if dist < closestDist then
+						closestDist = dist
+						closest = model
+					end
+
+					if hrp.Size.X ~= hitbox then
+						hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
+						hrp.Transparency = 1
+						hrp.CanCollide = false
+					end
+
 				end
 			end
 		end
@@ -300,8 +299,8 @@ task.spawn(function()
 			if hrp then
 
 				root.CFrame = CFrame.lookAt(
-					hrp.Position + Vector3.new(0,-7,0),
-					hrp.Position
+					hrp.Position + Vector3.new(0,-8,0),
+					hrp.Position + Vector3.new(0,5,0)
 				)
 
 				player.Character
@@ -318,14 +317,16 @@ end)
 
 
 
+
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
 
 Tab:Toggle({
 	Title = "Auto Attack",
 	Type = "Checkbox",
+    Icon = "swords",
 	Value = false,
-
 	Callback = function(state)
 
 		running = state
@@ -343,6 +344,7 @@ Tab:Toggle({
 
 Tab:Slider({
 	Title = "Attack Radius",
+	Desc = "ปรับระยะวง",
 	Step = 1,
 	Value = {
 		Min = 5,
@@ -350,7 +352,7 @@ Tab:Slider({
 		Default = 13,
 	},
 
-	Callback = function(value)
-		radius = value
+	Callback = function(v)
+		radius = v
 	end
 })
