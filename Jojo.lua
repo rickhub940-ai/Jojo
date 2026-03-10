@@ -155,8 +155,6 @@ end)
 
 
 
-
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -179,6 +177,7 @@ local segments=30
 local dashLength=5
 local rotation=0
 
+-- สร้างวงแดง
 local function createCircle()
 
 	for i=1,segments do
@@ -203,6 +202,7 @@ end
 
 createCircle()
 
+-- หมุนวง
 RunService.RenderStepped:Connect(function(dt)
 
 	if not root or not AutoFarm then
@@ -236,6 +236,7 @@ RunService.RenderStepped:Connect(function(dt)
 	
 end)
 
+-- เช็คมอน
 local function validTarget(m)
 
 	if m==player.Character then return end
@@ -260,6 +261,7 @@ local function validTarget(m)
 	
 end
 
+-- ระบบฟาร์ม
 task.spawn(function()
 
 	while true do
@@ -280,7 +282,7 @@ task.spawn(function()
 		local m1=controller:FindFirstChild("M1")
 		local skill=controller:FindFirstChild("Skill")
 		
-		for _,m in pairs(workspace.Map.Live:GetChildren()) do
+		for _,m in pairs(workspace:GetChildren()) do
 			
 			local hrp=validTarget(m)
 			
@@ -334,11 +336,14 @@ end)
 
 
 
+
+
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
 
 Tab:Toggle({
-	Title="ฟามมอนรอบๆ",
+	Title="ออโต้ฟามมอนรอบๆ",
 	Type="Checkbox",
 	Value=false,
 	Callback=function(v)
@@ -347,11 +352,11 @@ Tab:Toggle({
 })
 
 Tab:Slider({
-	Title="วงในการฟาม",
+	Title="วงในการฟามมอนรอบๆ",
 	Step=1,
 	Value={
 		Min=5,
-		Max=500,
+		Max=200,
 		Default=13
 	},
 	Callback=function(v)
@@ -362,7 +367,7 @@ Tab:Slider({
 
 
 Tab:Toggle({
-	Title="ออโต้กดสกิว",
+	Title="ออโต้สกิว",
 	Type="Checkbox",
 	Value=false,
 	Callback=function(v)
@@ -389,7 +394,7 @@ Tab:Dropdown({
 })
 
 Tab:Dropdown({
-	Title="โหมดในการฟาม",
+	Title="โหมดการฟาม",
 	Values={"Above","Below","Behind"},
 	Default="Below",
 	Callback=function(v)
@@ -397,9 +402,8 @@ Tab:Dropdown({
 	end
 })
 
-
 Tab:Slider({
-	Title="ระยะห่างในการฟาม",
+	Title="ระยะห่างการฟาม,
 	Step=1,
 	Value={
 		Min=3,
@@ -409,4 +413,5 @@ Tab:Slider({
 	Callback=function(v)
 		tpDistance=v
 	end
-})	
+})
+
