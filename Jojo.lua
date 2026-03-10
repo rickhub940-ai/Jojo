@@ -153,8 +153,6 @@ end)
 
 
 
-
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -331,8 +329,7 @@ task.spawn(function()
 	
 end)
 
-
-
+-- UI
 
 
 
@@ -343,7 +340,7 @@ local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
 
 Tab:Toggle({
-	Title="ออโต้ฟามมอนรอบๆ",
+	Title="Auto Farm",
 	Type="Checkbox",
 	Value=false,
 	Callback=function(v)
@@ -351,23 +348,8 @@ Tab:Toggle({
 	end
 })
 
-Tab:Slider({
-	Title="วงในการฟามมอนรอบๆ",
-	Step=1,
-	Value={
-		Min=5,
-		Max=200,
-		Default=13
-	},
-	Callback=function(v)
-		radius=v
-	end
-})
-
-
-
 Tab:Toggle({
-	Title="ออโต้สกิว",
+	Title="Auto Skill",
 	Type="Checkbox",
 	Value=false,
 	Callback=function(v)
@@ -394,7 +376,7 @@ Tab:Dropdown({
 })
 
 Tab:Dropdown({
-	Title="โหมดการฟาม",
+	Title="Farm Mode",
 	Values={"Above","Below","Behind"},
 	Default="Below",
 	Callback=function(v)
@@ -403,7 +385,20 @@ Tab:Dropdown({
 })
 
 Tab:Slider({
-	Title="ระยะห่างการฟาม,
+	Title="Farm Radius",
+	Step=1,
+	Value={
+		Min=5,
+		Max=40,
+		Default=13
+	},
+	Callback=function(v)
+		radius=v
+	end
+})
+
+Tab:Slider({
+	Title="Teleport Distance",
 	Step=1,
 	Value={
 		Min=3,
@@ -414,4 +409,3 @@ Tab:Slider({
 		tpDistance=v
 	end
 })
-
