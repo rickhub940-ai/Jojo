@@ -153,179 +153,7 @@ end)
 
 
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 
-local player = Players.LocalPlayer
-
-local AutoFarm = false
-local AutoSkill = false
-
-local radius = 13
-local tpDistance = 7
-local FarmMode = "Below"
-
-local selectedSkills = {
-	E=true,R=true,Z=true,X=true,C=true,V=true
-}
-
-local root
-local circleParts={}
-local segments=30
-local dashLength=5
-local rotation=0
-
--- สร้างวงแดง
-local function createCircle()
-
-	for i=1,segments do
-		
-		if i%4==0 then
-			
-			local p=Instance.new("Part")
-			p.Size=Vector3.new(0.6,0.2,dashLength)
-			p.Material=Enum.Material.Neon
-			p.Color=Color3.fromRGB(255,0,0)
-			p.Anchored=true
-			p.CanCollide=false
-			p.Parent=workspace
-			
-			table.insert(circleParts,{part=p,index=i})
-			
-		end
-		
-	end
-	
-end
-
-createCircle()
-
--- หมุนวง
-RunService.RenderStepped:Connect(function(dt)
-
-	if not root or not AutoFarm then
-	
-		for _,v in pairs(circleParts) do
-			v.part.Transparency=1
-		end
-		
-		return
-	end
-
-	rotation+=dt*2
-
-	for _,data in ipairs(circleParts) do
-		
-		local p=data.part
-		local i=data.index
-		
-		p.Transparency=0
-		
-		local angle=(i/segments)*math.pi*2+rotation
-		
-		local x=math.cos(angle)*radius
-		local z=math.sin(angle)*radius
-		
-		p.CFrame=
-		CFrame.new(root.Position+Vector3.new(x,0.05,z))
-		*CFrame.Angles(0,-angle,0)
-		
-	end
-	
-end)
-
--- เช็คมอน
-local function validTarget(m)
-
-	if m==player.Character then return end
-	
-	if Players:GetPlayerFromCharacter(m) then
-		return
-	end
-	
-	local hum=m:FindFirstChildWhichIsA("Humanoid")
-	if not hum then return end
-	
-	if m:FindFirstChildWhichIsA("ProximityPrompt",true) then return end
-	
-	local hrp=m:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
-	
-	local dist=(hrp.Position-root.Position).Magnitude
-	
-	if dist<=radius then
-		return hrp
-	end
-	
-end
-
--- ระบบฟาร์ม
-task.spawn(function()
-
-	while true do
-		
-		task.wait(0.01)
-		
-		if not AutoFarm then continue end
-		
-		local char=player.Character
-		if not char then continue end
-		
-		root=char:FindFirstChild("HumanoidRootPart")
-		if not root then continue end
-		
-		local controller=char:FindFirstChild("client_character_controller")
-		if not controller then continue end
-		
-		local m1=controller:FindFirstChild("M1")
-		local skill=controller:FindFirstChild("Skill")
-		
-		for _,m in pairs(workspace:GetChildren()) do
-			
-			local hrp=validTarget(m)
-			
-			if hrp then
-				
-				local pos
-				
-				if FarmMode=="Above" then
-					pos=hrp.Position+Vector3.new(0,tpDistance,0)
-					
-				elseif FarmMode=="Below" then
-					pos=hrp.Position+Vector3.new(0,-tpDistance,0)
-					
-				elseif FarmMode=="Behind" then
-					pos=hrp.Position-hrp.CFrame.LookVector*tpDistance
-					
-				end
-				
-				root.CFrame=
-				CFrame.new(pos)
-				*CFrame.Angles(math.rad(-90),0,0)
-				
-				if m1 then
-					m1:FireServer(true,false)
-				end
-				
-				if AutoSkill and skill then
-					
-					local order={"E","R","Z","X","C","V"}
-					
-					for _,k in ipairs(order) do
-						
-						if selectedSkills[k] then
-							skill:FireServer(k,true)
-						end
-						
-					end
-					
-				end
-				
-			end
-			
-		end
-		
-	end
 	
 end)
 
@@ -333,79 +161,292 @@ end)
 
 
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local root
+
+local running = false
+local autoSkill = false
+
+local radius = 13
+local hitbox = 35
+local tpDistance = 7
+
+local farmMode = "Below"
+
+local selectedSkills = {
+	E=true,R=true,Z=true,X=true,C=true,V=true
+}
+
+local segments = 16
+local dashLength = 5
+local rotation = 0
+
+local circleParts = {}
+local overlap = OverlapParams.new()
+
+local function clearCircle()
+	for _,v in ipairs(circleParts) do
+		if v.part then
+			v.part:Destroy()
+		end
+	end
+	table.clear(circleParts)
+end
+
+local function createCircle(char)
+
+	if #circleParts > 0 then return end
+
+	root = char:WaitForChild("HumanoidRootPart")
+
+	overlap.FilterType = Enum.RaycastFilterType.Blacklist
+	overlap.FilterDescendantsInstances = {char}
+
+	for i = 1,segments do
+		
+		if i % 2 == 0 then
+			
+			local p = Instance.new("Part")
+			p.Size = Vector3.new(0.6,0.2,dashLength)
+			p.Material = Enum.Material.Neon
+			p.Color = Color3.fromRGB(255,0,0)
+			p.Anchored = true
+			p.CanCollide = false
+			p.Parent = workspace
+			
+			table.insert(circleParts,{part=p,index=i})
+		end
+	end
+end
+
+player.CharacterAdded:Connect(function(char)
+	task.wait(0.5)
+	if running then
+		createCircle(char)
+	end
+end)
+
+RunService.Heartbeat:Connect(function(dt)
+
+	if not running or not root then return end
+
+	rotation += dt * 2
+
+	for _,data in ipairs(circleParts) do
+		
+		local i = data.index
+		local p = data.part
+		
+		local angle = (i/segments)*math.pi*2 + rotation
+		local x = math.cos(angle)*radius
+		local z = math.sin(angle)*radius
+		
+		p.CFrame =
+			CFrame.new(root.Position + Vector3.new(x,0.05,z))
+			* CFrame.Angles(0,-angle,0)
+	end
+
+end)
+
+task.spawn(function()
+
+	while true do
+
+		if not running then
+			task.wait(0.3)
+			continue
+		end
+
+		task.wait(0.01)
+
+		if not root then continue end
+
+		local parts = Workspace:GetPartBoundsInRadius(root.Position,radius,overlap)
+
+		local closest
+		local closestDist = radius
+
+		for _,part in ipairs(parts) do
+
+			local model = part:FindFirstAncestorOfClass("Model")
+
+			if model and model ~= player.Character then
+
+				local hrp = model:FindFirstChild("HumanoidRootPart")
+				local hum = model:FindFirstChildOfClass("Humanoid")
+
+				if hrp and hum then
+
+					if Players:GetPlayerFromCharacter(model) then
+						continue
+					end
+
+					if model:FindFirstChildWhichIsA("ProximityPrompt",true) then
+						continue
+					end
+
+					local dist = (hrp.Position-root.Position).Magnitude
+
+					if dist < closestDist then
+						closestDist = dist
+						closest = model
+					end
+
+					if hrp.Size.X ~= hitbox then
+						hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
+						hrp.Transparency = 1
+						hrp.CanCollide = false
+					end
+
+				end
+			end
+		end
+
+		if closest then
+
+			local hrp = closest:FindFirstChild("HumanoidRootPart")
+
+			if hrp then
+
+				local pos
+
+				if farmMode == "Above" then
+					pos = hrp.Position + Vector3.new(0,tpDistance,0)
+				elseif farmMode == "Below" then
+					pos = hrp.Position + Vector3.new(0,-tpDistance,0)
+				elseif farmMode == "Behind" then
+					pos = hrp.Position - hrp.CFrame.LookVector * tpDistance
+				end
+
+				root.CFrame = CFrame.lookAt(
+					pos,
+					hrp.Position
+				)
+
+				local controller = player.Character:FindFirstChild("client_character_controller")
+
+				if controller then
+
+					local m1 = controller:FindFirstChild("M1")
+					local skill = controller:FindFirstChild("Skill")
+
+					if m1 then
+						m1:FireServer(true,false)
+					end
+
+					if autoSkill and skill then
+
+						local order = {"E","R","Z","X","C","V"}
+
+						for _,k in ipairs(order) do
+							if selectedSkills[k] then
+								skill:FireServer(k,true)
+							end
+						end
+
+					end
+
+				end
+
+			end
+		end
+
+	end
+
+end)
+
 
 
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
-
 Tab:Toggle({
-	Title="Auto Farm",
-	Type="Checkbox",
-	Value=false,
-	Callback=function(v)
-		AutoFarm=v
+	Title = "Auto Attack",
+	Type = "Checkbox",
+	Value = false,
+
+	Callback = function(state)
+
+		running = state
+
+		if running then
+			if player.Character then
+				createCircle(player.Character)
+			end
+		else
+			clearCircle()
+		end
+
 	end
 })
 
 Tab:Toggle({
-	Title="Auto Skill",
-	Type="Checkbox",
-	Value=false,
-	Callback=function(v)
-		AutoSkill=v
+	Title = "Auto Skill",
+	Type = "Checkbox",
+	Value = false,
+
+	Callback = function(v)
+		autoSkill = v
 	end
 })
 
 Tab:Dropdown({
-	Title="Select Skills",
-	Values={"E","R","Z","X","C","V"},
-	Multi=true,
-	Default={"E","R","Z","X","C","V"},
-	Callback=function(values)
+	Title = "Select Skills",
+	Values = {"E","R","Z","X","C","V"},
+	Multi = true,
+	Default = {"E","R","Z","X","C","V"},
+
+	Callback = function(values)
 
 		for k in pairs(selectedSkills) do
-			selectedSkills[k]=false
+			selectedSkills[k] = false
 		end
-		
+
 		for _,v in ipairs(values) do
-			selectedSkills[v]=true
+			selectedSkills[v] = true
 		end
-		
+
 	end
 })
 
 Tab:Dropdown({
-	Title="Farm Mode",
-	Values={"Above","Below","Behind"},
-	Default="Below",
-	Callback=function(v)
-		FarmMode=v
+	Title = "Farm Mode",
+	Values = {"Above","Below","Behind"},
+	Default = "Below",
+
+	Callback = function(v)
+		farmMode = v
 	end
 })
 
 Tab:Slider({
-	Title="Farm Radius",
-	Step=1,
-	Value={
-		Min=5,
-		Max=40,
-		Default=13
+	Title = "Attack Radius",
+	Step = 1,
+	Value = {
+		Min = 5,
+		Max = 60,
+		Default = 13,
 	},
-	Callback=function(v)
-		radius=v
+
+	Callback = function(v)
+		radius = v
 	end
 })
 
 Tab:Slider({
-	Title="Teleport Distance",
-	Step=1,
-	Value={
-		Min=3,
-		Max=15,
-		Default=7
+	Title = "Teleport Distance",
+	Step = 1,
+	Value = {
+		Min = 3,
+		Max = 15,
+		Default = 7,
 	},
-	Callback=function(v)
-		tpDistance=v
+
+	Callback = function(v)
+		tpDistance = v
 	end
 })
