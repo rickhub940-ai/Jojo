@@ -155,6 +155,7 @@ end)
 
 
 	
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -168,8 +169,8 @@ local farmDistance = 7
 local radius = 13
 local hitbox = 35
 
--- รายการสกิลที่เลือกจาก Multi-Dropdown
-local selectedSkills = {"Z", "X", "C"} 
+-- ตัวแปรเก็บสกิลที่เลือก (เป็น Table ตามรูปแบบ Multi Dropdown)
+local selectedSkills = { "Z", "X", "C" } 
 
 -- [ ส่วนของวงแหวน Visual ]
 local segments = 16
@@ -222,24 +223,18 @@ task.spawn(function()
         root = player.Character:FindFirstChild("HumanoidRootPart")
         if not root then continue end
 
-        -- ค้นหาชิ้นส่วนในระยะ
         local parts = Workspace:GetPartBoundsInRadius(root.Position, radius, overlap)    
         local closest, closestDist = nil, radius    
 
         for _, part in ipairs(parts) do    
             local model = part:FindFirstAncestorOfClass("Model")    
-            
             if model and model ~= player.Character then    
                 local hrp = model:FindFirstChild("HumanoidRootPart")    
                 local hum = model:FindFirstChildOfClass("Humanoid")    
 
-                -- [ ระบบตรวจจับ Humanoid และข้าม ProximityPrompt ]
+                -- ตรวจสอบ Humanoid และข้าม ProximityPrompt
                 if hrp and hum and hum.Health > 0 then    
-                    
-                    -- ข้ามถ้าเป็นผู้เล่นคนอื่น
                     if Players:GetPlayerFromCharacter(model) then continue end    
-
-                    -- ข้ามถ้ามี ProximityPrompt (ปุ่มกด/ประตู/หีบ)
                     if model:FindFirstChildWhichIsA("ProximityPrompt", true) then continue end    
 
                     local dist = (hrp.Position - root.Position).Magnitude    
@@ -248,7 +243,6 @@ task.spawn(function()
                         closest = model 
                     end    
 
-                    -- ขยาย Hitbox
                     if hrp.Size.X ~= hitbox then
                         hrp.Size = Vector3.new(hitbox, hitbox, hitbox)
                         hrp.Transparency = 1
@@ -258,26 +252,28 @@ task.spawn(function()
             end
         end    
 
-        -- เริ่มการโจมตีเมื่อเจอเป้าหมาย
         if closest then    
             local e_hrp = closest:FindFirstChild("HumanoidRootPart")    
             local controller = player.Character:FindFirstChild("client_character_controller")
             
             if e_hrp and controller then
-                -- 1. วาร์ปไปตำแหน่งที่เลือก
+                -- 1. วาร์ป
                 local targetPos
-                if farmMode == "Under" then targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
-                elseif farmMode == "Above" then targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
-                elseif farmMode == "Behind" then targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position end
-                
+                if farmMode == "Under" then 
+                    targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
+                elseif farmMode == "Above" then 
+                    targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
+                elseif farmMode == "Behind" then 
+                    targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position 
+                end
                 root.CFrame = CFrame.lookAt(targetPos, e_hrp.Position)
 
-                -- 2. ยิง Remote M1 (แบบเดิม)
+                -- 2. Remote M1
                 if controller:FindFirstChild("M1") then
                     controller.M1:FireServer(true, false)
                 end
                 
-                -- 3. ยิง Remote Skill (เฉพาะสกิลที่ติ๊กเลือก และทำงานตอนเปิด Auto Attack)
+                -- 3. Remote Skill (ยิงเฉพาะที่เลือกใน Multi-Dropdown)
                 if autoSkill and controller:FindFirstChild("Skill") then
                     for _, key in ipairs(selectedSkills) do
                         controller.Skill:FireServer(key, true)
@@ -294,43 +290,39 @@ end)
 
 
 
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
 Tab:Toggle({
     Title = "Auto Attack",
-    Desc = "เปิดบอทฟาร์ม (สกิลจะรันพร้อมอันนี้)",
     Callback = function(state)
         running = state
-        if state then 
-            if player.Character then createCircle(player.Character) end 
-        else 
-            clearCircle() 
-        end
+        if state then if player.Character then createCircle(player.Character) end else clearCircle() end
     end
 })
 
 Tab:Toggle({
     Title = "Auto Skill",
-    Desc = "เปิดระบบสกิลอัตโนมัติ",
-    Callback = function(state)
-        autoSkill = state
-    end
+    Callback = function(state) autoSkill = state end
 })
 
-Tab:MultiDropdown({
+-- แก้ไข Dropdown เป็นแบบ Multi ตามตัวอย่างของคุณ
+Tab:Dropdown({
     Title = "Select Skills",
-    Desc = "เลือกสกิลที่จะให้บอทกด",
-    Values = {"Z", "X", "C", "V", "E", "R"},
-    Default = {"Z", "X", "C"},
-    Callback = function(v)
-        selectedSkills = v
+    Desc = "เลือกสกิลที่จะยิง",
+    Values = { "Z", "X", "C", "V", "E", "R" },
+    Value = { "Z", "X", "C" }, -- Default ที่เลือกไว้
+    Multi = true,
+    AllowNone = true,
+    Callback = function(option) 
+        -- option จะคืนค่ามาเป็น table เช่น { "Z", "X" }
+        selectedSkills = option
     end
 })
 
 Tab:Dropdown({
     Title = "Farm Position",
     Values = {"Under", "Above", "Behind"},
-    Default = "Under",
     Callback = function(v) farmMode = v end
 })
 
@@ -345,3 +337,4 @@ Tab:Slider({
     Min = 5, Max = 100, Default = 13,
     Callback = function(v) radius = v end
 })
+
