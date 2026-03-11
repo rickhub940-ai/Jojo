@@ -155,300 +155,193 @@ end)
 
 
 	
-
-
--- UI
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
 local root
-
 local running = false
 local autoSkill = false
-
+local farmMode = "Under"
+local farmDistance = 7
 local radius = 13
 local hitbox = 35
-local tpDistance = 7
 
-local farmMode = "Below"
+-- รายการสกิลที่เลือกจาก Multi-Dropdown
+local selectedSkills = {"Z", "X", "C"} 
 
-local selectedSkills = {
-	E=true,R=true,Z=true,X=true,C=true,V=true
-}
-
+-- [ ส่วนของวงแหวน Visual ]
 local segments = 16
 local dashLength = 5
 local rotation = 0
-
 local circleParts = {}
 local overlap = OverlapParams.new()
 
 local function clearCircle()
-	for _,v in ipairs(circleParts) do
-		if v.part then
-			v.part:Destroy()
-		end
-	end
-	table.clear(circleParts)
+    for _, v in ipairs(circleParts) do if v.part then v.part:Destroy() end end
+    table.clear(circleParts)
 end
 
 local function createCircle(char)
-
-	if #circleParts > 0 then return end  
-
-	root = char:WaitForChild("HumanoidRootPart")  
-
-	overlap.FilterType = Enum.RaycastFilterType.Blacklist  
-	overlap.FilterDescendantsInstances = {char}  
-
-	for i = 1,segments do  
-
-		if i % 2 == 0 then  
-
-			local p = Instance.new("Part")  
-			p.Size = Vector3.new(0.6,0.2,dashLength)  
-			p.Material = Enum.Material.Neon  
-			p.Color = Color3.fromRGB(255,0,0)  
-			p.Anchored = true  
-			p.CanCollide = false  
-			p.Parent = workspace  
-
-			table.insert(circleParts,{part=p,index=i})  
-
-		end  
-	end
+    if #circleParts > 0 then return end
+    root = char:WaitForChild("HumanoidRootPart")
+    overlap.FilterType = Enum.RaycastFilterType.Exclude
+    overlap.FilterDescendantsInstances = {char}
+    for i = 1, segments do
+        if i % 2 == 0 then    
+            local p = Instance.new("Part")    
+            p.Size = Vector3.new(0.6, 0.2, dashLength)    
+            p.Material = Enum.Material.Neon    
+            p.Color = Color3.fromRGB(255, 0, 0)
+            p.Anchored = true    
+            p.CanCollide = false    
+            p.Parent = workspace    
+            table.insert(circleParts, {part = p, index = i})    
+        end
+    end
 end
 
-player.CharacterAdded:Connect(function(char)
-	task.wait(0.5)
-	if running then
-		createCircle(char)
-	end
-end)
-
 RunService.Heartbeat:Connect(function(dt)
-
-	if not running or not root then return end  
-
-	rotation += dt * 2  
-
-	for _,data in ipairs(circleParts) do  
-
-		local i = data.index  
-		local p = data.part  
-
-		local angle = (i/segments)*math.pi*2 + rotation  
-		local x = math.cos(angle)*radius  
-		local z = math.sin(angle)*radius  
-
-		p.CFrame =  
-			CFrame.new(root.Position + Vector3.new(x,0.05,z))  
-			* CFrame.Angles(0,-angle,0)  
-
-	end
-
+    if not running or not root then return end
+    rotation += dt * 2
+    for _, data in ipairs(circleParts) do
+        local i, p = data.index, data.part
+        local angle = (i/segments)*math.pi*2 + rotation    
+        local x, z = math.cos(angle)*radius, math.sin(angle)*radius    
+        p.CFrame = CFrame.new(root.Position + Vector3.new(x, 0.05, z)) * CFrame.Angles(0, -angle, 0)
+    end
 end)
 
+-- [ LOOP หลัก: SMART FARM SYSTEM ]
 task.spawn(function()
+    while true do
+        task.wait(0.01)
+        
+        if not running or not player.Character then continue end
+        root = player.Character:FindFirstChild("HumanoidRootPart")
+        if not root then continue end
 
-	while true do  
+        -- ค้นหาชิ้นส่วนในระยะ
+        local parts = Workspace:GetPartBoundsInRadius(root.Position, radius, overlap)    
+        local closest, closestDist = nil, radius    
 
-		if not running then  
-			task.wait(0.3)  
-			continue  
-		end  
+        for _, part in ipairs(parts) do    
+            local model = part:FindFirstAncestorOfClass("Model")    
+            
+            if model and model ~= player.Character then    
+                local hrp = model:FindFirstChild("HumanoidRootPart")    
+                local hum = model:FindFirstChildOfClass("Humanoid")    
 
-		task.wait(0.01)  
+                -- [ ระบบตรวจจับ Humanoid และข้าม ProximityPrompt ]
+                if hrp and hum and hum.Health > 0 then    
+                    
+                    -- ข้ามถ้าเป็นผู้เล่นคนอื่น
+                    if Players:GetPlayerFromCharacter(model) then continue end    
 
-		if not root then continue end  
+                    -- ข้ามถ้ามี ProximityPrompt (ปุ่มกด/ประตู/หีบ)
+                    if model:FindFirstChildWhichIsA("ProximityPrompt", true) then continue end    
 
-		local parts = Workspace:GetPartBoundsInRadius(root.Position,radius,overlap)  
+                    local dist = (hrp.Position - root.Position).Magnitude    
+                    if dist < closestDist then 
+                        closestDist = dist
+                        closest = model 
+                    end    
 
-		local closest  
-		local closestDist = radius  
+                    -- ขยาย Hitbox
+                    if hrp.Size.X ~= hitbox then
+                        hrp.Size = Vector3.new(hitbox, hitbox, hitbox)
+                        hrp.Transparency = 1
+                        hrp.CanCollide = false
+                    end
+                end
+            end
+        end    
 
-		for _,part in ipairs(parts) do  
+        -- เริ่มการโจมตีเมื่อเจอเป้าหมาย
+        if closest then    
+            local e_hrp = closest:FindFirstChild("HumanoidRootPart")    
+            local controller = player.Character:FindFirstChild("client_character_controller")
+            
+            if e_hrp and controller then
+                -- 1. วาร์ปไปตำแหน่งที่เลือก
+                local targetPos
+                if farmMode == "Under" then targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
+                elseif farmMode == "Above" then targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
+                elseif farmMode == "Behind" then targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position end
+                
+                root.CFrame = CFrame.lookAt(targetPos, e_hrp.Position)
 
-			local model = part:FindFirstAncestorOfClass("Model")  
-
-			if model and model ~= player.Character then  
-
-				local hrp = model:FindFirstChild("HumanoidRootPart")  
-				local hum = model:FindFirstChildOfClass("Humanoid")  
-
-				if hrp and hum then  
-
-					if Players:GetPlayerFromCharacter(model) then  
-						continue  
-					end  
-
-					if model:FindFirstChildWhichIsA("ProximityPrompt",true) then  
-						continue  
-					end  
-
-					local dist = (hrp.Position-root.Position).Magnitude  
-
-					if dist < closestDist then  
-						closestDist = dist  
-						closest = model  
-					end  
-
-					if hrp.Size.X ~= hitbox then  
-						hrp.Size = Vector3.new(hitbox,hitbox,hitbox)  
-						hrp.Transparency = 1  
-						hrp.CanCollide = false  
-					end  
-
-				end  
-			end  
-		end  
-
-		if closest then  
-
-			local hrp = closest:FindFirstChild("HumanoidRootPart")  
-
-			if hrp then  
-
-				local pos
-
-				if farmMode == "Above" then
-					pos = hrp.Position + Vector3.new(0,tpDistance,0)
-
-				elseif farmMode == "Below" then
-					pos = hrp.Position + Vector3.new(0,-tpDistance,0)
-
-				elseif farmMode == "Behind" then
-					pos = hrp.Position - hrp.CFrame.LookVector * tpDistance
-				end
-
-				root.CFrame = CFrame.lookAt(
-					pos,
-					hrp.Position
-				)
-
-				local controller =
-				player.Character:WaitForChild("client_character_controller")
-
-				controller:WaitForChild("M1"):FireServer(true,false)
-
-				if autoSkill then
-
-					local skill = controller:FindFirstChild("Skill")
-
-					if skill then
-
-						local order = {"E","R","Z","X","C","V"}
-
-						for _,k in ipairs(order) do
-
-							if selectedSkills[k] then
-								skill:FireServer(k,true)
-							end
-
-						end
-
-					end
-
-				end
-
-			end  
-		end  
-
-	end
-
+                -- 2. ยิง Remote M1 (แบบเดิม)
+                if controller:FindFirstChild("M1") then
+                    controller.M1:FireServer(true, false)
+                end
+                
+                -- 3. ยิง Remote Skill (เฉพาะสกิลที่ติ๊กเลือก และทำงานตอนเปิด Auto Attack)
+                if autoSkill and controller:FindFirstChild("Skill") then
+                    for _, key in ipairs(selectedSkills) do
+                        controller.Skill:FireServer(key, true)
+                    end
+                end
+            end
+        end
+    end
 end)
+
+-- [ ส่วนของ UI Menu ]
+
+
+
 
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
 Tab:Toggle({
-	Title = "Auto Attackkkkkkkk",
-	Type = "Checkbox",
-	Value = false,
-
-	Callback = function(state)
-
-		running = state
-
-		if running then
-			if player.Character then
-				createCircle(player.Character)
-			end
-		else
-			clearCircle()
-		end
-
-	end
+    Title = "Auto Attack",
+    Desc = "เปิดบอทฟาร์ม (สกิลจะรันพร้อมอันนี้)",
+    Callback = function(state)
+        running = state
+        if state then 
+            if player.Character then createCircle(player.Character) end 
+        else 
+            clearCircle() 
+        end
+    end
 })
 
 Tab:Toggle({
-	Title = "Auto Skill",
-	Type = "Checkbox",
-	Value = false,
+    Title = "Auto Skill",
+    Desc = "เปิดระบบสกิลอัตโนมัติ",
+    Callback = function(state)
+        autoSkill = state
+    end
+})
 
-	Callback = function(v)
-		autoSkill = v
-	end
+Tab:MultiDropdown({
+    Title = "Select Skills",
+    Desc = "เลือกสกิลที่จะให้บอทกด",
+    Values = {"Z", "X", "C", "V", "E", "R"},
+    Default = {"Z", "X", "C"},
+    Callback = function(v)
+        selectedSkills = v
+    end
 })
 
 Tab:Dropdown({
-	Title = "Select Skills",
-	Values = {"E","R","Z","X","C","V"},
-	Multi = true,
-	Default = {"E","R","Z","X","C","V"},
-
-	Callback = function(values)
-
-		for k in pairs(selectedSkills) do
-			selectedSkills[k] = false
-		end
-
-		for _,v in ipairs(values) do
-			selectedSkills[v] = true
-		end
-
-	end
-})
-
-Tab:Dropdown({
-	Title = "Farm Mode",
-	Values = {"Above","Below","Behind"},
-	Default = "Below",
-
-	Callback = function(v)
-		farmMode = v
-	end
+    Title = "Farm Position",
+    Values = {"Under", "Above", "Behind"},
+    Default = "Under",
+    Callback = function(v) farmMode = v end
 })
 
 Tab:Slider({
-	Title = "Attack Radius",
-	Step = 1,
-	Value = {
-		Min = 5,
-		Max = 60,
-		Default = 13,
-	},
-
-	Callback = function(v)
-		radius = v
-	end
+    Title = "Farm Distance",
+    Min = 1, Max = 30, Default = 7,
+    Callback = function(v) farmDistance = v end
 })
 
 Tab:Slider({
-	Title = "Teleport Distance",
-	Step = 1,
-	Value = {
-		Min = 3,
-		Max = 15,
-		Default = 7,
-	},
-
-	Callback = function(v)
-		tpDistance = v
-	end
+    Title = "Attack Radius",
+    Min = 5, Max = 100, Default = 13,
+    Callback = function(v) radius = v end
 })
-
-
