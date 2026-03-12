@@ -153,7 +153,6 @@ end)
 
 
 
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -170,7 +169,7 @@ local hitbox = 35
 local selectedSkills = { "Z", "X", "C" } 
 local overlap = OverlapParams.new()
 
--- [ ระบบวงแหวน Visual (สีแดง) ]
+-- [ ระบบวงกลมสีแดง (Fixed Circle Logic) ]
 local circleParts = {}
 local function clearCircle()
     for _, v in ipairs(circleParts) do if v.part then v.part:Destroy() end end
@@ -184,32 +183,33 @@ local function createCircle()
     overlap.FilterType = Enum.RaycastFilterType.Exclude
     overlap.FilterDescendantsInstances = {char}
     
+    -- สร้าง 16 ชิ้นเพื่อให้ดูเป็นวงกลมที่เนียนขึ้น
     for i = 1, 16 do
-        if i % 2 == 0 then    
-            local p = Instance.new("Part")    
-            p.Size = Vector3.new(0.6, 0.2, 5)    
-            p.Material = Enum.Material.Neon    
-            p.Color = Color3.fromRGB(255, 0, 0) -- สีแดง
-            p.Anchored = true    
-            p.CanCollide = false    
-            p.Parent = Workspace
-            table.insert(circleParts, {part = p, index = i})    
-        end
+        local p = Instance.new("Part")    
+        p.Size = Vector3.new(0.8, 0.2, 0.2) -- ปรับขนาดให้เป็นขีดวงกลม
+        p.Material = Enum.Material.Neon    
+        p.Color = Color3.fromRGB(255, 0, 0) -- สีแดง
+        p.Anchored = true    
+        p.CanCollide = false    
+        p.Parent = Workspace
+        table.insert(circleParts, {part = p, index = i})    
     end
 end
 
-RunService.Heartbeat:Connect(function(dt)
+-- อัปเดตวงกลมให้หมุน (Render)
+RunService.Heartbeat:Connect(function()
     if not running or not root then return end
-    local rotSpeed = tick() * 2
+    local rotSpeed = tick() * 3 -- ความเร็วในการหมุน
     for _, data in ipairs(circleParts) do
         local i, p = data.index, data.part
-        local angle = (i/16)*math.pi*2 + rotSpeed
-        local x, z = math.cos(angle)*radius, math.sin(angle)*radius    
-        p.CFrame = CFrame.new(root.Position + Vector3.new(x, -2, z)) * CFrame.Angles(0, -angle, 0)
+        local angle = (i / 16) * math.pi * 2 + rotSpeed
+        local x = math.cos(angle) * radius
+        local z = math.sin(angle) * radius    
+        p.CFrame = CFrame.new(root.Position + Vector3.new(x, -3, z)) * CFrame.Angles(0, -angle, 0)
     end
 end)
 
--- [ LOOP หลัก: SMART FARM + AUTO SURFACE LOGIC ]
+-- [ LOOP ฟาร์มหลัก ]
 task.spawn(function()
     while true do
         task.wait(0.01)
@@ -224,7 +224,6 @@ task.spawn(function()
 
         for _, part in ipairs(parts) do    
             local model = part:FindFirstAncestorOfClass("Model") 
-            -- เงื่อนไข: Parent ชื่อ Live และ ชื่อขึ้นต้นด้วยจุด "."
             if model and model ~= char and model.Parent and model.Parent.Name == "Live" then
                 if string.sub(model.Name, 1, 1) == "." then
                     local hrp = model:FindFirstChild("HumanoidRootPart")    
@@ -237,11 +236,9 @@ task.spawn(function()
                         local dist = (hrp.Position - root.Position).Magnitude    
                         if dist < closestDist then closestDist = dist; closest = model end    
 
-                        -- ปรับ Hitbox
                         if hrp.Size.X ~= hitbox then
                             hrp.Size = Vector3.new(hitbox, hitbox, hitbox)
-                            hrp.Transparency = 1
-                            hrp.CanCollide = false
+                            hrp.Transparency = 1; hrp.CanCollide = false
                         end
                     end
                 end
@@ -253,44 +250,29 @@ task.spawn(function()
             local controller = char:FindFirstChild("client_character_controller")
             if e_hrp and controller then
                 local targetPos
-                if farmMode == "Under" then 
-                    targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
-                elseif farmMode == "Above" then 
-                    targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
-                elseif farmMode == "Behind" then 
-                    targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position 
-                end
+                if farmMode == "Under" then targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
+                elseif farmMode == "Above" then targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
+                elseif farmMode == "Behind" then targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position end
                 
                 root.CFrame = CFrame.lookAt(targetPos, e_hrp.Position)
                 
-                -- Remote M1 & Skill
                 if controller:FindFirstChild("M1") then controller.M1:FireServer(true, false) end
                 if autoSkill and controller:FindFirstChild("Skill") then
                     for _, key in ipairs(selectedSkills) do controller.Skill:FireServer(key, true) end
                 end
             end
-        else
-            -- [ ระบบวาร์ปกลับขึ้นบกทันทีเมื่อศัตรูตาย ]
-            if farmMode == "Under" then
-                -- เช็คความสูงของ Raycast สั้นๆ เพื่อหาพื้นดิน หรือวาร์ปขึ้นมาในตำแหน่งที่ปลอดภัย
-                root.CFrame = root.CFrame * CFrame.new(0, farmDistance + 3, 0)
-                task.wait(0.1) -- หน่วงเวลาสั้นๆ เพื่อให้ตัวละครไม่กระตุกเกินไป
-            end
         end
     end
 end)
 
+-- [ UI SETTINGS ]
 
 
 
-
-
-
-
-local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
+local Tab = Window:Tab({Title = "MAIN", Icon = "swords"
 
 Tab:Toggle({
-    Title = "ออโต้ตีมอนในวง",
+"ออโต้ตีมอนในวง",
     Callback = function(state) 
         running = state 
         if state then createCircle() else clearCircle() end
@@ -298,14 +280,12 @@ Tab:Toggle({
 })
 
 Tab:Slider({
-    Title = "ปรับวงในการตี",
+    Title = "ปรับวง",
     Step = 5,
     Value = { Min = 5, Max = 250, Default = 13 },
     Callback = function(v) radius = v end
 })
-
-
-
+                
 
 Tab:Toggle({
     Title = "ออโต้สกิว",
@@ -320,19 +300,18 @@ Tab:Dropdown({
     Callback = function(option) selectedSkills = option end
 })
 
+-- Standard Dropdown (เลือกโหมด) - แก้ไขตามตัวอย่าง No Multi
 Tab:Dropdown({
     Title = "โหมดฟาม",
-    Desc = "",
-    Values = {"Under", "Above", "Behind"},
-    Value = {"Under"},
-    Multi = false,
-    Callback = function(v) 
-        if type(v) == "table" then farmMode = v[1] else farmMode = v end
+    Values = { "Under", "Above", "Behind" },
+    Value = "Under", -- เป็น String โดยตรง
+    Callback = function(option) 
+        farmMode = option -- รับค่า String เข้าไปใช้งาน
     end
 })
 
 Tab:Slider({
-    Title = "ระยะห่างจากมอน",
+    Title = "ปรับระยะห่าง",
     Step = 1,
     Value = { Min = 1, Max = 40, Default = 7 },
     Callback = function(v) farmDistance = v end
