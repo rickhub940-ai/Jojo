@@ -171,6 +171,11 @@ local circleParts = {}
 local segments = 30
 local dashLength = 5
 local rotation = 0
+------------------
+-- ฟามเวลสแตน
+local standFarm = false
+-- --------------------
+
 
 local function clearCircle()
 	for _,v in ipairs(circleParts) do
@@ -322,8 +327,120 @@ task.spawn(function()
 end)
 
 
+-- ----------
+-- ฟาทเวลสแตน
+-- ----------
 
+local meditationPos = Vector3.new(1095.49,884.34,91.66)
 
+local function getMyEntity()
+	for _,v in pairs(Workspace.Live:GetChildren()) do
+		if string.sub(v.Name,1,#player.Name+1) == "."..player.Name then
+			return v
+		end
+	end
+end
+
+local function farmStandLevel()
+
+	if not standFarm then return end
+
+	local char = player.Character
+	if not char then return end
+
+	local root = char:FindFirstChild("HumanoidRootPart")
+	local controller = char:FindFirstChild("client_character_controller")
+
+	if not root or not controller then return end
+
+	local entity = getMyEntity()
+	if not entity then
+
+		local npc = Workspace.Npcs:FindFirstChild("The Self")
+
+		if npc then
+
+			local title = npc.HumanoidRootPart["NPC Name"].Title
+
+			if title and title.Text == player.Name then
+
+				root.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,-3)
+
+				local prompt = npc:FindFirstChildWhichIsA("ProximityPrompt",true)
+
+				if prompt then
+					fireproximityprompt(prompt,prompt.HoldDuration)
+				end
+
+				task.wait(0.2)
+
+				game:GetService("ReplicatedStorage").requests.character.dialogue:FireServer(
+					npc,
+					"Yes."
+				)
+
+			end
+
+		else
+			root.CFrame = CFrame.new(meditationPos)
+
+			local prompt = Workspace.Map.Meditation:GetChildren()[3].ProximityPrompt
+			fireproximityprompt(prompt,prompt.HoldDuration)
+
+			task.wait(2)
+
+		end
+
+		return
+	end
+	local e_hrp = entity:FindFirstChild("HumanoidRootPart")
+	local hum = entity:FindFirstChildOfClass("Humanoid")
+
+	if not e_hrp or not hum or hum.Health <= 0 then return end
+
+	if e_hrp.Size.X ~= hitbox then
+		e_hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
+		e_hrp.Transparency = 1
+		e_hrp.CanCollide = false
+	end
+
+	local targetPos
+
+	if farmMode == "Under" then
+		targetPos = e_hrp.Position + Vector3.new(0,-farmDistance,0)
+
+	elseif farmMode == "Above" then
+		targetPos = e_hrp.Position + Vector3.new(0,farmDistance,0)
+
+	elseif farmMode == "Behind" then
+		targetPos = (e_hrp.CFrame * CFrame.new(0,0,farmDistance)).Position
+	end
+
+	root.CFrame = CFrame.lookAt(targetPos,e_hrp.Position)
+
+	if controller:FindFirstChild("M1") then
+		controller.M1:FireServer(true,false)
+	end
+
+	if autoSkill and controller:FindFirstChild("Skill") then
+		for _,key in ipairs(selectedSkills) do
+			controller.Skill:FireServer(key,true)
+		end
+	end
+
+end
+task.spawn(function()
+
+	while true do
+		task.wait(0.01)
+
+		if standFarm then
+			farmStandLevel()
+		end
+
+	end
+
+end)
 
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
@@ -355,6 +472,13 @@ Tab:Slider({
 	end
 })
 
+Tab:Toggle({
+	Title = "ฟามเวลสแตน",
+	Value = false,
+	Callback = function(state)
+		standFarm = state
+	end
+})
 
 
 Tab:Toggle({
