@@ -154,6 +154,6 @@ end)
 
 
 
-local Tab = Window:Tab({Title = "MAIN", Icon = "swords"
+local Tab = Window:Tab({Title = "MAIN", Icon = "swords")}
 
         
