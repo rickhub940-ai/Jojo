@@ -331,8 +331,8 @@ end)
 -- ฟาทเวลสแตน
 -- ----------
 
-local meditationPos = Vector3.new(1095.49,884.34,91.66)
 
+local meditationPos = Vector3.new(1095.49,884.34,91.66)
 local root
 
 local function updateCharacter(char)
@@ -403,13 +403,12 @@ local function farmStandLevel()
 			local meditation = Workspace.Map:FindFirstChild("Meditation")
 
 			if meditation then
-
-				local prompt = meditation:FindFirstChildWhichIsA("ProximityPrompt",true)
-
-				if prompt then
-					fireproximityprompt(prompt,prompt.HoldDuration)
+				for _,v in pairs(meditation:GetDescendants()) do
+					if v:IsA("ProximityPrompt") then
+						fireproximityprompt(v,v.HoldDuration)
+						task.wait(0.2)
+					end
 				end
-
 			end
 
 			task.wait(2)
@@ -418,20 +417,18 @@ local function farmStandLevel()
 
 		return
 	end
--- เช็คสแตน
-	local controller = char:FindFirstChild("client_character_controller")
-if not controller then return end
-local standName = "."..player.Name.."'s Stand"
 
-if not Workspace.Effects:FindFirstChild(standName) then
-	if controller:FindFirstChild("SummonStand") then
-		controller.SummonStand:FireServer()
+	-- เช็ค Stand
+	local standName = "."..player.Name.."'s Stand"
+
+	if not Workspace.Effects:FindFirstChild(standName) then
+		if controller:FindFirstChild("SummonStand") then
+			controller.SummonStand:FireServer()
+		end
+		task.wait(0.2)
 	end
 
-	task.wait(0.2)
-	end
-
-	
+	-- farm entity
 	local e_hrp = entity:FindFirstChild("HumanoidRootPart")
 	local hum = entity:FindFirstChildOfClass("Humanoid")
 
@@ -470,16 +467,13 @@ if not Workspace.Effects:FindFirstChild(standName) then
 end
 
 task.spawn(function()
-
 	while true do
 		task.wait(0.01)
 
 		if standFarm then
 			farmStandLevel()
 		end
-
 	end
-
 end)
 
 
