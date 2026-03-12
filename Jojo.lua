@@ -515,6 +515,38 @@ Tab:Toggle({
 })
 
 Tab:Toggle({
+    Title = "ออโต้หาลูกศรตามพื้น",
+    Default = false,
+    Callback = function(state)
+        AutoArrow = state
+        if AutoArrow then
+            task.spawn(function()
+                while AutoArrow do
+                    for _,v in pairs(workspace:GetDescendants()) do
+                        if v.Name == "Stand Arrow" and v:FindFirstChild("ProximityPrompt") then
+                               local player = game:GetService("Players").LocalPlayer
+                                  local char = player.Character
+                                     local root = char and char:FindFirstChild("HumanoidRootPart")
+                                       if root then
+                                          root.CFrame = v.CFrame + Vector3.new(0,3,0)
+                                           task.wait(0.3)
+                                            while AutoArrow and v.Parent and v:FindFirstChild("ProximityPrompt") do
+                                              fireproximityprompt(v.ProximityPrompt)
+                                    task.wait(0.2)
+                                end
+                            end
+                            
+                        end
+                    end
+                    task.wait(1)
+                end
+            end)
+        end
+        
+    end
+})
+
+Tab:Toggle({
 	Title = "ออโต้สกิว",
 	Value = false,
 	Callback = function(state)
