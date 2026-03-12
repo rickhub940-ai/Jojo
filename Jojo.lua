@@ -170,7 +170,7 @@ local hitbox = 35
 local selectedSkills = { "Z", "X", "C" } 
 local overlap = OverlapParams.new()
 
--- [ ระบบวงแหวน Visual (Live Character) ]
+-- [ ระบบวงแหวน Visual (สีแดง) ]
 local circleParts = {}
 local function clearCircle()
     for _, v in ipairs(circleParts) do if v.part then v.part:Destroy() end end
@@ -189,7 +189,7 @@ local function createCircle()
             local p = Instance.new("Part")    
             p.Size = Vector3.new(0.6, 0.2, 5)    
             p.Material = Enum.Material.Neon    
-            p.Color = Color3.fromRGB(255, 255, 0)
+            p.Color = Color3.fromRGB(255, 0, 0) -- สีแดง
             p.Anchored = true    
             p.CanCollide = false    
             p.Parent = Workspace
@@ -209,22 +209,22 @@ RunService.Heartbeat:Connect(function(dt)
     end
 end)
 
+-- [ LOOP หลัก: SMART FARM + AUTO SURFACE LOGIC ]
 task.spawn(function()
     while true do
         task.wait(0.01)
-        
         if not running then continue end
-        
         local char = player.Character
         if not char then continue end
         root = char:FindFirstChild("HumanoidRootPart")
         if not root then continue end
+
         local parts = Workspace:GetPartBoundsInRadius(root.Position, radius, overlap)    
         local closest, closestDist = nil, radius    
 
         for _, part in ipairs(parts) do    
             local model = part:FindFirstAncestorOfClass("Model") 
-            
+            -- เงื่อนไข: Parent ชื่อ Live และ ชื่อขึ้นต้นด้วยจุด "."
             if model and model ~= char and model.Parent and model.Parent.Name == "Live" then
                 if string.sub(model.Name, 1, 1) == "." then
                     local hrp = model:FindFirstChild("HumanoidRootPart")    
@@ -235,10 +235,9 @@ task.spawn(function()
                         if model:FindFirstChildWhichIsA("ProximityPrompt", true) then continue end    
 
                         local dist = (hrp.Position - root.Position).Magnitude    
-                        if dist < closestDist then 
-                            closestDist = dist
-                            closest = model 
-                        end    
+                        if dist < closestDist then closestDist = dist; closest = model end    
+
+                        -- ปรับ Hitbox
                         if hrp.Size.X ~= hitbox then
                             hrp.Size = Vector3.new(hitbox, hitbox, hitbox)
                             hrp.Transparency = 1
@@ -253,29 +252,33 @@ task.spawn(function()
             local e_hrp = closest:FindFirstChild("HumanoidRootPart")
             local controller = char:FindFirstChild("client_character_controller")
             if e_hrp and controller then
-                -- คำนวณตำแหน่งวาร์ปตามโหมด
                 local targetPos
-                if farmMode == "Under" then targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
-                elseif farmMode == "Above" then targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
-                elseif farmMode == "Behind" then targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position end
+                if farmMode == "Under" then 
+                    targetPos = e_hrp.Position + Vector3.new(0, -farmDistance, 0)
+                elseif farmMode == "Above" then 
+                    targetPos = e_hrp.Position + Vector3.new(0, farmDistance, 0)
+                elseif farmMode == "Behind" then 
+                    targetPos = (e_hrp.CFrame * CFrame.new(0, 0, farmDistance)).Position 
+                end
                 
                 root.CFrame = CFrame.lookAt(targetPos, e_hrp.Position)
-
-                if controller:FindFirstChild("M1") then 
-                    controller.M1:FireServer(true, false) 
-                end
                 
+                -- Remote M1 & Skill
+                if controller:FindFirstChild("M1") then controller.M1:FireServer(true, false) end
                 if autoSkill and controller:FindFirstChild("Skill") then
-                    for _, key in ipairs(selectedSkills) do
-                        controller.Skill:FireServer(key, true)
-                    end
+                    for _, key in ipairs(selectedSkills) do controller.Skill:FireServer(key, true) end
                 end
+            end
+        else
+            -- [ ระบบวาร์ปกลับขึ้นบกทันทีเมื่อศัตรูตาย ]
+            if farmMode == "Under" then
+                -- เช็คความสูงของ Raycast สั้นๆ เพื่อหาพื้นดิน หรือวาร์ปขึ้นมาในตำแหน่งที่ปลอดภัย
+                root.CFrame = root.CFrame * CFrame.new(0, farmDistance + 3, 0)
+                task.wait(0.1) -- หน่วงเวลาสั้นๆ เพื่อให้ตัวละครไม่กระตุกเกินไป
             end
         end
     end
 end)
-
-
 
 
 
@@ -295,11 +298,14 @@ Tab:Toggle({
 })
 
 Tab:Slider({
-    Title = "ปรับวง",
+    Title = "ปรับวงในการตี",
     Step = 5,
-    Value = { Min = 5, Max = 200, Default = 13 },
+    Value = { Min = 5, Max = 250, Default = 13 },
     Callback = function(v) radius = v end
 })
+
+
+
 
 Tab:Toggle({
     Title = "ออโต้สกิว",
@@ -311,15 +317,18 @@ Tab:Dropdown({
     Values = { "Z", "X", "C", "V", "E", "R" },
     Value = { "Z", "X", "C" },
     Multi = true,
-    AllowNone = true,
     Callback = function(option) selectedSkills = option end
 })
 
 Tab:Dropdown({
-    Title = "เลือกโหมดการตี",
+    Title = "โหมดฟาม",
+    Desc = "",
     Values = {"Under", "Above", "Behind"},
     Value = {"Under"},
-    Callback = function(v) farmMode = v[1] or v end
+    Multi = false,
+    Callback = function(v) 
+        if type(v) == "table" then farmMode = v[1] else farmMode = v end
+    end
 })
 
 Tab:Slider({
@@ -328,6 +337,4 @@ Tab:Slider({
     Value = { Min = 1, Max = 40, Default = 7 },
     Callback = function(v) farmDistance = v end
 })
-
-
 
