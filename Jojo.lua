@@ -333,6 +333,20 @@ end)
 
 local meditationPos = Vector3.new(1095.49,884.34,91.66)
 
+local root
+
+local function updateCharacter(char)
+	root = char:WaitForChild("HumanoidRootPart")
+end
+
+if player.Character then
+	updateCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(function(char)
+	updateCharacter(char)
+end)
+
 local function getMyEntity()
 	for _,v in pairs(Workspace.Live:GetChildren()) do
 		if string.sub(v.Name,1,#player.Name+1) == "."..player.Name then
@@ -344,16 +358,17 @@ end
 local function farmStandLevel()
 
 	if not standFarm then return end
+	if not root then return end
 
 	local char = player.Character
 	if not char then return end
 
-	local root = char:FindFirstChild("HumanoidRootPart")
 	local controller = char:FindFirstChild("client_character_controller")
-
-	if not root or not controller then return end
+	if not controller then return end
 
 	local entity = getMyEntity()
+
+	-- spawn stand
 	if not entity then
 
 		local npc = Workspace.Npcs:FindFirstChild("The Self")
@@ -382,10 +397,20 @@ local function farmStandLevel()
 			end
 
 		else
+
 			root.CFrame = CFrame.new(meditationPos)
 
-			local prompt = Workspace.Map.Meditation:GetChildren()[3].ProximityPrompt
-			fireproximityprompt(prompt,prompt.HoldDuration)
+			local meditation = Workspace.Map:FindFirstChild("Meditation")
+
+			if meditation then
+
+				local prompt = meditation:FindFirstChildWhichIsA("ProximityPrompt",true)
+
+				if prompt then
+					fireproximityprompt(prompt,prompt.HoldDuration)
+				end
+
+			end
 
 			task.wait(2)
 
@@ -429,6 +454,7 @@ local function farmStandLevel()
 	end
 
 end
+
 task.spawn(function()
 
 	while true do
@@ -479,7 +505,6 @@ Tab:Toggle({
 		standFarm = state
 	end
 })
-
 
 Tab:Toggle({
 	Title = "ออโต้สกิว",
