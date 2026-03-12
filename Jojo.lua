@@ -418,6 +418,20 @@ local function farmStandLevel()
 
 		return
 	end
+-- เช็คสแตน
+	local controller = char:FindFirstChild("client_character_controller")
+if not controller then return end
+local standName = "."..player.Name.."'s Stand"
+
+if not Workspace.Effects:FindFirstChild(standName) then
+	if controller:FindFirstChild("SummonStand") then
+		controller.SummonStand:FireServer()
+	end
+
+	task.wait(0.2)
+	end
+
+	
 	local e_hrp = entity:FindFirstChild("HumanoidRootPart")
 	local hum = entity:FindFirstChildOfClass("Humanoid")
 
