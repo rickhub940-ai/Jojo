@@ -653,7 +653,7 @@ Tab:Slider({
 
 
 
-local RollTab = Window:Tab({Title = "Roll", Icon = "dna"})
+local RollTab = Window:Tab({Title = "Roll", Icon = "bone"})
 
 
 RollTab:Dropdown({
