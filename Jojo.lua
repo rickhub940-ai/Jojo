@@ -160,8 +160,9 @@ local Workspace = game:GetService("Workspace")
 local player = Players.LocalPlayer
 local RS = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
-
-
+local GuiService = game:GetService("GuiService")
+local VIM = game:GetService("VirtualInputManager")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
 
@@ -543,6 +544,127 @@ end
 standValue:GetPropertyChangedSignal("Value"):Connect(roll)
 
 
+-- -------------
+-- ออโต้ฟามเรทคิระ
+-- ------------
+
+
+local function autoRaidKira()
+
+    local gui = player:WaitForChild("PlayerGui")
+    local main = gui:WaitForChild("Main Menu")
+    local buttons = main:WaitForChild("Buttons")
+    local button = buttons:WaitForChild("Quick Play")
+
+    repeat task.wait() until button
+
+    while button.Visible do
+        GuiService.SelectedObject = button
+        VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        VIM:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+        task.wait(0.2)
+    end
+
+    GuiService.SelectedObject = nil
+
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+
+    local talkPos = CFrame.new(1020.61,875.60,-652.46)
+    local lockPos = CFrame.new(1034.99,875.60,-649.95)
+
+    if not workspace.Map:FindFirstChild("Yoshikage Kira Bites the Dust") then
+
+        local prompt = workspace.Npcs["Yoshikage Kira"]:WaitForChild("ProximityPrompt")
+
+        root.CFrame = talkPos
+        task.wait(0.5)
+
+        while not player.PlayerGui.Dialogue.Holder.Visible do
+            fireproximityprompt(prompt)
+            task.wait(0.2)
+        end
+
+        ReplicatedStorage.requests.character.dialogue:FireServer(
+            workspace.Npcs["Yoshikage Kira"],
+            "Raid."
+        )
+
+        repeat task.wait()
+        until not player.PlayerGui.Dialogue.Holder.Visible
+    end
+
+    root.CFrame = lockPos
+
+    local function getEnemy()
+
+        for _,model in pairs(workspace.Live:GetChildren()) do
+
+            if string.sub(model.Name,1,1) == "." then
+
+                local hrp = model:FindFirstChild("HumanoidRootPart")
+                local hum = model:FindFirstChildOfClass("Humanoid")
+
+                if hrp and hum and hum.Health > 0 then
+
+                    if not Players:GetPlayerFromCharacter(model) then
+
+                        if hrp.Size.X ~= hitbox then
+                            hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
+                            hrp.Transparency = 1
+                            hrp.CanCollide = false
+                        end
+
+                        return model
+                    end
+                end
+            end
+        end
+    end
+
+    while true do
+        task.wait(0.03)
+
+        root.CFrame = lockPos
+
+        local enemy = getEnemy()
+
+        if enemy then
+
+            local e_hrp = enemy:FindFirstChild("HumanoidRootPart")
+            local controller = player.Character:FindFirstChild("client_character_controller")
+
+            if e_hrp and controller then
+
+                local targetPos
+
+                if farmMode == "Under" then
+                    targetPos = e_hrp.Position + Vector3.new(0,-farmDistance,0)
+
+                elseif farmMode == "Above" then
+                    targetPos = e_hrp.Position + Vector3.new(0,farmDistance,0)
+
+                elseif farmMode == "Behind" then
+                    targetPos = (e_hrp.CFrame * CFrame.new(0,0,farmDistance)).Position
+                end
+
+                root.CFrame = CFrame.lookAt(targetPos,e_hrp.Position)
+
+                controller.M1:FireServer(true,false)
+
+                if autoSkill then
+                    for _,key in ipairs(selectedSkills) do
+                        controller.Skill:FireServer(key,true)
+                    end
+                end
+
+            end
+        end
+    end
+end
+
+
+
 
 
 
@@ -687,3 +809,17 @@ RollTab:Toggle({
     end
 })
 
+
+local RaidTab = Window:Tab({Title = "Raid", Icon = "bone"})
+
+
+RaidTab:Toggle({
+    Title = "Auto Farm Raid Kira",
+	Desc = "ออโต้ฟาทเรทคิระ",
+    Value = false,
+    Callback = function(state)
+        if state then
+            task.spawn(autoRaidKira)
+        end
+    end
+})
