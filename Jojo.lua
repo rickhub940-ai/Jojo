@@ -570,23 +570,33 @@ standValue:GetPropertyChangedSignal("Value"):Connect(roll)
 -- ------------
 
 
-local function autoRaidKira()
+function autoRaidKira()
 
     local gui = player:WaitForChild("PlayerGui")
-    local main = gui:WaitForChild("Main Menu")
-    local buttons = main:WaitForChild("Buttons")
-    local button = buttons:WaitForChild("Quick Play")
+    local main = gui:FindFirstChild("Main Menu")
 
-    repeat task.wait() until button
 
-    while button.Visible do
-        GuiService.SelectedObject = button
-        VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-        VIM:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-        task.wait(0.2)
+    if main and main.Visible then
+
+        local buttons = main:FindFirstChild("Buttons")
+        local quickPlay = buttons and buttons:FindFirstChild("Quick Play")
+
+        if quickPlay then
+            while main.Visible do
+
+                GuiService.SelectedObject = quickPlay
+
+                VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                VIM:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+                task.wait(0.2)
+
+            end
+
+            GuiService.SelectedObject = nil
+        end
     end
 
-    GuiService.SelectedObject = nil
 
     local char = player.Character or player.CharacterAdded:Wait()
     local root = char:WaitForChild("HumanoidRootPart")
@@ -614,47 +624,33 @@ local function autoRaidKira()
         repeat task.wait()
         until not player.PlayerGui.Dialogue.Holder.Visible
     end
-
     root.CFrame = lockPos
 
     local function getEnemy()
 
-        for _,model in pairs(workspace.Live:GetChildren()) do
+        for _,v in pairs(workspace.Live:GetChildren()) do
 
-            if string.sub(model.Name,1,1) == "." then
+            if string.sub(v.Name,1,1) == "." then
 
-                local hrp = model:FindFirstChild("HumanoidRootPart")
-                local hum = model:FindFirstChildOfClass("Humanoid")
+                local hum = v:FindFirstChildOfClass("Humanoid")
+                local hrp = v:FindFirstChild("HumanoidRootPart")
 
-                if hrp and hum and hum.Health > 0 then
-
-                    if not Players:GetPlayerFromCharacter(model) then
-
-                        if hrp.Size.X ~= hitbox then
-                            hrp.Size = Vector3.new(hitbox,hitbox,hitbox)
-                            hrp.Transparency = 1
-                            hrp.CanCollide = false
-                        end
-
-                        return model
-                    end
+                if hum and hrp and hum.Health > 0 then
+                    return v
                 end
+
             end
         end
+
     end
 
     while true do
         task.wait(0.03)
-
-        root.CFrame = lockPos
-
         local enemy = getEnemy()
-
         if enemy then
 
             local e_hrp = enemy:FindFirstChild("HumanoidRootPart")
             local controller = player.Character:FindFirstChild("client_character_controller")
-
             if e_hrp and controller then
 
                 local targetPos
@@ -668,11 +664,8 @@ local function autoRaidKira()
                 elseif farmMode == "Behind" then
                     targetPos = (e_hrp.CFrame * CFrame.new(0,0,farmDistance)).Position
                 end
-
                 root.CFrame = CFrame.lookAt(targetPos,e_hrp.Position)
-
                 controller.M1:FireServer(true,false)
-
                 if autoSkill then
                     for _,key in ipairs(selectedSkills) do
                         controller.Skill:FireServer(key,true)
@@ -682,8 +675,8 @@ local function autoRaidKira()
             end
         end
     end
-end
 
+end
 
 
 
@@ -728,6 +721,49 @@ Tab:Toggle({
 		standFarm = state
 
 	end
+})
+Tab:Toggle({
+    Title = "ออโต้หาลูกศรตามพื้น",
+    Value = Get("AutoArrow",false),
+    Callback = function(state)
+
+        Save("AutoArrow",state)
+        AutoArrow = state
+
+        if AutoArrow then
+            task.spawn(function()
+
+                while AutoArrow do
+
+                    for _,v in pairs(workspace:GetDescendants()) do
+                        if v.Name == "Stand Arrow" and v:FindFirstChild("ProximityPrompt") then
+
+                            local player = game:GetService("Players").LocalPlayer
+                            local char = player.Character
+                            local root = char and char:FindFirstChild("HumanoidRootPart")
+
+                            if root then
+                                root.CFrame = v.CFrame + Vector3.new(0,3,0)
+
+                                task.wait(0.3)
+
+                                while AutoArrow and v.Parent and v:FindFirstChild("ProximityPrompt") do
+                                    fireproximityprompt(v.ProximityPrompt)
+                                    task.wait(0.2)
+                                end
+                            end
+
+                        end
+                    end
+
+                    task.wait(1)
+
+                end
+
+            end)
+        end
+
+    end
 })
 
 
