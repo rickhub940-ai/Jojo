@@ -70,7 +70,6 @@ local Window = WindUI:CreateWindow({
     Title = "RICK HUB [ JoJo ] FOR 009.exe",
     Icon = "rbxassetid://108958018844079",
     Author = "Author[ 009.exe ]",
-    Folder = "RICK HUB",
     Size = UDim2.fromOffset(730, 410),
     Theme = "RickHUBTheme",
     Transparent = true,
@@ -101,7 +100,7 @@ Window:EditOpenButton({ Enabled = false })
 local ScreenGui = Instance.new("ScreenGui")
 local ToggleBtn = Instance.new("ImageButton")
 
-ScreenGui.Name = "WindUI_Toggle"
+ScreenGui.Name = "Rickhub_Toggle"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = CoreGui
 
@@ -150,6 +149,28 @@ UserInputService.InputBegan:Connect(function(input, gp)
         toggle()
     end
 end)
+
+local HttpService = game:GetService("HttpService")
+
+local ConfigFile = "RICK HUB [ Bizarre Lineage ].json"
+local Config = {}
+
+if isfile(ConfigFile) then
+	Config = HttpService:JSONDecode(readfile(ConfigFile))
+end
+
+local function Get(name,default)
+	if Config[name] == nil then
+		Config[name] = default
+	end
+	return Config[name]
+end
+
+local function Save(name,value)
+	Config[name] = value
+	writefile(ConfigFile,HttpService:JSONEncode(Config))
+end
+
 
 
 
@@ -673,11 +694,10 @@ local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
         
 Tab:Toggle({
 	Title = "ออโต้ตีมอนในวง",
-	Value = false,
+	Value = Get("MobAura",false),
 	Callback = function(state)
-
+		Save("MobAura",state)
 		running = state
-
 		if state then
 			createCircle()
 		else
@@ -691,75 +711,57 @@ Tab:Toggle({
 Tab:Slider({
 	Title = "ปรับวงตี",
 	Step = 5,
-	Value = {Min = 5,Max = 250,Default = 13},
+	Value = {Min = 5,Max = 250,Default = Get("Radius",13)},
 	Callback = function(v)
+		Save("Radius",v)
 		radius = v
+
 	end
 })
+
 
 Tab:Toggle({
 	Title = "ฟามเวลสแตน",
-	Value = false,
+	Value = Get("StandFarm",false),
 	Callback = function(state)
+		Save("StandFarm",state)
 		standFarm = state
+
 	end
 })
 
-Tab:Toggle({
-    Title = "ออโต้หาลูกศรตามพื้น",
-    Default = false,
-    Callback = function(state)
-        AutoArrow = state
-        if AutoArrow then
-            task.spawn(function()
-                while AutoArrow do
-                    for _,v in pairs(workspace:GetDescendants()) do
-                        if v.Name == "Stand Arrow" and v:FindFirstChild("ProximityPrompt") then
-                               local player = game:GetService("Players").LocalPlayer
-                                  local char = player.Character
-                                     local root = char and char:FindFirstChild("HumanoidRootPart")
-                                       if root then
-                                          root.CFrame = v.CFrame + Vector3.new(0,3,0)
-                                           task.wait(0.3)
-                                            while AutoArrow and v.Parent and v:FindFirstChild("ProximityPrompt") do
-                                              fireproximityprompt(v.ProximityPrompt)
-                                    task.wait(0.2)
-                                end
-                            end
-                            
-                        end
-                    end
-                    task.wait(1)
-                end
-            end)
-        end
-        
-    end
-})
-
-Tab:Toggle({
-	Title = "ออโต้สกิว",
-	Value = false,
-	Callback = function(state)
-		autoSkill = state
-	end
-})
 
 Tab:Dropdown({
 	Title = "เลือกสกิว",
 	Values = {"Z","X","C","V","E","R"},
-	Value = {"Z","X","C"},
+	Value = Get("Skills",{"Z","X","C"}),
 	Multi = true,
 	Callback = function(option)
+		Save("Skills",option)
 		selectedSkills = option
+
 	end
 })
+
+
+
+Tab:Toggle({
+	Title = "ออโต้สกิว",
+	Value = Get("AutoSkill",false),
+	Callback = function(state)
+		Save("AutoSkill",state)
+		autoSkill = state
+
+	end
+})
+
 
 Tab:Dropdown({
 	Title = "เลือกโหมดการตี",
 	Values = {"Under","Above","Behind"},
-	Value = "Under",
+	Value = Get("FarmMode","Under"),
 	Callback = function(option)
+		Save("FarmMode",option)
 		farmMode = option
 	end
 })
@@ -767,8 +769,9 @@ Tab:Dropdown({
 Tab:Slider({
 	Title = "ปรับระยะห่างจากมอน",
 	Step = 1,
-	Value = {Min = 1,Max = 15,Default = 7},
+	Value = {Min = 1,Max = 15,Default = Get("FarmDistance",7)},
 	Callback = function(v)
+		Save("FarmDistance",v)
 		farmDistance = v
 	end
 })
@@ -784,10 +787,10 @@ RollTab:Dropdown({
     Values = standList,
     Multi = true,
     AllowNone = true,
+    Value = Get("TargetStand",{}),
     Callback = function(option)
-
+        Save("TargetStand",option)
         targets = {}
-
         for _,v in pairs(option) do
             targets[v] = true
         end
@@ -796,19 +799,19 @@ RollTab:Dropdown({
 })
 
 
-
 RollTab:Toggle({
     Title = "Auto Roll Stand",
     Desc = "ออโต้สุ่มสแตน",
-    Value = false,
+    Value = Get("AutoRoll",false),
     Callback = function(state)
+        Save("AutoRoll",state)
         autoRoll = state
         if state then
             roll()
         end
+
     end
 })
-
 
 local RaidTab = Window:Tab({Title = "Raid", Icon = "bone"})
 
@@ -816,10 +819,12 @@ local RaidTab = Window:Tab({Title = "Raid", Icon = "bone"})
 RaidTab:Toggle({
     Title = "Auto Farm Raid Kira",
 	Desc = "ออโต้ฟาทเรทคิระ",
-    Value = false,
+    Value = Get("AutoRaidKira",false),
     Callback = function(state)
+        Save("AutoRaidKira",state)
         if state then
             task.spawn(autoRaidKira)
         end
+
     end
 })
