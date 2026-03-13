@@ -158,6 +158,13 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local player = Players.LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+
+
+
+
+
 local root
 local running = false
 local autoSkill = false
@@ -477,6 +484,68 @@ task.spawn(function()
 end)
 
 
+
+
+-- -----------
+-- ออโต้สุ่มสแตน
+-- -----------
+
+local standValue = player.PlayerData.SlotData.Stand
+local standName = "."..player.Name.."'s Stand"
+
+local autoRoll = false
+local targets = {}
+
+-- ดึงชื่อ Stand
+local standList = {}
+local standsFolder = RS.assets.models.stands
+for _,v in pairs(standsFolder:GetChildren()) do
+    if v:IsA("Model") then
+        table.insert(standList, v.Name)
+    end
+end
+
+local function roll()
+    if not autoRoll then return end
+    
+    local data = HttpService:JSONDecode(standValue.Value)
+    if targets[data.Name] then
+        
+        WindUI:Notify({
+            Title = "Stand Roll",
+            Content = "สุ่มได้: "..data.Name.." ✅",
+            Duration = 5,
+            Icon = "star",
+        })
+autoRoll = false
+return
+end
+     WindUI:Notify({
+        Title = "Stand Roll",
+        Content = "สุ่มได้: "..data.Name.."❌",
+        Duration = 3,
+        Icon = "dna",
+    })
+
+    local controller = player.Character and player.Character:FindFirstChild("client_character_controller")
+
+    if controller then
+        
+        if Workspace.Effects:FindFirstChild(standName) then
+            controller.SummonStand:FireServer()
+        else
+            RS.requests.character.use_item:FireServer("Stand Arrow")
+        end
+        
+    end
+end
+
+standValue:GetPropertyChangedSignal("Value"):Connect(roll)
+
+
+
+
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "swords"})
 
         
@@ -580,5 +649,41 @@ Tab:Slider({
 	Callback = function(v)
 		farmDistance = v
 	end
+})
+
+
+
+local RollTab = Window:Tab({Title = "Roll", Icon = "dna"})
+
+
+RollTab:Dropdown({
+    Title = "Target Stand",
+    Desc = "เลือก สแตน ที่ต้องการ",
+    Values = standList,
+    Multi = true,
+    AllowNone = true,
+    Callback = function(option)
+
+        targets = {}
+
+        for _,v in pairs(option) do
+            targets[v] = true
+        end
+
+    end
+})
+
+
+
+RollTab:Toggle({
+    Title = "Auto Roll Stand",
+    Desc = "ออโต้สุ่มสแตน",
+    Value = false,
+    Callback = function(state)
+        autoRoll = state
+        if state then
+            roll()
+        end
+    end
 })
 
