@@ -399,7 +399,77 @@ task.spawn(function()
     end
 end)
 
+-- ----------
+-- ออโต้ถือ
+-- ----------
+
+local SelectedTool = Get("SelectedTool", nil)
+local AutoEquip = Get("AutoEquip", false)
+local function GetTools()
+	local t = {}
+	local added = {}
+
+	local function scan(container)
+		for _,v in pairs(container:GetChildren()) do
+			if v:IsA("Tool") and not added[v.Name] then
+				added[v.Name] = true
+				table.insert(t,v.Name)
+			end
+		end
+	end
+
+	scan(backpack)
+
+	if player.Character then
+		scan(player.Character)
+	end
+
+	return t
+end
+local function UpdateDropdown()
+	if Dropdown then
+		Dropdown:SetValues(GetTools())
+	end
+end
+
+backpack.ChildAdded:Connect(UpdateDropdown)
+backpack.ChildRemoved:Connect(UpdateDropdown)
+
+local function HookCharacter(char)
+	char.ChildAdded:Connect(UpdateDropdown)
+	char.ChildRemoved:Connect(UpdateDropdown)
+end
+
+if player.Character then
+	HookCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(function(char)
+	HookCharacter(char)
+	UpdateDropdown()
+end)
+task.spawn(function()
+	while true do
+		task.wait(0.5)
+
+		if AutoEquip and SelectedTool then
+			local char = player.Character
+			if not char then continue end
+
+			if not char:FindFirstChild(SelectedTool) then
+				local tool = backpack:FindFirstChild(SelectedTool)
+				if tool then
+					tool.Parent = char
+				end
+			end
+		end
+	end
+end)
+
+
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
+
 Tab:Dropdown({
     Title = "เลือกโหมดการฟาม",
     Values = { "Above", "Behind", "Below" },
@@ -431,4 +501,26 @@ Tab:Slider({
         FarmDistance = value
         Save("FarmDistance", value)
     end
+})
+
+
+Dropdown = Tab:Dropdown({
+	Title = "เลือกอาวุธ",
+	Values = GetTools(),
+	Value = SelectedTool,
+	Multi = false,
+	AllowNone = true,
+	Callback = function(option)
+		SelectedTool = option
+		Save("SelectedTool", option)
+	end
+})
+
+Tab:Toggle({
+	Title = "ออโต้ถือ",
+	Value = AutoEquip,
+	Callback = function(state)
+		AutoEquip = state
+		Save("AutoEquip", state)
+	end
 })
