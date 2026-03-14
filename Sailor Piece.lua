@@ -399,6 +399,17 @@ task.spawn(function()
     end
 end)
 
+local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
+Tab:Dropdown({
+    Title = "เลือกโหมดการฟาม",
+    Values = { "Above", "Behind", "Below" },
+    Value = FarmMode,
+    Multi = false,
+    Callback = function(option) 
+        FarmMode = option
+        Save("FarmMode", option)
+    end
+})
 
 
 Tab:Toggle({
@@ -410,16 +421,7 @@ Tab:Toggle({
     end
 })
 
-Tab:Dropdown({
-    Title = "เลือกโหมดการฟาม",
-    Values = { "Above", "Behind", "Below" },
-    Value = FarmMode,
-    Multi = false,
-    Callback = function(option) 
-        FarmMode = option
-        Save("FarmMode", option)
-    end
-})
+
 
 Tab:Slider({
     Title = "ระยะห่างจากมอน",
