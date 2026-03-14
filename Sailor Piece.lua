@@ -403,13 +403,22 @@ end)
 -- ออโต้ถือ
 -- ----------
 
+
+local player = Players.LocalPlayer
+local backpack = player:WaitForChild("Backpack")
+
 local SelectedTool = Get("SelectedTool", nil)
 local AutoEquip = Get("AutoEquip", false)
+
+local Dropdown
+
+-- ดึง Tool
 local function GetTools()
 	local t = {}
 	local added = {}
 
 	local function scan(container)
+		if not container then return end
 		for _,v in pairs(container:GetChildren()) do
 			if v:IsA("Tool") and not added[v.Name] then
 				added[v.Name] = true
@@ -419,35 +428,28 @@ local function GetTools()
 	end
 
 	scan(backpack)
-
-	if player.Character then
-		scan(player.Character)
-	end
+	scan(player.Character)
 
 	return t
 end
+
+-- อัปเดต Dropdown
 local function UpdateDropdown()
 	if Dropdown then
 		Dropdown:SetValues(GetTools())
 	end
 end
 
+-- อัปเดต Tool
 backpack.ChildAdded:Connect(UpdateDropdown)
 backpack.ChildRemoved:Connect(UpdateDropdown)
-
-local function HookCharacter(char)
+player.CharacterAdded:Connect(function(char)
 	char.ChildAdded:Connect(UpdateDropdown)
 	char.ChildRemoved:Connect(UpdateDropdown)
-end
-
-if player.Character then
-	HookCharacter(player.Character)
-end
-
-player.CharacterAdded:Connect(function(char)
-	HookCharacter(char)
 	UpdateDropdown()
 end)
+
+-- Auto Equip
 task.spawn(function()
 	while true do
 		task.wait(0.5)
