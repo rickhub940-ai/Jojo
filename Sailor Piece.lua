@@ -630,13 +630,15 @@ Tab:Toggle({
 
 local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
 
-local Remote = ReplicatedStorage.RemoteEvents.AllocateStat
 
+
+local Remote = ReplicatedStorage.RemoteEvents.AllocateStat
 
 local Autostats = Get("Autostats", {})
 local Amount = Get("Amount", 1)
 local Auto = Get("AutoStat", false)
-StatTab:Dropdown({
+
+Tab:Dropdown({
     Title = "Stat",
     Values = {"Melee","Defense","Sword","Power"},
     Multi = true,
@@ -647,7 +649,7 @@ StatTab:Dropdown({
     end
 })
 
-StatTab:Slider({
+Tab:Slider({
     Title = "Amount",
     Step = 1,
     Value = {
@@ -661,7 +663,8 @@ StatTab:Slider({
     end
 })
 
-StatTab:Toggle({
+-- TOGGLE
+Tab:Toggle({
     Title = "Auto Stat",
     Value = Auto,
     Callback = function(v)
@@ -670,11 +673,16 @@ StatTab:Toggle({
     end
 })
 
+-- LOOP
 task.spawn(function()
     while task.wait(0.2) do
         if Auto then
             for stat,_ in pairs(Autostats) do
-                Remote:FireServer(stat, Amount)
+                local args = {
+                    [1] = stat,
+                    [2] = Amount
+                }
+                Remote:FireServer(unpack(args))
             end
         end
     end
