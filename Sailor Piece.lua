@@ -85,7 +85,7 @@ local Window = WindUI:CreateWindow({
     }
 })
 Window:Tag({
-    Title = "v0.0.1",
+    Title = "v0.0.2",
     Icon = "github",
     Color = Color3.fromHex("#00bfff"),
     Radius = 5,
@@ -638,7 +638,7 @@ local Autostats = Get("Autostats", {})
 local Amount = Get("Amount", 1)
 local Auto = Get("AutoStat", false)
 
-Tab:Dropdown({
+StatTab:Dropdown({
     Title = "Stat",
     Values = {"Melee","Defense","Sword","Power"},
     Multi = true,
@@ -649,7 +649,7 @@ Tab:Dropdown({
     end
 })
 
-Tab:Slider({
+StatTab:Slider({
     Title = "Amount",
     Step = 1,
     Value = {
@@ -664,7 +664,7 @@ Tab:Slider({
 })
 
 -- TOGGLE
-Tab:Toggle({
+StatTab:Toggle({
     Title = "Auto Stat",
     Value = Auto,
     Callback = function(v)
