@@ -649,11 +649,11 @@ StatTab:Dropdown({
 })
 
 StatTab:Slider({
-    Title = "Amount",
+    Title = "ปรับพ้อยท์ที่จะอัพ",
     Step = 1,
     Value = {
         Min = 1,
-        Max = 50,
+        Max = 10000,
         Default = 1
     },
     Callback = function(v)
