@@ -626,42 +626,7 @@ Tab:Toggle({
 		EquipTool()
 	end
 })
-local Vim = game:GetService("VirtualInputManager")
 
-local SelectedSkills = {}
-local AutoSkill = false
-
-Dropdown = Tab:Dropdown({
-    Title = "เลือกปุ่มสกิล",
-    Values = {"Z","X","C","V","F","G"},
-    Multi = true,
-    AllowNone = true,
-    Callback = function(option)
-        SelectedSkills = option
-    end
-})
-
-Toggle = Tab:Toggle({
-    Title = "Auto Skill",
-    Value = false,
-    Callback = function(state)
-        AutoSkill = state
-    end
-})
-
-task.spawn(function()
-    while true do
-        if AutoSkill then
-            for _,key in pairs(SelectedSkills) do
-                Vim:SendKeyEvent(true, key, false, game)
-                task.wait()
-                Vim:SendKeyEvent(false, key, false, game)
-                task.wait(0.4)
-            end
-        end
-        task.wait()
-    end
-end)
 
 local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
 
@@ -728,3 +693,9 @@ task.spawn(function()
         end
     end
 end)
+
+
+
+local SkillTab = Window:Tab({Title = "SKILL", Icon = "biohazard"})
+
+
