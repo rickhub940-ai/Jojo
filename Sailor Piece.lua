@@ -155,6 +155,11 @@ local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
+local player = Players.LocalPlayer
+local backpack = player:WaitForChild("Backpack")
+
+
+
 
 local ConfigFile = "RICK HUB [ Sailor Piece ].json"
 local Config = {}
@@ -403,9 +408,7 @@ end)
 -- ออโต้ถือ
 -- ----------
 
-
-local player = Players.LocalPlayer
-local backpack = player:WaitForChild("Backpack")
+local Character = player.Character or player.CharacterAdded:Wait()
 
 local SelectedTool = Get("SelectedTool", nil)
 local AutoEquip = Get("AutoEquip", false)
@@ -428,7 +431,7 @@ local function GetTools()
 	end
 
 	scan(backpack)
-	scan(player.Character)
+	scan(Character)
 
 	return t
 end
@@ -440,34 +443,43 @@ local function UpdateDropdown()
 	end
 end
 
+-- ฟังก์ชันถือ
+local function EquipTool()
+	if not AutoEquip or not SelectedTool then return end
+
+	local tool = backpack:FindFirstChild(SelectedTool)
+	if tool and Character then
+		tool.Parent = Character
+	end
+end
+
 -- อัปเดต Tool
-backpack.ChildAdded:Connect(UpdateDropdown)
-backpack.ChildRemoved:Connect(UpdateDropdown)
-player.CharacterAdded:Connect(function(char)
-	char.ChildAdded:Connect(UpdateDropdown)
-	char.ChildRemoved:Connect(UpdateDropdown)
+backpack.ChildAdded:Connect(function()
 	UpdateDropdown()
+	EquipTool()
 end)
 
--- Auto Equip
-task.spawn(function()
-	while true do
-		task.wait(0.5)
+backpack.ChildRemoved:Connect(UpdateDropdown)
 
-		if AutoEquip and SelectedTool then
-			local char = player.Character
-			if not char then continue end
-
-			if not char:FindFirstChild(SelectedTool) then
-				local tool = backpack:FindFirstChild(SelectedTool)
-				if tool then
-					tool.Parent = char
-				end
-			end
-		end
+-- ตอนอาวุธหลุดจากมือ
+Character.ChildRemoved:Connect(function(v)
+	if v.Name == SelectedTool then
+		EquipTool()
 	end
 end)
 
+-- ตอนตาย
+player.CharacterAdded:Connect(function(char)
+	Character = char
+	UpdateDropdown()
+	EquipTool()
+
+	char.ChildRemoved:Connect(function(v)
+		if v.Name == SelectedTool then
+			EquipTool()
+		end
+	end)
+end)
 
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
@@ -515,14 +527,16 @@ Dropdown = Tab:Dropdown({
 	Callback = function(option)
 		SelectedTool = option
 		Save("SelectedTool", option)
+		EquipTool()
 	end
 })
 
 Tab:Toggle({
-	Title = "ออโต้ถือ",
+	Title = "ออโต้ถืออาวุธ",
 	Value = AutoEquip,
 	Callback = function(state)
 		AutoEquip = state
 		Save("AutoEquip", state)
+		EquipTool()
 	end
 })
