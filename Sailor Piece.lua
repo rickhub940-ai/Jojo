@@ -632,20 +632,19 @@ local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
 
 
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remote = ReplicatedStorage.RemoteEvents.AllocateStat
 
-local Autostats = Get("Autostats", {})
-local Amount = Get("Amount", 1)
-local Auto = Get("AutoStat", false)
+local Autostats = {}
+local Amount = 1
+local Auto = false
 
 StatTab:Dropdown({
     Title = "Stat",
     Values = {"Melee","Defense","Sword","Power"},
     Multi = true,
-    Default = Autostats,
     Callback = function(v)
         Autostats = v
-        Save("Autostats", v)
     end
 })
 
@@ -655,34 +654,41 @@ StatTab:Slider({
     Value = {
         Min = 1,
         Max = 50,
-        Default = Amount
+        Default = 1
     },
     Callback = function(v)
         Amount = v
-        Save("Amount", v)
     end
 })
 
--- TOGGLE
 StatTab:Toggle({
     Title = "Auto Stat",
-    Value = Auto,
+    Value = false,
     Callback = function(v)
         Auto = v
-        Save("AutoStat", v)
     end
 })
 
--- LOOP
 task.spawn(function()
     while task.wait(0.2) do
         if Auto then
-            for stat,_ in pairs(Autostats) do
+            for k,v in pairs(Autostats) do
+                
+                local stat = v
+                if type(k) == "string" then
+                    stat = k
+                end
+
                 local args = {
                     [1] = stat,
                     [2] = Amount
                 }
-                Remote:FireServer(unpack(args))
+
+                game:GetService("ReplicatedStorage")
+                    .RemoteEvents
+                    .AllocateStat
+                    :FireServer(unpack(args))
+
             end
         end
     end
