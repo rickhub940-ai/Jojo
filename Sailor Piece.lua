@@ -630,11 +630,12 @@ Tab:Toggle({
 
 local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
 
+local Remote = ReplicatedStorage.RemoteEvents.AllocateStat
 
-local Remote = game:GetService("ReplicatedStorage").RemoteEvents.AllocateStat
-local Autostats = Load("Autostats") or {}
-local Amount = Load("Amount") or 1
-local Auto = Load("AutoStat") or false
+
+local Autostats = Get("Autostats", {})
+local Amount = Get("Amount", 1)
+local Auto = Get("AutoStat", false)
 StatTab:Dropdown({
     Title = "Stat",
     Values = {"Melee","Defense","Sword","Power"},
@@ -651,7 +652,7 @@ StatTab:Slider({
     Step = 1,
     Value = {
         Min = 1,
-        Max = 10000,
+        Max = 50,
         Default = Amount
     },
     Callback = function(v)
