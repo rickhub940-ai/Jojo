@@ -568,6 +568,10 @@ player.CharacterAdded:Connect(function(char)
 end)
 
 
+
+
+
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
 Tab:Toggle({
