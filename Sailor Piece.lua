@@ -85,7 +85,7 @@ local Window = WindUI:CreateWindow({
     }
 })
 Window:Tag({
-    Title = "v0.0.2",
+    Title = "v0.0.3",
     Icon = "github",
     Color = Color3.fromHex("#00bfff"),
     Radius = 5,
@@ -313,8 +313,18 @@ local QuestData = {
 }
 
 
+local function GetPlayerSpawn()
+    local customSpawn = workspace:FindFirstChild(player.Name.."_Spawn")
+    if customSpawn then return customSpawn end
+    if player.RespawnLocation then return player.RespawnLocation end
+    return nil
+end
+
+local function GetRoot()
+    return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+end
 local function ManagePlatform(state)
-    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    local root = GetRoot()
     if not root then return end
     
     local floor = workspace:FindFirstChild(PlatformName)
@@ -322,21 +332,18 @@ local function ManagePlatform(state)
         if not floor then
             floor = Instance.new("Part")
             floor.Name = PlatformName
-            floor.Size = Vector3.new(40, 1, 40) 
+            floor.Size = Vector3.new(45, 1, 45) 
             floor.Transparency = 1
             floor.Anchored = true
             floor.CanCollide = true
             floor.Parent = workspace
         end
-        floor.CFrame = root.CFrame * CFrame.new(0, -3.5, 0)
+        floor.CFrame = root.CFrame * CFrame.new(0, -3.5, -2)
     else
         if floor then floor:Destroy() end
     end
 end
 
-local function GetRoot()
-    return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
 local function TweenTo(pos)
     local root = GetRoot()
     if not root or isTweening then return end
@@ -354,26 +361,26 @@ local function TweenTo(pos)
     )
     
     tween:Play()
-
-    local platformLoop = RunService.Heartbeat:Connect(function()
+    local platLoop = RunService.Heartbeat:Connect(function()
         if isTweening then ManagePlatform(true) end
     end)
 
     tween.Completed:Connect(function()
         isTweening = false
-        platformLoop:Disconnect()
+        platLoop:Disconnect()
         ManagePlatform(false)
     end)
 end
 
-local function AutoScanSpawn()
+
+local function AutoScanSave()
     local root = GetRoot()
     if not root then return end
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj:IsA("ProximityPrompt") and obj.Name == "CheckpointPrompt" then
-            if (root.Position - obj.Parent.Position).Magnitude < 25 then
+            local dist = (root.Position - obj.Parent.Position).Magnitude
+            if dist < 35 then
                 fireproximityprompt(obj)
-                return true
             end
         end
     end
@@ -413,10 +420,7 @@ task.spawn(function()
             end
         end
     end)
-end)
 
-
-task.spawn(function()
     while true do
         task.wait(0.1)
         if not AutoFarm then 
@@ -428,17 +432,28 @@ task.spawn(function()
         local root = GetRoot()
         local quest = GetQuest()
         if not root or not quest then continue end
+        local spawnObj = GetPlayerSpawn()
+        local isSpawnCorrect = false
+        
+        if spawnObj then
+            local dist = (spawnObj.Position - quest.posspow).Magnitude
+            if dist < 60 then
+                isSpawnCorrect = true
+            end
+        end
 
-        -- เช็คจุดเซฟ (Spawn)
-        local spawnObj = workspace:FindFirstChild(player.Name .. "_Spawn")
-        if not spawnObj or (spawnObj.Position - quest.posspow).Magnitude > 60 then
+        if not isSpawnCorrect then
             TargetMob = nil
-            if not isTweening then TweenTo(quest.posspow) end
-            if (root.Position - quest.posspow).Magnitude < 15 then AutoScanSpawn() end
+            if (root.Position - quest.posspow).Magnitude > 15 then
+                if not isTweening then TweenTo(quest.posspow) end
+            else
+                isTweening = false
+                AutoScanSave() 
+                task.wait(1)
+            end
             continue
         end
 
-        -- เช็คเควส
         local hasQ = player.PlayerGui:FindFirstChild("QuestUI") and player.PlayerGui.QuestUI.Quest.Visible
         if not hasQ then
             TargetMob = nil
@@ -450,7 +465,8 @@ task.spawn(function()
                 task.wait(1.5)
             end
             continue
-			end
+        end
+
         local monster = nil
         for _, v in pairs(workspace.NPCs:GetChildren()) do
             for _, name in pairs(quest.NM) do
@@ -477,7 +493,6 @@ task.spawn(function()
         end
     end
 end)
-
 
 -- ----------
 -- ออโต้ถือ
@@ -515,6 +530,9 @@ Tab:Slider({
         Save("FarmDistance", value)
     end
 })
+
+
+
 
 
 
@@ -626,3 +644,5 @@ task.spawn(function()
         task.wait()
     end
 end)
+
+
