@@ -322,7 +322,7 @@ local function ManagePlatform(state)
         if not floor then
             floor = Instance.new("Part")
             floor.Name = PlatformName
-            floor.Size = Vector3.new(40, 1, 40) -- แผ่นใหญ่กันพลาด
+            floor.Size = Vector3.new(40, 1, 40) 
             floor.Transparency = 1
             floor.Anchored = true
             floor.CanCollide = true
@@ -337,8 +337,6 @@ end
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
-
--- [[ ฟังก์ชั่น Tween แบบความเร็วคงที่ ]]
 local function TweenTo(pos)
     local root = GetRoot()
     if not root or isTweening then return end
@@ -356,8 +354,7 @@ local function TweenTo(pos)
     )
     
     tween:Play()
-    
-    -- สร้างพื้นวิ่งตามตัวละคร
+
     local platformLoop = RunService.Heartbeat:Connect(function()
         if isTweening then ManagePlatform(true) end
     end)
@@ -369,7 +366,6 @@ local function TweenTo(pos)
     end)
 end
 
--- [[ ฟังก์ชั่นช่วยอื่นๆ ]]
 local function AutoScanSpawn()
     local root = GetRoot()
     if not root then return end
@@ -391,10 +387,7 @@ local function GetQuest()
     end
     return best
 end
-
--- [[ ระบบ Loop หลัก ]]
 task.spawn(function()
-    -- Noclip (กันชน)
     RunService.Stepped:Connect(function()
         if (AutoFarm or isTweening) and player.Character then
             for _, v in pairs(player.Character:GetDescendants()) do
@@ -402,8 +395,6 @@ task.spawn(function()
             end
         end
     end)
-
-    -- ล็อคตำแหน่งตัวละครตอนตีมอน
     RunService.RenderStepped:Connect(function()
         if AutoFarm and TargetMob and TargetMob.Parent and TargetMob:FindFirstChild("HumanoidRootPart") then
             local root = GetRoot()
@@ -459,9 +450,7 @@ task.spawn(function()
                 task.wait(1.5)
             end
             continue
-        end
-
-        -- หามอนสเตอร์
+			end
         local monster = nil
         for _, v in pairs(workspace.NPCs:GetChildren()) do
             for _, name in pairs(quest.NM) do
@@ -493,82 +482,6 @@ end)
 -- ----------
 -- ออโต้ถือ
 -- ----------
-
-local Character = player.Character or player.CharacterAdded:Wait()
-
-local SelectedTool = Get("SelectedTool", nil)
-local AutoEquip = Get("AutoEquip", false)
-
-local Dropdown
-
--- ดึง Tool
-local function GetTools()
-	local t = {}
-	local added = {}
-
-	local function scan(container)
-		if not container then return end
-		for _,v in pairs(container:GetChildren()) do
-			if v:IsA("Tool") and not added[v.Name] then
-				added[v.Name] = true
-				table.insert(t,v.Name)
-			end
-		end
-	end
-
-	scan(backpack)
-	scan(Character)
-
-	return t
-end
-
--- อัปเดต Dropdown
-local function UpdateDropdown()
-	if Dropdown then
-		Dropdown:SetValues(GetTools())
-	end
-end
-
--- ฟังก์ชันถือ
-local function EquipTool()
-	if not AutoEquip or not SelectedTool then return end
-
-	local tool = backpack:FindFirstChild(SelectedTool)
-	if tool and Character then
-		tool.Parent = Character
-	end
-end
-
--- อัปเดต Tool
-backpack.ChildAdded:Connect(function()
-	UpdateDropdown()
-	EquipTool()
-end)
-
-backpack.ChildRemoved:Connect(UpdateDropdown)
-
--- ตอนอาวุธหลุดจากมือ
-Character.ChildRemoved:Connect(function(v)
-	if v.Name == SelectedTool then
-		EquipTool()
-	end
-end)
-
--- ตอนตาย
-player.CharacterAdded:Connect(function(char)
-	Character = char
-	UpdateDropdown()
-	EquipTool()
-
-	char.ChildRemoved:Connect(function(v)
-		if v.Name == SelectedTool then
-			EquipTool()
-		end
-	end)
-end)
-
-
-
 
 
 
@@ -604,29 +517,6 @@ Tab:Slider({
 })
 
 
-Dropdown = Tab:Dropdown({
-	Title = "เลือกอาวุธ",
-	Values = GetTools(),
-	Value = SelectedTool,
-	Multi = false,
-	AllowNone = true,
-	Callback = function(option)
-		SelectedTool = option
-		Save("SelectedTool", option)
-		EquipTool()
-	end
-})
-
-Tab:Toggle({
-	Title = "ออโต้ถืออาวุธ",
-	Value = AutoEquip,
-	Callback = function(state)
-		AutoEquip = state
-		Save("AutoEquip", state)
-		EquipTool()
-	end
-})
-
 
 local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
 
@@ -640,7 +530,7 @@ local Amount = 1
 local Auto = false
 
 StatTab:Dropdown({
-    Title = "Stat",
+    Title = "เลือกสตัดที่จะอัพ",
     Values = {"Melee","Defense","Sword","Power"},
     Multi = true,
     Callback = function(v)
@@ -649,7 +539,7 @@ StatTab:Dropdown({
 })
 
 StatTab:Slider({
-    Title = "ปรับพ้อยท์ที่จะอัพ",
+    Title = "ปรับจำนวนพ้อยท์ที่จะอัพ",
     Step = 1,
     Value = {
         Min = 1,
@@ -662,7 +552,7 @@ StatTab:Slider({
 })
 
 StatTab:Toggle({
-    Title = "Auto Stat",
+    Title = "ออโต้อัพสตัด",
     Value = false,
     Callback = function(v)
         Auto = v
@@ -698,4 +588,41 @@ end)
 
 local SkillTab = Window:Tab({Title = "SKILL", Icon = "biohazard"})
 
+local Vim = game:GetService("VirtualInputManager")
+local SelectedSkills = Get("SelectedSkills", {})
+local AutoSkill = Get("AutoSkill", false)
 
+
+local Dropdown = SkillTab:Dropdown({
+    Title = "เลือกสกิล",
+    Values = {"Z","X","C","V"},
+    Multi = true,
+    Default = SelectedSkills,
+    Callback = function(option)
+        SelectedSkills = option
+        Save("SelectedSkills", option)
+    end
+})
+
+
+local Toggle = SkillTab:Toggle({
+    Title = "ออโต้สกิล",
+    Value = AutoSkill,
+    Callback = function(state)
+        AutoSkill = state
+        Save("AutoSkill", state)
+    end
+})
+task.spawn(function()
+    while true do
+        if AutoSkill then
+            for _,key in pairs(SelectedSkills) do
+                Vim:SendKeyEvent(true, key, false, game)
+                task.wait()
+                Vim:SendKeyEvent(false, key, false, game)
+                task.wait(0.4)
+            end
+        end
+        task.wait()
+    end
+end)
