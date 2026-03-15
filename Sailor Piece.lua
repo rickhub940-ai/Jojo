@@ -626,3 +626,55 @@ Tab:Toggle({
 		EquipTool()
 	end
 })
+
+
+local StatTab = Window:Tab({Title = "MAIN", Icon = "trending-up"})
+
+
+local Remote = game:GetService("ReplicatedStorage").RemoteEvents.AllocateStat
+local Autostats = Load("Autostats") or {}
+local Amount = Load("Amount") or 1
+local Auto = Load("AutoStat") or false
+StatTab:Dropdown({
+    Title = "Stat",
+    Values = {"Melee","Defense","Sword","Power"},
+    Multi = true,
+    Default = Autostats,
+    Callback = function(v)
+        Autostats = v
+        Save("Autostats", v)
+    end
+})
+
+StatTab:Slider({
+    Title = "Amount",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 10000,
+        Default = Amount
+    },
+    Callback = function(v)
+        Amount = v
+        Save("Amount", v)
+    end
+})
+
+StatTab:Toggle({
+    Title = "Auto Stat",
+    Value = Auto,
+    Callback = function(v)
+        Auto = v
+        Save("AutoStat", v)
+    end
+})
+
+task.spawn(function()
+    while task.wait(0.2) do
+        if Auto then
+            for stat,_ in pairs(Autostats) do
+                Remote:FireServer(stat, Amount)
+            end
+        end
+    end
+end)
