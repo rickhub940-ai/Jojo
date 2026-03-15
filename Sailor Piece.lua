@@ -267,9 +267,44 @@ local QuestData = {
         posspow = Vector3.new(-485.79,-3.74,938.70),
         posQ = Vector3.new(-287.02,-3.37,1040.38),
         NM = {"Hollow1","Hollow2","Hollow3","Hollow4","Hollow5"}
+    },
+
+{
+        LV = 6250,
+        NPC = "QuestNPC12",
+        posspow = Vector3.new(362.39, -2.35, -1631.44),
+        posQ = Vector3.new(627.67, 1.89, -1611.04),
+        NM = {"StrongSorcerer1","StrongSorcerer2","StrongSorcerer3","StrongSorcerer4","StrongSorcerer5"}
+    },
+{
+        LV = 7000,
+        NPC = "QuestNPC13",
+        posspow = Vector3.new(362.39, -2.35, -1631.44),
+        posQ = Vector3.new(-19.17, 1.89, -1983.12),
+        NM = {"Curse1","Curse2","Curse3","Curse4","Curse5"}
+    },
+{
+        LV = 8000,
+        NPC = "QuestNPC14",
+        posspow = Vector3.new(-988.14, -3.80, 252.10),
+        posQ = Vector3.new(-1186.31, 18.12, 338.01),
+        NM = {"Slime1","Slime2","Slime3","Slime4","Slime5"}
+    },
+{
+        LV = 9000,
+        NPC = "QuestNPC15",
+        posspow = Vector3.new(1036.72, -3.70, 1090.25),
+        posQ = Vector3.new(1029.79, 1.46, 1241.60),
+        NM = {"AcademyTeacher1","AcademyTeacher2","AcademyTeacher3","AcademyTeacher4","AcademyTeacher5"}
+    },
+{
+        LV = 10000,
+        NPC = "QuestNPC16",
+        posspow = Vector3.new(-958.98, -2.08, -1060.27),
+        posQ = Vector3.new(-1165.34, 2.50, -1191.39),
+        NM = {"Swordsman1","Swordsman2","Swordsman3","Swordsman4","Swordsman5"}
     }
 }
-
 
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
