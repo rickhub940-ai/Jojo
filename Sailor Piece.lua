@@ -161,6 +161,11 @@ local backpack = player:WaitForChild("Backpack")
 
 
 
+
+
+
+
+
 local ConfigFile = "RICK HUB [ Sailor Piece ].json"
 local Config = {}
 
@@ -184,8 +189,9 @@ end
 local player = Players.LocalPlayer
 local TargetMob = nil
 local isTweening = false
+local TweenSpeed = 80
+local PlatformName = "RickHub_Floor"
 
--- โหลดค่าจาก Config
 local AutoFarm = Get("AutoFarm", false)
 local FarmMode = Get("FarmMode", "Above")
 local FarmDistance = Get("FarmDistance", 10)
@@ -306,26 +312,64 @@ local QuestData = {
     }
 }
 
+
+local function ManagePlatform(state)
+    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local floor = workspace:FindFirstChild(PlatformName)
+    if state then
+        if not floor then
+            floor = Instance.new("Part")
+            floor.Name = PlatformName
+            floor.Size = Vector3.new(40, 1, 40) -- แผ่นใหญ่กันพลาด
+            floor.Transparency = 1
+            floor.Anchored = true
+            floor.CanCollide = true
+            floor.Parent = workspace
+        end
+        floor.CFrame = root.CFrame * CFrame.new(0, -3.5, 0)
+    else
+        if floor then floor:Destroy() end
+    end
+end
+
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
 
+-- [[ ฟังก์ชั่น Tween แบบความเร็วคงที่ ]]
 local function TweenTo(pos)
     local root = GetRoot()
     if not root or isTweening then return end
+    
     local dist = (root.Position - pos).Magnitude
     if dist < 5 then return end
 
     isTweening = true
+    local duration = dist / TweenSpeed 
+    
     local tween = TweenService:Create(
         root,
-        TweenInfo.new(math.clamp(dist/130,0.5,10), Enum.EasingStyle.Linear),
+        TweenInfo.new(duration, Enum.EasingStyle.Linear),
         {CFrame = CFrame.new(pos)}
     )
+    
     tween:Play()
-    tween.Completed:Connect(function() isTweening = false end)
+    
+    -- สร้างพื้นวิ่งตามตัวละคร
+    local platformLoop = RunService.Heartbeat:Connect(function()
+        if isTweening then ManagePlatform(true) end
+    end)
+
+    tween.Completed:Connect(function()
+        isTweening = false
+        platformLoop:Disconnect()
+        ManagePlatform(false)
+    end)
 end
 
+-- [[ ฟังก์ชั่นช่วยอื่นๆ ]]
 local function AutoScanSpawn()
     local root = GetRoot()
     if not root then return end
@@ -348,16 +392,18 @@ local function GetQuest()
     return best
 end
 
-
+-- [[ ระบบ Loop หลัก ]]
 task.spawn(function()
+    -- Noclip (กันชน)
     RunService.Stepped:Connect(function()
-        if AutoFarm and player.Character then
+        if (AutoFarm or isTweening) and player.Character then
             for _, v in pairs(player.Character:GetDescendants()) do
                 if v:IsA("BasePart") then v.CanCollide = false end
             end
         end
     end)
 
+    -- ล็อคตำแหน่งตัวละครตอนตีมอน
     RunService.RenderStepped:Connect(function()
         if AutoFarm and TargetMob and TargetMob.Parent and TargetMob:FindFirstChild("HumanoidRootPart") then
             local root = GetRoot()
@@ -378,6 +424,7 @@ task.spawn(function()
     end)
 end)
 
+
 task.spawn(function()
     while true do
         task.wait(0.1)
@@ -391,6 +438,7 @@ task.spawn(function()
         local quest = GetQuest()
         if not root or not quest then continue end
 
+        -- เช็คจุดเซฟ (Spawn)
         local spawnObj = workspace:FindFirstChild(player.Name .. "_Spawn")
         if not spawnObj or (spawnObj.Position - quest.posspow).Magnitude > 60 then
             TargetMob = nil
@@ -399,6 +447,7 @@ task.spawn(function()
             continue
         end
 
+        -- เช็คเควส
         local hasQ = player.PlayerGui:FindFirstChild("QuestUI") and player.PlayerGui.QuestUI.Quest.Visible
         if not hasQ then
             TargetMob = nil
@@ -412,6 +461,7 @@ task.spawn(function()
             continue
         end
 
+        -- หามอนสเตอร์
         local monster = nil
         for _, v in pairs(workspace.NPCs:GetChildren()) do
             for _, name in pairs(quest.NM) do
@@ -438,6 +488,7 @@ task.spawn(function()
         end
     end
 end)
+
 
 -- ----------
 -- ออโต้ถือ
@@ -519,18 +570,6 @@ end)
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
-Tab:Dropdown({
-    Title = "เลือกโหมดการฟาม",
-    Values = { "Above", "Behind", "Below" },
-    Value = FarmMode,
-    Multi = false,
-    Callback = function(option) 
-        FarmMode = option
-        Save("FarmMode", option)
-    end
-})
-
-
 Tab:Toggle({
     Title = "ออโต้ฟาม",
     Value = AutoFarm,
@@ -540,7 +579,15 @@ Tab:Toggle({
     end
 })
 
-
+Tab:Dropdown({
+    Title = "เลือกโหมดการฟาม",
+    Values = { "Above", "Behind", "Below" },
+    Value = FarmMode,
+    Callback = function(option) 
+        FarmMode = option
+        Save("FarmMode", option)
+    end
+})
 
 Tab:Slider({
     Title = "ระยะห่างจากมอน",
