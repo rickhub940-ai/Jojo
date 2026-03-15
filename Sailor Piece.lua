@@ -628,7 +628,7 @@ Tab:Toggle({
 })
 
 
-local StatTab = Window:Tab({Title = "MAIN", Icon = "trending-up"})
+local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
 
 
 local Remote = game:GetService("ReplicatedStorage").RemoteEvents.AllocateStat
