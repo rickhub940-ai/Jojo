@@ -332,13 +332,15 @@ local function ManagePlatform(state)
         if not floor then
             floor = Instance.new("Part")
             floor.Name = PlatformName
-            floor.Size = Vector3.new(45, 1, 45) 
+            floor.Size = Vector3.new(60,1,60)
             floor.Transparency = 1
             floor.Anchored = true
             floor.CanCollide = true
             floor.Parent = workspace
         end
-        floor.CFrame = root.CFrame * CFrame.new(0, 1-3, 0)
+
+        floor.CFrame = root.CFrame * CFrame.new(0,-3,0)
+
     else
         if floor then floor:Destroy() end
     end
@@ -347,30 +349,41 @@ end
 local function TweenTo(pos)
     local root = GetRoot()
     if not root or isTweening then return end
-    
+
+    ManagePlatform(true)
+    local floor = workspace:FindFirstChild(PlatformName)
+
     local dist = (root.Position - pos).Magnitude
     if dist < 5 then return end
 
     isTweening = true
-    local duration = dist / TweenSpeed 
-    
-    local tween = TweenService:Create(
+
+    local duration = dist / TweenSpeed
+    local info = TweenInfo.new(duration, Enum.EasingStyle.Linear)
+
+    local playerTween = TweenService:Create(
         root,
-        TweenInfo.new(duration, Enum.EasingStyle.Linear),
+        info,
         {CFrame = CFrame.new(pos)}
     )
-    
-    tween:Play()
-    local platLoop = RunService.Heartbeat:Connect(function()
-        if isTweening then ManagePlatform(true) end
-    end)
 
-    tween.Completed:Connect(function()
+    local floorTween = TweenService:Create(
+        floor,
+        info,
+        {CFrame = CFrame.new(pos) * CFrame.new(0,-3,0)}
+    )
+
+    playerTween:Play()
+    floorTween:Play()
+
+    playerTween.Completed:Connect(function()
         isTweening = false
-        platLoop:Disconnect()
         ManagePlatform(false)
     end)
 end
+
+
+
 
 
 local function AutoScanSave()
