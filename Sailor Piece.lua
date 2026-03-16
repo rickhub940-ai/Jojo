@@ -537,8 +537,12 @@ Tab:Slider({
 -- --------
 
 
+local plr = Players.LocalPlayer
+
 
 local Dropdown
+
+--// ดึง Tool จาก Backpack
 local function GetTools()
     local t = {}
 
@@ -551,6 +555,8 @@ local function GetTools()
 
     return t
 end
+
+--// Equip จาก Backpack เท่านั้น
 function equipandattack(v)
     local char = plr.Character or plr.CharacterAdded:Wait()
     local bp = plr:WaitForChild("Backpack")
@@ -564,7 +570,7 @@ function equipandattack(v)
     end
 end
 
-
+--// Toggle
 Tab:Toggle({
     Title = "Auto Equip",
     Value = Config.AutoEquip,
@@ -574,7 +580,7 @@ Tab:Toggle({
     end
 })
 
-
+--// Dropdown
 Dropdown = Tab:Dropdown({
     Title = "เลือกอาวุธ",
     Values = GetTools(),
@@ -587,7 +593,7 @@ Dropdown = Tab:Dropdown({
     end
 })
 
-
+--// ปุ่มรีอาวุธ
 Tab:Button({
     Title = "รีชื่ออาวุธ",
     Callback = function()
@@ -595,6 +601,7 @@ Tab:Button({
     end
 })
 
+--// ลูป Auto Equip
 task.spawn(function()
     while task.wait(0.2) do
         if Config.AutoEquip and Config.SelectedTool then
@@ -603,7 +610,7 @@ task.spawn(function()
     end
 end)
 
-
+--// ตอนเกิดใหม่
 plr.CharacterAdded:Connect(function()
     task.wait(1)
     if Config.AutoEquip and Config.SelectedTool then
