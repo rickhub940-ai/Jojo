@@ -536,7 +536,11 @@ Tab:Slider({
 -- ออโต้ถือ
 -- --------
 
+
+
+--// Services
 local Dropdown
+--// ดึง Tool
 local function GetTools()
     local t = {}
     local added = {}
@@ -558,6 +562,18 @@ local function GetTools()
     return t
 end
 
+--// หา Tool จาก Character ก่อน
+local function GetEquippedTool()
+    if player.Character then
+        for _,v in pairs(player.Character:GetChildren()) do
+            if v:IsA("Tool") then
+                return v.Name
+            end
+        end
+    end
+end
+
+--// ออโต้ถือ
 local function EquipTool()
     if not Config.AutoEquip then return end
     if not Config.SelectedTool then return end
@@ -566,7 +582,9 @@ local function EquipTool()
     local backpack = player:FindFirstChild("Backpack")
     if not char or not backpack then return end
 
-    if char:FindFirstChild(Config.SelectedTool) then return end
+    if char:FindFirstChild(Config.SelectedTool) then
+        return
+    end
 
     local tool = backpack:FindFirstChild(Config.SelectedTool)
     if tool then
@@ -574,7 +592,18 @@ local function EquipTool()
     end
 end
 
+--// Toggle
+Tab:Toggle({
+    Title = "Auto Equip",
+    Value = Config.AutoEquip,
+    Callback = function(v)
+        Config.AutoEquip = v
+        SaveConfig()
+        EquipTool()
+    end
+})
 
+--// Dropdown
 Dropdown = Tab:Dropdown({
     Title = "เลือกอาวุธ",
     Values = GetTools(),
@@ -588,31 +617,36 @@ Dropdown = Tab:Dropdown({
     end
 })
 
-Tab:Toggle({
-    Title = "ออโต้ถือ",
-    Value = Config.AutoEquip,
-    Callback = function(v)
-        Config.AutoEquip = v
-        SaveConfig()
-        EquipTool()
-    end
-})
-
+--// ปุ่มรีอาวุธ
 Tab:Button({
     Title = "รีชื่ออาวุธ",
     Callback = function()
         Dropdown:Refresh(GetTools())
     end
 })
+
+--// ถ้าเริ่มเกมถืออาวุธอยู่ให้จำ
+task.spawn(function()
+    task.wait(1)
+    local tool = GetEquippedTool()
+    if tool and not Config.SelectedTool then
+        Config.SelectedTool = tool
+        SaveConfig()
+        Dropdown:SetValue(tool)
+    end
+end)
+
+--// Tool ใหม่
 player.Backpack.ChildAdded:Connect(function()
     task.wait()
     EquipTool()
 end)
+
+--// ตอนเกิดใหม่
 player.CharacterAdded:Connect(function()
     task.wait(1)
     EquipTool()
 end)
-
 
 
 local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
