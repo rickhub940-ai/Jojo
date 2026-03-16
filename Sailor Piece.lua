@@ -532,7 +532,86 @@ Tab:Slider({
 })
 
 
+-- --------
+-- ออโต้ถือ
+-- --------
 
+local Dropdown
+local function GetTools()
+    local t = {}
+    local added = {}
+
+    local function scan(container)
+        for _,v in pairs(container:GetChildren()) do
+            if v:IsA("Tool") and not added[v.Name] then
+                added[v.Name] = true
+                table.insert(t,v.Name)
+            end
+        end
+    end
+
+    scan(player:WaitForChild("Backpack"))
+    if player.Character then
+        scan(player.Character)
+    end
+
+    return t
+end
+
+local function EquipTool()
+    if not Config.AutoEquip then return end
+    if not Config.SelectedTool then return end
+
+    local char = player.Character
+    local backpack = player:FindFirstChild("Backpack")
+    if not char or not backpack then return end
+
+    if char:FindFirstChild(Config.SelectedTool) then return end
+
+    local tool = backpack:FindFirstChild(Config.SelectedTool)
+    if tool then
+        tool.Parent = char
+    end
+end
+
+
+Dropdown = Tab:Dropdown({
+    Title = "เลือกอาวุธ",
+    Values = GetTools(),
+    Value = Config.SelectedTool,
+    Multi = false,
+    AllowNone = true,
+    Callback = function(option)
+        Config.SelectedTool = option
+        SaveConfig()
+        EquipTool()
+    end
+})
+
+Tab:Toggle({
+    Title = "ออโต้ถือ",
+    Value = Config.AutoEquip,
+    Callback = function(v)
+        Config.AutoEquip = v
+        SaveConfig()
+        EquipTool()
+    end
+})
+
+Tab:Button({
+    Title = "รีชื่ออาวุธ",
+    Callback = function()
+        Dropdown:Refresh(GetTools())
+    end
+})
+player.Backpack.ChildAdded:Connect(function()
+    task.wait()
+    EquipTool()
+end)
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    EquipTool()
+end)
 
 
 
@@ -649,10 +728,6 @@ end)
 
 local TeleportsTab = Window:Tab({Title = "TELEPORTS", Icon = "map-pinned"})
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local player = Players.LocalPlayer
 local Holder = player.PlayerGui.TeleportUI.MainFrame.Frame.Content.Holder
 local Remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("TeleportToPortal")
 
