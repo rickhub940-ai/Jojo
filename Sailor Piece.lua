@@ -332,8 +332,8 @@ local function ManagePlatform(state)
         if not floor then
             floor = Instance.new("Part")
             floor.Name = PlatformName
-            floor.Size = Vector3.new(45, 1, 45) 
-            floor.Transparency = 1
+            floor.Size = Vector3.new(100, 1, 100) 
+            floor.Transparency = 0.5
             floor.Anchored = true
             floor.CanCollide = true
             floor.Parent = workspace
@@ -539,59 +539,42 @@ Tab:Slider({
 
 
 local Dropdown
-
---// ดึง Tool
 local function GetTools()
-    local tools = {}
-    local added = {}
+    local t = {}
 
-    local function scan(container)
-        for _,v in pairs(container:GetChildren()) do
-            if v:IsA("Tool") and not added[v.Name] then
-                added[v.Name] = true
-                table.insert(tools,v.Name)
-            end
+    local bp = plr:WaitForChild("Backpack")
+    for _,v in pairs(bp:GetChildren()) do
+        if v:IsA("Tool") then
+            table.insert(t,v.Name)
         end
     end
 
-    scan(player:WaitForChild("Backpack"))
-    if player.Character then
-        scan(player.Character)
-    end
-
-    return tools
+    return t
 end
+function equipandattack(v)
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local bp = plr:WaitForChild("Backpack")
+    local hu = char:FindFirstChildOfClass("Humanoid")
 
---// ออโต้ถืออาวุธ
-local function EquipTool()
-    if not Config.AutoEquip then return end
-    if not Config.SelectedTool then return end
+    if not hu then return end
 
-    local char = player.Character or player.CharacterAdded:Wait()
-    local backpack = player:WaitForChild("Backpack")
-
-    if char:FindFirstChild(Config.SelectedTool) then
-        return
-    end
-
-    local tool = backpack:FindFirstChild(Config.SelectedTool)
+    local tool = bp:FindFirstChild(v)
     if tool then
-        tool.Parent = char
+        hu:EquipTool(tool)
     end
 end
 
---// Toggle
+
 Tab:Toggle({
     Title = "Auto Equip",
     Value = Config.AutoEquip,
     Callback = function(v)
         Config.AutoEquip = v
         SaveConfig()
-        EquipTool()
     end
 })
 
---// Dropdown
+
 Dropdown = Tab:Dropdown({
     Title = "เลือกอาวุธ",
     Values = GetTools(),
@@ -601,11 +584,10 @@ Dropdown = Tab:Dropdown({
     Callback = function(option)
         Config.SelectedTool = option
         SaveConfig()
-        EquipTool()
     end
 })
 
---// ปุ่มรีชื่ออาวุธ
+
 Tab:Button({
     Title = "รีชื่ออาวุธ",
     Callback = function()
@@ -613,23 +595,20 @@ Tab:Button({
     end
 })
 
---// มี Tool ใหม่
-player.Backpack.ChildAdded:Connect(function()
-    task.wait()
-    EquipTool()
-end)
-
---// ตอนเกิดใหม่
-player.CharacterAdded:Connect(function()
-    task.wait(1)
-    EquipTool()
-end)
-
---// เริ่มระบบ
 task.spawn(function()
-    player.CharacterAdded:Wait()
+    while task.wait(0.2) do
+        if Config.AutoEquip and Config.SelectedTool then
+            equipandattack(Config.SelectedTool)
+        end
+    end
+end)
+
+
+plr.CharacterAdded:Connect(function()
     task.wait(1)
-    EquipTool()
+    if Config.AutoEquip and Config.SelectedTool then
+        equipandattack(Config.SelectedTool)
+    end
 end)
 
 
