@@ -338,7 +338,7 @@ local function ManagePlatform(state)
             floor.CanCollide = true
             floor.Parent = workspace
         end
-        floor.CFrame = root.CFrame * CFrame.new(0, 1, 1)
+        floor.CFrame = root.CFrame * CFrame.new(0, 1-3, 0)
     else
         if floor then floor:Destroy() end
     end
