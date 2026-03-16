@@ -646,3 +646,30 @@ task.spawn(function()
 end)
 
 
+
+local TeleportsTab = Window:Tab({Title = "TELEPORTS", Icon = "map-pinned"})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local Holder = player.PlayerGui.TeleportUI.MainFrame.Frame.Content.Holder
+local Remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("TeleportToPortal")
+
+local Teleports = {}
+
+for _,v in pairs(Holder:GetChildren()) do
+	if string.find(v.Name,"Teleport_") then
+		local name = v.Name:gsub("Teleport_","")
+		table.insert(Teleports,name)
+	end
+end
+
+for _,place in ipairs(Teleports) do
+	TeleportsTab:Button({
+		Title = place.." Island",
+		Callback = function()
+			Remote:FireServer(place)
+		end
+	})
+end
