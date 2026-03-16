@@ -538,18 +538,18 @@ Tab:Slider({
 
 
 
---// Services
 local Dropdown
+
 --// ดึง Tool
 local function GetTools()
-    local t = {}
+    local tools = {}
     local added = {}
 
     local function scan(container)
         for _,v in pairs(container:GetChildren()) do
             if v:IsA("Tool") and not added[v.Name] then
                 added[v.Name] = true
-                table.insert(t,v.Name)
+                table.insert(tools,v.Name)
             end
         end
     end
@@ -559,28 +559,16 @@ local function GetTools()
         scan(player.Character)
     end
 
-    return t
+    return tools
 end
 
---// หา Tool จาก Character ก่อน
-local function GetEquippedTool()
-    if player.Character then
-        for _,v in pairs(player.Character:GetChildren()) do
-            if v:IsA("Tool") then
-                return v.Name
-            end
-        end
-    end
-end
-
---// ออโต้ถือ
+--// ออโต้ถืออาวุธ
 local function EquipTool()
     if not Config.AutoEquip then return end
     if not Config.SelectedTool then return end
 
-    local char = player.Character
-    local backpack = player:FindFirstChild("Backpack")
-    if not char or not backpack then return end
+    local char = player.Character or player.CharacterAdded:Wait()
+    local backpack = player:WaitForChild("Backpack")
 
     if char:FindFirstChild(Config.SelectedTool) then
         return
@@ -617,7 +605,7 @@ Dropdown = Tab:Dropdown({
     end
 })
 
---// ปุ่มรีอาวุธ
+--// ปุ่มรีชื่ออาวุธ
 Tab:Button({
     Title = "รีชื่ออาวุธ",
     Callback = function()
@@ -625,18 +613,7 @@ Tab:Button({
     end
 })
 
---// ถ้าเริ่มเกมถืออาวุธอยู่ให้จำ
-task.spawn(function()
-    task.wait(1)
-    local tool = GetEquippedTool()
-    if tool and not Config.SelectedTool then
-        Config.SelectedTool = tool
-        SaveConfig()
-        Dropdown:SetValue(tool)
-    end
-end)
-
---// Tool ใหม่
+--// มี Tool ใหม่
 player.Backpack.ChildAdded:Connect(function()
     task.wait()
     EquipTool()
@@ -647,6 +624,14 @@ player.CharacterAdded:Connect(function()
     task.wait(1)
     EquipTool()
 end)
+
+--// เริ่มระบบ
+task.spawn(function()
+    player.CharacterAdded:Wait()
+    task.wait(1)
+    EquipTool()
+end)
+
 
 
 local StatTab = Window:Tab({Title = "STATS", Icon = "trending-up"})
