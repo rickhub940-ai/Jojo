@@ -85,7 +85,7 @@ local Window = WindUI:CreateWindow({
     }
 })
 Window:Tag({
-    Title = "v0.0.3",
+    Title = "v0.0.5",
     Icon = "github",
     Color = Color3.fromHex("#00bfff"),
     Radius = 5,
@@ -189,7 +189,7 @@ end
 local player = Players.LocalPlayer
 local TargetMob = nil
 local isTweening = false
-local TweenSpeed = 80
+local TweenSpeed = 75
 local PlatformName = "RickHub_Floor"
 
 local AutoFarm = Get("AutoFarm", false)
@@ -332,13 +332,13 @@ local function ManagePlatform(state)
         if not floor then
             floor = Instance.new("Part")
             floor.Name = PlatformName
-            floor.Size = Vector3.new(100, 1, 100) 
-            floor.Transparency = 0.5
+            floor.Size = Vector3.new(45, 1, 45) 
+            floor.Transparency = 1
             floor.Anchored = true
             floor.CanCollide = true
             floor.Parent = workspace
         end
-        floor.CFrame = root.CFrame * CFrame.new(0, -3.5, -2)
+        floor.CFrame = root.CFrame * CFrame.new(0, 1, 1)
     else
         if floor then floor:Destroy() end
     end
@@ -542,7 +542,6 @@ local plr = Players.LocalPlayer
 
 local Dropdown
 
---// ดึง Tool จาก Backpack
 local function GetTools()
     local t = {}
 
@@ -555,8 +554,6 @@ local function GetTools()
 
     return t
 end
-
---// Equip จาก Backpack เท่านั้น
 function equipandattack(v)
     local char = plr.Character or plr.CharacterAdded:Wait()
     local bp = plr:WaitForChild("Backpack")
@@ -570,17 +567,6 @@ function equipandattack(v)
     end
 end
 
---// Toggle
-Tab:Toggle({
-    Title = "Auto Equip",
-    Value = Config.AutoEquip,
-    Callback = function(v)
-        Config.AutoEquip = v
-        SaveConfig()
-    end
-})
-
---// Dropdown
 Dropdown = Tab:Dropdown({
     Title = "เลือกอาวุธ",
     Values = GetTools(),
@@ -593,15 +579,21 @@ Dropdown = Tab:Dropdown({
     end
 })
 
---// ปุ่มรีอาวุธ
 Tab:Button({
     Title = "รีชื่ออาวุธ",
     Callback = function()
         Dropdown:Refresh(GetTools())
     end
 })
+Tab:Toggle({
+    Title = "Auto ถือ",
+    Value = Config.AutoEquip,
+    Callback = function(v)
+        Config.AutoEquip = v
+        SaveConfig()
+    end
+})
 
---// ลูป Auto Equip
 task.spawn(function()
     while task.wait(0.2) do
         if Config.AutoEquip and Config.SelectedTool then
@@ -610,7 +602,6 @@ task.spawn(function()
     end
 end)
 
---// ตอนเกิดใหม่
 plr.CharacterAdded:Connect(function()
     task.wait(1)
     if Config.AutoEquip and Config.SelectedTool then
