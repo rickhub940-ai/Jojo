@@ -502,9 +502,13 @@ task.spawn(function()
                 ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
             end
         else
-            TargetMob = nil
+    TargetMob = nil
+    
+    if (root.Position - quest.posQ).Magnitude > 15 then
+        if not isTweening then
+            TweenTo(quest.posQ + Vector3.new(0, 3, 0))
         end
-    end
+     end
 end)
 
 -- ----------
