@@ -554,6 +554,8 @@ Tab:Slider({
 
 
 
+
+
 -- ตัวแปร (พิมเล็ก)
 local farmzone_on = false
 local farmzone_radius = 20
@@ -564,7 +566,7 @@ local farmzone_attacking = false
 local farmzone_mode = "Above"
 local farmzone_distance = 10
 
--- ฟังก์ชันสร้างวงกลม
+-- ฟังก์ชันสร้างวงกลม (ใช้ Part + SpecialMesh)
 local function farmzone_create(pos, radius)
     if not pos then return end
     
@@ -573,10 +575,10 @@ local function farmzone_create(pos, radius)
         farmzone_circle = nil
     end
     
-    local circle = Instance.new("CylinderPart")
+    -- ใช้ Part ปกติ
+    local circle = Instance.new("Part")
     circle.Name = "farmzone_circle"
-    circle.Height = 0.2
-    circle.Radius = radius
+    circle.Size = Vector3.new(radius * 2, 0.2, radius * 2)
     circle.CFrame = CFrame.new(pos)
     circle.Anchored = true
     circle.CanCollide = false
@@ -585,6 +587,12 @@ local function farmzone_create(pos, radius)
     circle.Material = Enum.Material.Neon
     circle.Parent = workspace
     
+    -- ใส่ mesh ให้เป็นทรงกระบอก (วงกลม)
+    local mesh = Instance.new("SpecialMesh")
+    mesh.MeshType = Enum.MeshType.Cylinder
+    mesh.Parent = circle
+    
+    -- เพิ่มแสง
     local light = Instance.new("PointLight")
     light.Color = Color3.new(1, 0, 0)
     light.Range = radius * 1.5
@@ -788,8 +796,6 @@ Tab:Slider({
         farmzone_distance = val
     end
 })
-
-
 -- --------
 -- ออโต้ถือ
 -- --------
