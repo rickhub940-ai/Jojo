@@ -520,54 +520,64 @@ end)
 -- ฟามออร่า
 -- ----------
 
---// CONFIGaura
+
+--// CONFIG
 local AuraFarm = Get("AuraFarm", false)
 local AuraRange = Get("AuraRange", 20)
-local AuraMode = Get("AuraMode", "วงตามตัว") 
 local FarmModeAura = Get("FarmModeAura", "Above")
 local FarmDistanceAura = Get("FarmDistanceAura", 5)
 
 
+
+--// VAR
 local AuraPart
-local AuraPosition
-local lastUpdate = 0
+local CurrentTween
 
-
+--// ROOT
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
+
+local function NoClip()
+    local char = player.Character
+    if not char then return end
+
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = false
+        end
+    end
+end
 local function CreateAura()
     if AuraPart then return end
+    
     AuraPart = Instance.new("Part")
     AuraPart.Name = "RickHub_Aura"
     AuraPart.Shape = Enum.PartType.Cylinder
     AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
     AuraPart.Material = Enum.Material.Neon
-    AuraPart.Color = Color3.fromRGB(255, 0, 0) 
+    AuraPart.Color = Color3.fromRGB(255, 0, 0)
     AuraPart.Transparency = 0.7
     AuraPart.Anchored = true
     AuraPart.CanCollide = false
     AuraPart.Parent = workspace
 end
+
 local function UpdateAura()
     if not AuraFarm then
         if AuraPart then AuraPart:Destroy() AuraPart = nil end
         return
-	end
+    end
+
     local root = GetRoot()
     if not root then return end
+
     if not AuraPart then
         CreateAura()
-	end
+    end
+
     AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
-    if AuraMode == "วงแค่ตรงที่เปิดครั้งแรก" then
-        if not AuraPosition then
-            AuraPosition = root.Position - Vector3.new(0,3,0)
-		end
-        AuraPart.Position = AuraPosition
-    else
-        AuraPart.Position = root.Position - Vector3.new(0,3,0)
-	end
+    AuraPart.Position = root.Position - Vector3.new(0,3,0)
     AuraPart.Orientation = Vector3.new(0, 0, 90)
 end
 local function GetClosestMob()
@@ -601,6 +611,23 @@ local function GetOffset()
     end
     return Vector3.new(0, FarmDistanceAura, 0)
 end
+
+local function TweenTo(targetPos)
+    local root = GetRoot()
+    if not root then return end
+
+    if CurrentTween then
+        CurrentTween:Cancel()
+    end
+
+    CurrentTween = TweenService:Create(
+        root,
+        TweenInfo.new(0.15, Enum.EasingStyle.Linear),
+        {CFrame = CFrame.new(targetPos)}
+    )
+
+    CurrentTween:Play()
+end
 local function AuraSystem()
     if not AuraFarm then return end
 
@@ -614,31 +641,31 @@ local function AuraSystem()
     if not mobRoot then return end
 
     local offset = GetOffset()
+    local targetPos = mobRoot.Position + offset
 
-    root.CFrame = CFrame.new(
-        mobRoot.Position + offset,
-        mobRoot.Position
-    )
-    ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
+    local dist = (root.Position - mobRoot.Position).Magnitude
+
+    if dist > 10 then
+        TweenTo(targetPos)
+	else
+        root.CFrame = CFrame.new(targetPos, mobRoot.Position)
+        ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
+    end
 end
 task.spawn(function()
     while true do
-        task.wait(0.01)
+        task.wait(0.1)
+
         if AuraFarm then
+            NoClip()
             UpdateAura()
             AuraSystem()
         end
     end
 end)
 
---// RESET
-local function ResetAura()
-    AuraPosition = nil
-end
 
-
-
-
+Tab:Toggle({
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
@@ -671,29 +698,17 @@ Tab:Slider({
     end
 })
 
-Tab:Toggle({
+
     Title = "ฟามออร่า",
     Value = AuraFarm,
     Callback = function(state)
         AuraFarm = state
         Save("AuraFarm", state)
-        ResetAura()
     end
 })
 
 Tab:Dropdown({
-    Title = "Aura Type",
-    Values = { "วงตามตัว", "วงแค่ตรงที่เปิดครั้งแรก" },
-    Value = AuraMode,
-    Callback = function(option)
-        AuraMode = option
-        Save("AuraMode", option)
-        ResetAura()
-    end
-})
-
-Tab:Dropdown({
-    Title = "Aura Position",
+    Title = "ตำแหน่งตี",
     Values = { "Above", "Behind", "Below" },
     Value = FarmModeAura,
     Callback = function(option)
@@ -721,6 +736,7 @@ Tab:Slider({
         Save("FarmDistanceAura", value)
     end
 })
+
 
 
 
