@@ -542,6 +542,24 @@ local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
 
+--// หา "พื้น"
+local function GetGroundPosition(pos)
+    local rayOrigin = pos
+    local rayDirection = Vector3.new(0, -200, 0)
+
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {player.Character}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+    local result = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+    if result then
+        return result.Position
+    end
+
+    return pos
+end
+
 --// CREATE AURA
 local function CreateAura()
     if AuraPart then return end
@@ -558,7 +576,7 @@ local function CreateAura()
     AuraPart.Parent = workspace
 end
 
---// UPDATE AURA
+--// UPDATE AURA (ติดพื้น + ไม่เอียง)
 local function UpdateAura()
     if not AuraFarm then
         if AuraPart then AuraPart:Destroy() AuraPart = nil end
@@ -574,17 +592,22 @@ local function UpdateAura()
 
     AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
 
+    local groundPos
+
     if AuraMode == "Static" then
         if not AuraPosition then
-            AuraPosition = root.Position - Vector3.new(0,3,0)
+            AuraPosition = GetGroundPosition(root.Position)
         end
-        AuraPart.CFrame = CFrame.new(AuraPosition) * CFrame.Angles(math.rad(90),0,0)
+        groundPos = AuraPosition
     else
-        AuraPart.CFrame = CFrame.new(root.Position - Vector3.new(0,3,0)) * CFrame.Angles(math.rad(90),0,0)
+        groundPos = GetGroundPosition(root.Position)
     end
+
+    AuraPart.Position = groundPos + Vector3.new(0, 0.1, 0)
+    AuraPart.Orientation = Vector3.new(0, 0, 90)
 end
 
---// GET OFFSET
+--// OFFSET
 local function GetOffset()
     if FarmModeAura == "Above" then
         return Vector3.new(0, FarmDistanceAura, 0)
@@ -601,7 +624,7 @@ local function GetClosestMob()
     local root = GetRoot()
     if not root then return nil end
 
-    local center = (AuraMode == "Static" and AuraPosition) or (root.Position - Vector3.new(0,3,0))
+    local center = (AuraMode == "Static" and AuraPosition) or GetGroundPosition(root.Position)
     if not center then return nil end
 
     local closest = nil
@@ -638,9 +661,9 @@ local function AuraSystem()
 
     local mobRoot = mob.HumanoidRootPart
 
-    -- กลับกลาง (Static)
+    -- Static กลับกลาง
     if AuraMode == "Static" and AuraPosition then
-        if (root.Position - AuraPosition).Magnitude > 5 then
+        if (GetGroundPosition(root.Position) - AuraPosition).Magnitude > 5 then
             TweenTo(AuraPosition + Vector3.new(0,3,0))
             return
         end
@@ -658,7 +681,7 @@ local function AuraSystem()
     end
 end
 
---// RENDER (ล็อคตำแหน่ง + หันหน้าหามอน)
+--// RENDER
 RunService.RenderStepped:Connect(function()
     if not AuraFarm then return end
 
@@ -695,6 +718,7 @@ end
 
 
 
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
 Tab:Toggle({
@@ -725,8 +749,6 @@ Tab:Slider({
         Save("FarmDistance", value)
     end
 })
-
-
 
 
 Tab:Toggle({
@@ -779,6 +801,9 @@ Tab:Slider({
         Save("AuraRange", v)
     end
 })
+
+
+
 -- --------
 -- ออโต้ถือ
 -- --------
