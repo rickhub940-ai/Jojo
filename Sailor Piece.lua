@@ -520,134 +520,109 @@ end)
 -- ฟามออร่า
 -- ----------
 
+
 --// SETTINGS
 local running = false
-local farmMode = Get("FarmMode","Under")
-local farmDistance = Get("FarmDistance",7)
-local radius = Get("Radius",13)
+local farmModeaura = Get("FarmMode","Under")
+local AuraDistance = Get("FarmDistance",7)
+local AuraRadius = Get("Radius",13)
 
-local AttackRemote = ReplicatedStorage.CombatSystem.Remotes.RequestHit
-local NPCFolder = workspace:WaitForChild("NPCs")
-
+local player = Players.LocalPlayer
 local root
-local rotation = 0
-local circleParts = {}
+local TargetMob
 
---// CLEAR
-function clearCircle()
-	for _,v in ipairs(circleParts) do
-		if v.part then
-			v.part:Destroy()
-		end
-	end
-	table.clear(circleParts)
+local NPCFolder = workspace:WaitForChild("NPCs")
+local AttackRemote = ReplicatedStorage.CombatSystem.Remotes.RequestHit
+
+--// Tween
+local isTweening = false
+function TweenTo(cf)
+	isTweening = true
+	local tw = TweenService:Create(root,TweenInfo.new(0.3),{CFrame = cf})
+	tw:Play()
+	tw.Completed:Wait()
+	isTweening = false
 end
 
---// CREATE
-function createCircle()
-	clearCircle()
+--// หาเป้าหมาย
+function GetClosestMob()
+	local char = player.Character
+	if not char then return end
 
-	local char = player.Character or player.CharacterAdded:Wait()
-	root = char:WaitForChild("HumanoidRootPart")
+	root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
 
-	for i = 1,60 do
-		if i % 3 == 0 then
-			local p = Instance.new("Part")
-			p.Size = Vector3.new(0.6,0.2,2)
-			p.Material = Enum.Material.Neon
-			p.Color = Color3.fromRGB(255,0,0)
-			p.Anchored = true
-			p.CanCollide = false
-			p.Parent = workspace
+	local closest
+	local closestDist = AuraRadius
 
-			table.insert(circleParts,{part=p,index=i})
-		end
-	end
-end
+	for _,mob in ipairs(NPCFolder:GetChildren()) do
+		if mob:IsA("Model") then
 
---// วงหมุน
-RunService.Heartbeat:Connect(function(dt)
-	if not running or not root then return end
+			local hrp = mob:FindFirstChild("HumanoidRootPart")
+			local hum = mob:FindFirstChildOfClass("Humanoid")
 
-	rotation += dt * 2
+			if hrp and hum and hum.Health > 0 then
+				local dist = (hrp.Position - root.Position).Magnitude
 
-	for _,data in ipairs(circleParts) do
-		local i = data.index
-		local p = data.part
-
-		local angle = (i/60)*math.pi*2 + rotation
-		local x = math.cos(angle)*radius
-		local z = math.sin(angle)*radius
-
-		p.CFrame =
-			CFrame.new(root.Position + Vector3.new(x,-3,z))
-			* CFrame.Angles(0,-angle,0)
-	end
-end)
-
---// LOOP
-task.spawn(function()
-	while true do
-		task.wait(0.05)
-
-		if not running then continue end
-
-		local char = player.Character
-		if not char then continue end
-
-		root = char:FindFirstChild("HumanoidRootPart")
-		if not root then continue end
-
-		local closest
-		local closestDist = radius
-
-		for _,mob in ipairs(NPCFolder:GetChildren()) do
-			if mob:IsA("Model") then
-
-				local hrp = mob:FindFirstChild("HumanoidRootPart")
-				local hum = mob:FindFirstChildOfClass("Humanoid")
-
-				if hrp and hum and hum.Health > 0 then
-					local dist = (hrp.Position - root.Position).Magnitude
-
-					if dist <= radius and dist < closestDist then
-						closestDist = dist
-						closest = mob
-					end
-				end
-			end
-		end
-
-		if closest then
-			local e_hrp = closest:FindFirstChild("HumanoidRootPart")
-
-			if e_hrp then
-				local targetPos
-
-				if farmMode == "Under" then
-					targetPos = e_hrp.Position + Vector3.new(0,-farmDistance,0)
-
-				elseif farmMode == "Above" then
-					targetPos = e_hrp.Position + Vector3.new(0,farmDistance,0)
-
-				elseif farmMode == "Behind" then
-					targetPos = (e_hrp.CFrame * CFrame.new(0,0,farmDistance)).Position
-				end
-
-				local dist = (root.Position - e_hrp.Position).Magnitude
-
-				if dist > 10 then
-					if not isTweening then
-						TweenTo(targetPos)
-					end
-				else
-					root.CFrame = CFrame.lookAt(targetPos,e_hrp.Position)
-					AttackRemote:FireServer()
+				if dist <= AuraRadius and dist < closestDist then
+					closestDist = dist
+					closest = mob
 				end
 			end
 		end
 	end
+
+	return closest
+end
+
+--// ระบบหลัก
+RunService.RenderStepped:Connect(function()
+
+	if not running then return end
+
+	local char = player.Character
+	if not char then return end
+
+	root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
+
+	TargetMob = GetClosestMob()
+	if not TargetMob then return end
+
+	local mobRoot = TargetMob:FindFirstChild("HumanoidRootPart")
+	if not mobRoot then return end
+
+	local targetPos
+
+	if farmModeaura == "Under" then
+		targetPos = mobRoot.Position + Vector3.new(0,-AuraDistance,0)
+
+	elseif farmModeaura == "Above" then
+		targetPos = mobRoot.Position + Vector3.new(0,AuraDistance,0)
+
+	elseif farmModeaura == "Behind" then
+		targetPos = (mobRoot.CFrame * CFrame.new(0,0,AuraDistance)).Position
+	end
+
+	local dist = (root.Position - mobRoot.Position).Magnitude
+
+	-- ไกล → Tween
+	if dist > 8 then
+		if not isTweening then
+			TweenTo(CFrame.new(targetPos))
+		end
+	else
+		-- ใกล้ → TP บนหัว + หันหามอน
+		root.CFrame = CFrame.lookAt(
+			mobRoot.Position + Vector3.new(0,3,0),
+			mobRoot.Position
+		)
+
+		AttackRemote:FireServer()
+	end
+
 end)
+
 
 
 
@@ -692,12 +667,6 @@ Tab:Toggle({
 	Callback = function(state)
 		Save("MobAura",state)
 		running = state
-
-		if state then
-			createCircle()
-		else
-			clearCircle()
-		end
 	end
 })
 
@@ -707,7 +676,7 @@ Tab:Dropdown({
 	Value = Get("FarmMode","Under"),
 	Callback = function(option)
 		Save("FarmMode",option)
-		farmMode = option
+		farmModeaura = option
 	end
 })
 
@@ -717,7 +686,7 @@ Tab:Slider({
 	Value = {Min = 1,Max = 15,Default = Get("FarmDistance",7)},
 	Callback = function(v)
 		Save("FarmDistance",v)
-		farmDistance = v
+		AuraDistance = v
 	end
 })
 
@@ -727,7 +696,7 @@ Tab:Slider({
 	Value = {Min = 5,Max = 250,Default = Get("Radius",13)},
 	Callback = function(v)
 		Save("Radius",v)
-		radius = v
+		AuraRadius = v
 	end
 })
 
