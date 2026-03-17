@@ -623,7 +623,7 @@ local function AuraSystem()
 end
 task.spawn(function()
     while true do
-        task.wait(0.1)
+        task.wait(0.01)
         if AuraFarm then
             UpdateAura()
             AuraSystem()
