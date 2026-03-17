@@ -521,167 +521,6 @@ end)
 -- ----------
 
 
--- ตัวแปรที่ต้องมี
-local FarmZone = false
-local ZoneRadius = 20
-local ZonePosition = nil
-local ZoneCircle = nil
-local isAtZoneCenter = false
-
--- ฟังก์ชันสร้างวงกลมแดง
-local function CreateZoneCircle(position, radius)
-    if not position then return end
-    
-    if ZoneCircle then
-        ZoneCircle:Destroy()
-        ZoneCircle = nil
-    end
-    
-    -- ใช้ Part แบบเดิม แต่ไม่ใช้ Shape
-    local circle = Instance.new("Part")
-    circle.Name = "FarmZone_Circle"
-    circle.Size = Vector3.new(radius * 2, 0.2, radius * 2)
-    circle.CFrame = CFrame.new(position)
-    circle.Anchored = true
-    circle.CanCollide = false
-    circle.Transparency = 0.5
-    circle.BrickColor = BrickColor.new("Bright red")
-    circle.Material = Enum.Material.Neon
-    circle.Parent = workspace
-    
-    -- เพิ่มแสง
-    local pointLight = Instance.new("PointLight")
-    pointLight.Color = Color3.new(1, 0, 0)
-    pointLight.Range = radius * 1.5
-    pointLight.Brightness = 1
-    pointLight.Parent = circle
-    
-    ZoneCircle = circle
-    ZonePosition = position
-    isAtZoneCenter = false
-end
-
--- ฟังก์ชันหลัก Farm Zone
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        
-        local character = player.Character
-        local root = character and character:FindFirstChild("HumanoidRootPart")
-        
-        -- ถ้าตาย แต่ยังเปิด Farm Zone อยู่
-        if not root and FarmZone then
-            task.wait(1)
-            character = player.Character
-            root = character and character:FindFirstChild("HumanoidRootPart")
-            if root and FarmZone and ZonePosition then
-                isAtZoneCenter = false
-            end
-            continue
-        end
-        
-        if not FarmZone or not root then
-            continue
-        end
-
-        -- ถ้ายังไม่มีวง ให้สร้างวงใหม่
-        if not ZoneCircle and root then
-            CreateZoneCircle(root.Position, ZoneRadius)
-        end
-
-        if not ZonePosition then
-            if ZoneCircle then
-                ZoneCircle:Destroy()
-                ZoneCircle = nil
-            end
-            continue
-        end
-
-        -- ตรวจสอบว่าอยู่ที่กลางวงหรือยัง
-        local distFromCenter = (root.Position - ZonePosition).Magnitude
-        
-        -- ถ้ายังไม่ได้อยู่กลางวง ให้ tween ไปก่อน
-        if not isAtZoneCenter and distFromCenter > 3 then
-            if not isTweening then
-                TweenTo(ZonePosition + Vector3.new(0, 3, 0))
-            end
-            continue
-        elseif distFromCenter <= 3 then
-            isAtZoneCenter = true
-            isTweening = false
-            ManagePlatform(false)
-        end
-
-        -- เมื่ออยู่กลางวงแล้ว ค่อยหา monster
-        if isAtZoneCenter then
-            local closestMonster = nil
-            local closestDist = math.huge
-            
-            local npcFolder = workspace:FindFirstChild("NPCs")
-            if npcFolder then
-                for _, monster in pairs(npcFolder:GetChildren()) do
-                    if monster and monster:FindFirstChild("Humanoid") and monster:FindFirstChild("HumanoidRootPart") then
-                        local humanoid = monster.Humanoid
-                        local mobRoot = monster.HumanoidRootPart
-                        
-                        if humanoid and humanoid.Health > 0 and mobRoot then
-                            local dist = (mobRoot.Position - ZonePosition).Magnitude
-                            
-                            if dist <= ZoneRadius and dist < closestDist then
-                                closestDist = dist
-                                closestMonster = monster
-                            end
-                        end
-                    end
-                end
-            end
-
-            -- จัดการกับ monster ที่เจอ
-            if closestMonster then
-                local mobRoot = closestMonster.HumanoidRootPart
-                
-                if mobRoot and root then
-                    local distToMob = (root.Position - mobRoot.Position).Magnitude
-                    
-                    if distToMob > 7 then
-                        if not isTweening then
-                            TweenTo(mobRoot.Position + Vector3.new(0, FarmDistance, 0))
-                        end
-                    else
-                        isTweening = false
-                        ManagePlatform(false)
-                        
-                        -- ใช้ offset ตาม FarmMode
-                        local offset = CFrame.new(0, 0, 0)
-                        if FarmMode == "Above" then
-                            offset = CFrame.new(0, FarmDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-                        elseif FarmMode == "Behind" then
-                            offset = CFrame.new(0, 0, FarmDistance)
-                        elseif FarmMode == "Below" then
-                            offset = CFrame.new(0, -FarmDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
-                        end
-                        
-                        root.CFrame = mobRoot.CFrame * offset
-                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        
-                        -- ยิงรีโมตตี
-                        local remote = ReplicatedStorage:FindFirstChild("CombatSystem") and
-                                       ReplicatedStorage.CombatSystem:FindFirstChild("Remotes") and
-                                       ReplicatedStorage.CombatSystem.Remotes:FindFirstChild("RequestHit")
-                        if remote then
-                            remote:FireServer()
-                        end
-                    end
-                end
-            end
-        end
-    end
-end)
-
--- UI (ใช้รูปแบบ Value = { Min = , Max = , Default = } ตามโค้ดแรก)
-
-
-
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
 Tab:Toggle({
@@ -715,22 +554,206 @@ Tab:Slider({
 
 
 
+-- ตัวแปร (พิมเล็ก)
+local farmzone_on = false
+local farmzone_radius = 20
+local farmzone_pos = nil
+local farmzone_circle = nil
+local farmzone_atcenter = false
+local farmzone_attacking = false
+local farmzone_mode = "Above"
+local farmzone_distance = 10
+
+-- ฟังก์ชันสร้างวงกลม
+local function farmzone_create(pos, radius)
+    if not pos then return end
+    
+    if farmzone_circle then
+        farmzone_circle:Destroy()
+        farmzone_circle = nil
+    end
+    
+    local circle = Instance.new("CylinderPart")
+    circle.Name = "farmzone_circle"
+    circle.Height = 0.2
+    circle.Radius = radius
+    circle.CFrame = CFrame.new(pos)
+    circle.Anchored = true
+    circle.CanCollide = false
+    circle.Transparency = 0.5
+    circle.BrickColor = BrickColor.new("Bright red")
+    circle.Material = Enum.Material.Neon
+    circle.Parent = workspace
+    
+    local light = Instance.new("PointLight")
+    light.Color = Color3.new(1, 0, 0)
+    light.Range = radius * 1.5
+    light.Brightness = 1
+    light.Parent = circle
+    
+    farmzone_circle = circle
+    farmzone_pos = pos
+    farmzone_atcenter = false
+end
+
+-- ฟังก์ชันโจมตี (ทุก 0.01 วิ) + หันตามมอน
+local function farmzone_attack(monster)
+    if farmzone_attacking then return end
+    farmzone_attacking = true
+    
+    task.spawn(function()
+        while farmzone_attacking and farmzone_on and monster and monster.Parent and monster.Humanoid and monster.Humanoid.Health > 0 do
+            local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            local mobRoot = monster:FindFirstChild("HumanoidRootPart")
+            
+            if root and mobRoot then
+                local offset = CFrame.new(0, 0, 0)
+                if farmzone_mode == "Above" then
+                    offset = CFrame.new(0, farmzone_distance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                elseif farmzone_mode == "Behind" then
+                    offset = CFrame.new(0, 0, farmzone_distance)
+                elseif farmzone_mode == "Below" then
+                    offset = CFrame.new(0, -farmzone_distance, 0) * CFrame.Angles(math.rad(90), 0, 0)
+                end
+                
+                -- TP ไปตำแหน่ง
+                root.CFrame = mobRoot.CFrame * offset
+                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                
+                -- หันหน้าไปทางมอนตลอด
+                local look = CFrame.lookAt(root.Position, mobRoot.Position)
+                root.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, look:ToEulerAnglesYXZ(), 0)
+                
+                -- ยิงรีโมต
+                local remote = ReplicatedStorage:FindFirstChild("CombatSystem") and
+                               ReplicatedStorage.CombatSystem:FindFirstChild("Remotes") and
+                               ReplicatedStorage.CombatSystem.Remotes:FindFirstChild("RequestHit")
+                if remote then
+                    remote:FireServer()
+                end
+            end
+            
+            task.wait(0.01)
+        end
+        farmzone_attacking = false
+    end)
+end
+
+-- ฟังก์ชันหลัก
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        
+        local char = player.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        
+        if not root and farmzone_on then
+            farmzone_attacking = false
+            task.wait(1)
+            char = player.Character
+            root = char and char:FindFirstChild("HumanoidRootPart")
+            if root and farmzone_on and farmzone_pos then
+                farmzone_atcenter = false
+            end
+            continue
+        end
+        
+        if not farmzone_on or not root then
+            farmzone_attacking = false
+            continue
+        end
+
+        if not farmzone_circle and root then
+            farmzone_create(root.Position, farmzone_radius)
+        end
+
+        if not farmzone_pos then
+            if farmzone_circle then
+                farmzone_circle:Destroy()
+                farmzone_circle = nil
+            end
+            continue
+        end
+
+        local dist = (root.Position - farmzone_pos).Magnitude
+        
+        if not farmzone_atcenter and dist > 3 then
+            if not isTweening then
+                TweenTo(farmzone_pos + Vector3.new(0, 3, 0))
+                farmzone_attacking = false
+            end
+            continue
+        elseif dist <= 3 then
+            farmzone_atcenter = true
+            isTweening = false
+            ManagePlatform(false)
+        end
+
+        if farmzone_atcenter then
+            local closeMon = nil
+            local closeDist = math.huge
+            
+            local npc = workspace:FindFirstChild("NPCs")
+            if npc then
+                for _, m in pairs(npc:GetChildren()) do
+                    if m and m:FindFirstChild("Humanoid") and m:FindFirstChild("HumanoidRootPart") then
+                        local hp = m.Humanoid
+                        local part = m.HumanoidRootPart
+                        
+                        if hp and hp.Health > 0 and part then
+                            local d = (part.Position - farmzone_pos).Magnitude
+                            
+                            if d <= farmzone_radius and d < closeDist then
+                                closeDist = d
+                                closeMon = m
+                            end
+                        end
+                    end
+                end
+            end
+
+            if closeMon then
+                local part = closeMon.HumanoidRootPart
+                
+                if part and root then
+                    local toMob = (root.Position - part.Position).Magnitude
+                    
+                    if toMob > 7 then
+                        if not isTweening then
+                            TweenTo(part.Position + Vector3.new(0, farmzone_distance, 0))
+                            farmzone_attacking = false
+                        end
+                    else
+                        isTweening = false
+                        ManagePlatform(false)
+                        farmzone_attack(closeMon)
+                    end
+                end
+            else
+                farmzone_attacking = false
+            end
+        end
+    end
+end)
+
+-- UI
 Tab:Toggle({
     Title = "โหมด Farm Zone (วงแดง)",
     Value = false,
     Callback = function(state) 
-        FarmZone = state
+        farmzone_on = state
         if state then
             local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             if root then
-                CreateZoneCircle(root.Position, ZoneRadius)
+                farmzone_create(root.Position, farmzone_radius)
             end
         else
-            if ZoneCircle then
-                ZoneCircle:Destroy()
-                ZoneCircle = nil
-                ZonePosition = nil
-                isAtZoneCenter = false
+            if farmzone_circle then
+                farmzone_circle:Destroy()
+                farmzone_circle = nil
+                farmzone_pos = nil
+                farmzone_atcenter = false
+                farmzone_attacking = false
             end
         end
     end
@@ -741,14 +764,28 @@ Tab:Slider({
     Step = 1,
     Value = { Min = 5, Max = 50, Default = 20 },
     Callback = function(value)
-        ZoneRadius = value
-        if ZoneCircle and ZonePosition then
-            ZoneCircle.Size = Vector3.new(value * 2, 0.2, value * 2)
-            local light = ZoneCircle:FindFirstChildOfClass("PointLight")
-            if light then
-                light.Range = value * 1.5
-            end
+        farmzone_radius = value
+        if farmzone_circle and farmzone_pos then
+            farmzone_create(farmzone_pos, value)
         end
+    end
+})
+
+Tab:Dropdown({
+    Title = "ตำแหน่งโจมตี",
+    Values = { "Above", "Behind", "Below" },
+    Value = "Above",
+    Callback = function(opt)
+        farmzone_mode = opt
+    end
+})
+
+Tab:Slider({
+    Title = "ระยะห่างจากมอน",
+    Step = 1,
+    Value = { Min = 5, Max = 30, Default = 10 },
+    Callback = function(val)
+        farmzone_distance = val
     end
 })
 
