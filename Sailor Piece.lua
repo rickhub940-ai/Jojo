@@ -523,7 +523,7 @@ end)
 --// CONFIGaura
 local AuraFarm = Get("AuraFarm", false)
 local AuraRange = Get("AuraRange", 20)
-local AuraMode = Get("AuraMode", "Follow") 
+local AuraMode = Get("AuraMode", "วงตามตัว") 
 local FarmModeAura = Get("FarmModeAura", "Above")
 local FarmDistanceAura = Get("FarmDistanceAura", 5)
 
@@ -544,7 +544,7 @@ local function CreateAura()
     AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
     AuraPart.Material = Enum.Material.Neon
     AuraPart.Color = Color3.fromRGB(255, 0, 0) 
-    AuraPart.Transparency = 0.5
+    AuraPart.Transparency = 0.7
     AuraPart.Anchored = true
     AuraPart.CanCollide = false
     AuraPart.Parent = workspace
@@ -560,7 +560,7 @@ local function UpdateAura()
         CreateAura()
 	end
     AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
-    if AuraMode == "Static" then
+    if AuraMode == "วงแค่ตรงที่เปิดครั้งแรก" then
         if not AuraPosition then
             AuraPosition = root.Position - Vector3.new(0,3,0)
 		end
@@ -637,6 +637,40 @@ local function ResetAura()
 end
 
 
+
+
+
+local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
+
+Tab:Toggle({
+    Title = "ออโต้ฟาม",
+    Value = AutoFarm,
+    Callback = function(state) 
+        AutoFarm = state
+        Save("AutoFarm", state)
+    end
+})
+
+Tab:Dropdown({
+    Title = "เลือกโหมดการฟาม",
+    Values = { "Above", "Behind", "Below" },
+    Value = FarmMode,
+    Callback = function(option) 
+        FarmMode = option
+        Save("FarmMode", option)
+    end
+})
+
+Tab:Slider({
+    Title = "ระยะห่างจากมอน",
+    Step = 1,
+    Value = { Min = 5, Max = 30, Default = FarmDistance },
+    Callback = function(value)
+        FarmDistance = value
+        Save("FarmDistance", value)
+    end
+})
+
 Tab:Toggle({
     Title = "ฟามออร่า",
     Value = AuraFarm,
@@ -649,7 +683,7 @@ Tab:Toggle({
 
 Tab:Dropdown({
     Title = "Aura Type",
-    Values = { "Follow", "Static" },
+    Values = { "วงตามตัว", "วงแค่ตรงที่เปิดครั้งแรก" },
     Value = AuraMode,
     Callback = function(option)
         AuraMode = option
@@ -685,90 +719,6 @@ Tab:Slider({
     Callback = function(value)
         FarmDistanceAura = value
         Save("FarmDistanceAura", value)
-    end
-})
-
-
-local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
-
-Tab:Toggle({
-    Title = "ออโต้ฟาม",
-    Value = AutoFarm,
-    Callback = function(state) 
-        AutoFarm = state
-        Save("AutoFarm", state)
-    end
-})
-
-Tab:Dropdown({
-    Title = "เลือกโหมดการฟาม",
-    Values = { "Above", "Behind", "Below" },
-    Value = FarmMode,
-    Callback = function(option) 
-        FarmMode = option
-        Save("FarmMode", option)
-    end
-})
-
-Tab:Slider({
-    Title = "ระยะห่างจากมอน",
-    Step = 1,
-    Value = { Min = 5, Max = 30, Default = FarmDistance },
-    Callback = function(value)
-        FarmDistance = value
-        Save("FarmDistance", value)
-    end
-})
-
-
-Tab:Toggle({
-    Title = "ฟามออร่า",
-    Value = AuraFarm,
-    Callback = function(v)
-        AuraFarm = v
-        Save("AuraFarm", v)
-        ResetAura()
-    end
-})
-
-Tab:Dropdown({
-    Title = "โหมดออร่า",
-    Values = { "Follow", "Static" },
-    Value = AuraMode,
-    Callback = function(v)
-        AuraMode = v
-        Save("AuraMode", v)
-        ResetAura()
-    end
-})
-
-Tab:Dropdown({
-    Title = "ตำแหน่งตี",
-    Values = { "Above", "Behind", "Below" },
-    Value = FarmModeAura,
-    Callback = function(v)
-        FarmModeAura = v
-        Save("FarmModeAura", v)
-    end
-})
-
-Tab:Slider({
-    Title = "ระยะออร่า",
-    Step = 1,
-    Value = { Min = 1, Max = 20, Default = FarmDistanceAura },
-    Callback = function(v)
-        FarmDistanceAura = v
-        Save("FarmDistanceAura", v)
-    end
-})
-
-Tab:Slider({
-    Title = "ระยะวง",
-    Step = 1,
-    Value = { Min = 5, Max = 50, Default = AuraRange },
-    Callback = function(v)
-        AuraRange = v
-        Save("AuraRange", v)
     end
 })
 
