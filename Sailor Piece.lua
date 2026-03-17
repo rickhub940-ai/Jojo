@@ -665,7 +665,7 @@ task.spawn(function()
 end)
 
 
-Tab:Toggle({
+
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
@@ -699,7 +699,7 @@ Tab:Slider({
 })
 
 
-    Title = "ฟามออร่า",
+Tab:Toggle({Title = "ฟามออร่า",
     Value = AuraFarm,
     Callback = function(state)
         AuraFarm = state
