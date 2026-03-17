@@ -520,149 +520,136 @@ end)
 -- ฟามออร่า
 -- ----------
 
+--// SETTINGS
+local running = false
+local farmMode = Get("FarmMode","Under")
+local farmDistance = Get("FarmDistance",7)
+local radius = Get("Radius",13)
 
---// CONFIG
-local AuraFarm = Get("AuraFarm", false)
-local AuraRange = Get("AuraRange", 20)
-local FarmModeAura = Get("FarmModeAura", "Above")
-local FarmDistanceAura = Get("FarmDistanceAura", 5)
+local AttackRemote = ReplicatedStorage.CombatSystem.Remotes.RequestHit
+local NPCFolder = workspace:WaitForChild("NPCs")
 
+local root
+local rotation = 0
+local circleParts = {}
 
-
---// VAR
-local AuraPart
-local CurrentTween
-
---// ROOT
-local function GetRoot()
-    return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+--// CLEAR
+function clearCircle()
+	for _,v in ipairs(circleParts) do
+		if v.part then
+			v.part:Destroy()
+		end
+	end
+	table.clear(circleParts)
 end
 
-local function NoClip()
-    local char = player.Character
-    if not char then return end
+--// CREATE
+function createCircle()
+	clearCircle()
 
-    for _, v in pairs(char:GetDescendants()) do
-        if v:IsA("BasePart") then
-            v.CanCollide = false
-        end
-    end
-end
-local function CreateAura()
-    if AuraPart then return end
-    
-    AuraPart = Instance.new("Part")
-    AuraPart.Name = "RickHub_Aura"
-    AuraPart.Shape = Enum.PartType.Cylinder
-    AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
-    AuraPart.Material = Enum.Material.Neon
-    AuraPart.Color = Color3.fromRGB(255, 0, 0)
-    AuraPart.Transparency = 0.7
-    AuraPart.Anchored = true
-    AuraPart.CanCollide = false
-    AuraPart.Parent = workspace
+	local char = player.Character or player.CharacterAdded:Wait()
+	root = char:WaitForChild("HumanoidRootPart")
+
+	for i = 1,60 do
+		if i % 3 == 0 then
+			local p = Instance.new("Part")
+			p.Size = Vector3.new(0.6,0.2,2)
+			p.Material = Enum.Material.Neon
+			p.Color = Color3.fromRGB(255,0,0)
+			p.Anchored = true
+			p.CanCollide = false
+			p.Parent = workspace
+
+			table.insert(circleParts,{part=p,index=i})
+		end
+	end
 end
 
-local function UpdateAura()
-    if not AuraFarm then
-        if AuraPart then AuraPart:Destroy() AuraPart = nil end
-        return
-    end
+--// วงหมุน
+RunService.Heartbeat:Connect(function(dt)
+	if not running or not root then return end
 
-    local root = GetRoot()
-    if not root then return end
+	rotation += dt * 2
 
-    if not AuraPart then
-        CreateAura()
-    end
+	for _,data in ipairs(circleParts) do
+		local i = data.index
+		local p = data.part
 
-    AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
-    AuraPart.Position = root.Position - Vector3.new(0,3,0)
-    AuraPart.Orientation = Vector3.new(0, 0, 90)
-end
-local function GetClosestMob()
-    local root = GetRoot()
-    if not root then return nil end
+		local angle = (i/60)*math.pi*2 + rotation
+		local x = math.cos(angle)*radius
+		local z = math.sin(angle)*radius
 
-    local closest, shortest = nil, AuraRange
-
-    for _, v in pairs(workspace:FindFirstChild("NPCs"):GetChildren()) do
-        local hrp = v:FindFirstChild("HumanoidRootPart")
-        local hum = v:FindFirstChild("Humanoid")
-
-        if hrp and hum and hum.Health > 0 then
-            local dist = (root.Position - hrp.Position).Magnitude
-            if dist < shortest then
-                shortest = dist
-                closest = v
-            end
-        end
-    end
-
-    return closest
-end
-local function GetOffset()
-    if FarmModeAura == "Above" then
-        return Vector3.new(0, FarmDistanceAura, 0)
-    elseif FarmModeAura == "Behind" then
-        return Vector3.new(0, 0, FarmDistanceAura)
-    elseif FarmModeAura == "Below" then
-        return Vector3.new(0, -FarmDistanceAura, 0)
-    end
-    return Vector3.new(0, FarmDistanceAura, 0)
-end
-
-local function TweenTo(targetPos)
-    local root = GetRoot()
-    if not root then return end
-
-    if CurrentTween then
-        CurrentTween:Cancel()
-    end
-
-    CurrentTween = TweenService:Create(
-        root,
-        TweenInfo.new(0.15, Enum.EasingStyle.Linear),
-        {CFrame = CFrame.new(targetPos)}
-    )
-
-    CurrentTween:Play()
-end
-local function AuraSystem()
-    if not AuraFarm then return end
-
-    local root = GetRoot()
-    if not root then return end
-
-    local mob = GetClosestMob()
-    if not mob then return end
-
-    local mobRoot = mob:FindFirstChild("HumanoidRootPart")
-    if not mobRoot then return end
-
-    local offset = GetOffset()
-    local targetPos = mobRoot.Position + offset
-
-    local dist = (root.Position - mobRoot.Position).Magnitude
-
-    if dist > 10 then
-        TweenTo(targetPos)
-	else
-        root.CFrame = CFrame.new(targetPos, mobRoot.Position)
-        ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
-    end
-end
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-
-        if AuraFarm then
-            NoClip()
-            UpdateAura()
-            AuraSystem()
-        end
-    end
+		p.CFrame =
+			CFrame.new(root.Position + Vector3.new(x,-3,z))
+			* CFrame.Angles(0,-angle,0)
+	end
 end)
+
+--// LOOP
+task.spawn(function()
+	while true do
+		task.wait(0.05)
+
+		if not running then continue end
+
+		local char = player.Character
+		if not char then continue end
+
+		root = char:FindFirstChild("HumanoidRootPart")
+		if not root then continue end
+
+		local closest
+		local closestDist = radius
+
+		for _,mob in ipairs(NPCFolder:GetChildren()) do
+			if mob:IsA("Model") then
+
+				local hrp = mob:FindFirstChild("HumanoidRootPart")
+				local hum = mob:FindFirstChildOfClass("Humanoid")
+
+				if hrp and hum and hum.Health > 0 then
+					local dist = (hrp.Position - root.Position).Magnitude
+
+					if dist <= radius and dist < closestDist then
+						closestDist = dist
+						closest = mob
+					end
+				end
+			end
+		end
+
+		if closest then
+			local e_hrp = closest:FindFirstChild("HumanoidRootPart")
+
+			if e_hrp then
+				local targetPos
+
+				if farmMode == "Under" then
+					targetPos = e_hrp.Position + Vector3.new(0,-farmDistance,0)
+
+				elseif farmMode == "Above" then
+					targetPos = e_hrp.Position + Vector3.new(0,farmDistance,0)
+
+				elseif farmMode == "Behind" then
+					targetPos = (e_hrp.CFrame * CFrame.new(0,0,farmDistance)).Position
+				end
+
+				local dist = (root.Position - e_hrp.Position).Magnitude
+
+				if dist > 10 then
+					if not isTweening then
+						TweenTo(targetPos)
+					end
+				else
+					root.CFrame = CFrame.lookAt(targetPos,e_hrp.Position)
+					AttackRemote:FireServer()
+				end
+			end
+		end
+	end
+end)
+
+
 
 
 
@@ -699,44 +686,50 @@ Tab:Slider({
 })
 
 
-Tab:Toggle({Title = "ฟามออร่า",
-    Value = AuraFarm,
-    Callback = function(state)
-        AuraFarm = state
-        Save("AuraFarm", state)
-    end
+Tab:Toggle({
+	Title = "ออโต้ตีมอนในวง",
+	Value = Get("MobAura",false),
+	Callback = function(state)
+		Save("MobAura",state)
+		running = state
+
+		if state then
+			createCircle()
+		else
+			clearCircle()
+		end
+	end
 })
 
 Tab:Dropdown({
-    Title = "ตำแหน่งตี",
-    Values = { "Above", "Behind", "Below" },
-    Value = FarmModeAura,
-    Callback = function(option)
-        FarmModeAura = option
-        Save("FarmModeAura", option)
-    end
+	Title = "เลือกโหมดการตี",
+	Values = {"Under","Above","Behind"},
+	Value = Get("FarmMode","Under"),
+	Callback = function(option)
+		Save("FarmMode",option)
+		farmMode = option
+	end
 })
 
 Tab:Slider({
-    Title = "ระยะออร่า",
-    Step = 1,
-    Value = { Min = 5, Max = 50, Default = AuraRange },
-    Callback = function(value)
-        AuraRange = value
-        Save("AuraRange", value)
-    end
+	Title = "ปรับระยะห่างจากมอน",
+	Step = 1,
+	Value = {Min = 1,Max = 15,Default = Get("FarmDistance",7)},
+	Callback = function(v)
+		Save("FarmDistance",v)
+		farmDistance = v
+	end
 })
 
 Tab:Slider({
-    Title = "ระยะยืนตี",
-    Step = 1,
-    Value = { Min = 2, Max = 15, Default = FarmDistanceAura },
-    Callback = function(value)
-        FarmDistanceAura = value
-        Save("FarmDistanceAura", value)
-    end
+	Title = "ปรับวงตี",
+	Step = 5,
+	Value = {Min = 5,Max = 250,Default = Get("Radius",13)},
+	Callback = function(v)
+		Save("Radius",v)
+		radius = v
+	end
 })
-
 
 
 
