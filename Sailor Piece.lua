@@ -517,8 +517,194 @@ end)
 
 
 -- ----------
--- ออโต้ถือ
+-- ฟามออร่า
 -- ----------
+--// CONFIG
+local AuraFarm = Get("AuraFarm", false)
+local AuraRange = Get("AuraRange", 20)
+local AuraMode = Get("AuraMode", "Follow") -- Follow / Static
+local FarmModeAura = Get("FarmModeAura", "Above") -- Above / Behind / Below
+
+local AuraPart = nil
+local AuraPosition = nil
+
+--// CREATE AURA
+local function CreateAura()
+    if AuraPart then return end
+    
+    AuraPart = Instance.new("Part")
+    AuraPart.Name = "RickHub_Aura"
+    AuraPart.Shape = Enum.PartType.Cylinder
+    AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
+    AuraPart.Material = Enum.Material.Neon
+    AuraPart.Color = Color3.fromRGB(0,255,255)
+    AuraPart.Transparency = 0.5
+    AuraPart.Anchored = true
+    AuraPart.CanCollide = false
+    AuraPart.Parent = workspace
+end
+
+--// UPDATE AURA
+local function UpdateAura()
+    if not AuraFarm then
+        if AuraPart then AuraPart:Destroy() AuraPart = nil end
+        return
+    end
+
+    local root = GetRoot()
+    if not root then return end
+
+    if not AuraPart then
+        CreateAura()
+    end
+
+    AuraPart.Size = Vector3.new(1, AuraRange * 2, AuraRange * 2)
+
+    if AuraMode == "Static" then
+        if not AuraPosition then
+            AuraPosition = root.Position
+        end
+        AuraPart.CFrame = CFrame.new(AuraPosition) * CFrame.Angles(0,0,math.rad(90))
+    else
+        AuraPart.CFrame = root.CFrame * CFrame.new(0,-3,0) * CFrame.Angles(0,0,math.rad(90))
+    end
+end
+
+--// GET CLOSEST MOB (AURA)
+local function GetClosestMob()
+    local root = GetRoot()
+    if not root then return nil end
+
+    local closest = nil
+    local shortest = math.huge
+
+    for _, v in pairs(workspace.NPCs:GetChildren()) do
+        if v:FindFirstChild("HumanoidRootPart") 
+        and v:FindFirstChild("Humanoid") 
+        and v.Humanoid.Health > 0 then
+
+            local dist = (root.Position - v.HumanoidRootPart.Position).Magnitude
+            if dist < shortest and dist <= AuraRange then
+                shortest = dist
+                closest = v
+            end
+        end
+    end
+
+    return closest
+end
+
+--// AURA SYSTEM
+local function AuraSystem()
+    if not AuraFarm then return end
+    
+    local root = GetRoot()
+    if not root then return end
+
+    local mob = GetClosestMob()
+    if not mob then return end
+
+    local mobRoot = mob.HumanoidRootPart
+
+    -- STATIC: กลับจุดกลาง
+    if AuraMode == "Static" and AuraPosition then
+        if (root.Position - AuraPosition).Magnitude > 5 then
+            if not isTweening then
+                TweenTo(AuraPosition)
+            end
+            return
+        end
+    end
+
+    local dist = (root.Position - mobRoot.Position).Magnitude
+
+    if dist > 10 then
+        if not isTweening then
+            TweenTo(mobRoot.Position + Vector3.new(0, FarmDistance, 0))
+        end
+    else
+        isTweening = false
+        root.CFrame = mobRoot.CFrame * CFrame.new(0, FarmDistance, 0)
+
+        -- 🔥 ตีรัว
+        while AuraFarm 
+        and mob 
+        and mob:FindFirstChild("Humanoid") 
+        and mob.Humanoid.Health > 0 do
+
+            ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
+            task.wait(0.08)
+        end
+    end
+end
+
+--// RENDER (ควบคุมตำแหน่ง)
+RunService.RenderStepped:Connect(function()
+    local root = GetRoot()
+    if not root then return end
+
+    local mob = TargetMob
+
+    -- Aura ใช้ mob ของมันเอง
+    if AuraFarm then
+        mob = GetClosestMob()
+    end
+
+    if mob and mob:FindFirstChild("HumanoidRootPart") then
+        local mobRoot = mob.HumanoidRootPart
+        local offset = CFrame.new()
+
+        -- 🟢 AutoFarm
+        if not AuraFarm then
+            if FarmMode == "Above" then
+                offset = CFrame.new(0, FarmDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+
+            elseif FarmMode == "Behind" then
+                offset = CFrame.new(0, 0, FarmDistance)
+
+            elseif FarmMode == "Below" then
+                offset = CFrame.new(0, -FarmDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
+            end
+        end
+
+        -- 🔵 Aura
+        if AuraFarm then
+            if FarmModeAura == "Above" then
+                offset = CFrame.new(0, FarmDistance, 0)
+
+            elseif FarmModeAura == "Behind" then
+                offset = CFrame.new(0, 0, FarmDistance)
+
+            elseif FarmModeAura == "Below" then
+                offset = CFrame.new(0, -FarmDistance, 0)
+            end
+        end
+
+        root.CFrame = mobRoot.CFrame * offset
+        root.AssemblyLinearVelocity = Vector3.new(0,0,0)
+    end
+end)
+
+--// LOOP
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+
+        if AuraFarm then
+            TargetMob = nil
+        end
+
+        UpdateAura()
+        AuraSystem()
+    end
+end)
+
+--// RESET
+local function ResetAura()
+    AuraPosition = nil
+end
+
+--// UI
 
 
 
@@ -550,6 +736,49 @@ Tab:Slider({
     Callback = function(value)
         FarmDistance = value
         Save("FarmDistance", value)
+    end
+})
+
+
+
+Tab:Toggle({
+    Title = "ฟามออร่า",
+    Value = AuraFarm,
+    Callback = function(state) 
+        AuraFarm = state
+        Save("AuraFarm", state)
+        ResetAura()
+    end
+})
+
+Tab:Dropdown({
+    Title = "Aura Type",
+    Values = { "Follow", "Static" },
+    Value = AuraMode,
+    Callback = function(option)
+        AuraMode = option
+        Save("AuraMode", option)
+        ResetAura()
+    end
+})
+
+Tab:Dropdown({
+    Title = "Aura Position",
+    Values = { "Above", "Behind", "Below" },
+    Value = FarmModeAura,
+    Callback = function(option)
+        FarmModeAura = option
+        Save("FarmModeAura", option)
+    end
+})
+
+Tab:Slider({
+    Title = "ระยะออร่า",
+    Step = 1,
+    Value = { Min = 5, Max = 50, Default = AuraRange },
+    Callback = function(value)
+        AuraRange = value
+        Save("AuraRange", value)
     end
 })
 
