@@ -521,7 +521,151 @@ end)
 -- ----------
 
 
+-- ตัวแปรที่ต้องมี
+local FarmZone = false
+local ZoneRadius = 20
+local ZonePosition = nil
+local ZoneCircle = nil
+local isAtZoneCenter = false
 
+-- ฟังก์ชันสร้างวงกลมแดง (อยู่กับที่)
+local function CreateZoneCircle(position, radius)
+    if ZoneCircle then
+        ZoneCircle:Destroy()
+    end
+    
+    local circle = Instance.new("Part")
+    circle.Name = "FarmZone_Circle"
+    circle.Size = Vector3.new(radius * 2, 0.2, radius * 2)
+    circle.CFrame = CFrame.new(position)
+    circle.Anchored = true
+    circle.CanCollide = false
+    circle.Transparency = 0.5
+    circle.BrickColor = BrickColor.new("Bright red")
+    circle.Material = Enum.Material.Neon
+    circle.Shape = Enum.PartShape.Cylinder
+    circle.Parent = workspace
+    
+    local pointLight = Instance.new("PointLight")
+    pointLight.Color = Color3.new(1, 0, 0)
+    pointLight.Range = radius * 1.5
+    pointLight.Brightness = 1
+    pointLight.Parent = circle
+    
+    ZoneCircle = circle
+    ZonePosition = position
+end
+
+-- ฟังก์ชันหลัก Farm Zone
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        
+        local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        
+        -- ถ้าตาย แต่ยังเปิด Farm Zone อยู่
+        if not root and FarmZone then
+            -- รอจนกว่าจะเกิดใหม่
+            task.wait(1)
+            root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if root and FarmZone then
+                -- ถ้าเกิดแล้ว กลับไปที่กลางวง
+                isAtZoneCenter = false
+            end
+            continue
+        end
+        
+        if not FarmZone or not root then
+            continue
+        end
+
+        -- ถ้ายังไม่มีวง หรือปิดแล้วเปิดใหม่ ให้สร้างวงใหม่ที่ตำแหน่งปัจจุบัน
+        if not ZoneCircle then
+            CreateZoneCircle(root.Position, ZoneRadius)
+            isAtZoneCenter = false
+        end
+
+        -- ตรวจสอบว่าอยู่ที่กลางวงหรือยัง
+        local distFromCenter = (root.Position - ZonePosition).Magnitude
+        
+        -- ถ้ายังไม่ได้อยู่กลางวง ให้ tween ไปก่อน
+        if not isAtZoneCenter and distFromCenter > 3 then
+            if not isTweening then
+                TweenTo(ZonePosition + Vector3.new(0, 3, 0))
+            end
+            continue
+        elseif distFromCenter <= 3 then
+            isAtZoneCenter = true
+            isTweening = false
+            ManagePlatform(false)
+        end
+
+        -- เมื่ออยู่กลางวงแล้ว ค่อยหา monster
+        if isAtZoneCenter then
+            -- หา monster ในรัศมี
+            local closestMonster = nil
+            local closestDist = math.huge
+            
+            local npcFolder = workspace:FindFirstChild("NPCs")
+            if npcFolder then
+                for _, monster in pairs(npcFolder:GetChildren()) do
+                    if monster:FindFirstChild("Humanoid") and monster:FindFirstChild("HumanoidRootPart") then
+                        local humanoid = monster.Humanoid
+                        if humanoid.Health > 0 then
+                            local mobRoot = monster.HumanoidRootPart
+                            local dist = (mobRoot.Position - ZonePosition).Magnitude
+                            
+                            if dist <= ZoneRadius and dist < closestDist then
+                                closestDist = dist
+                                closestMonster = monster
+                            end
+                        end
+                    end
+                end
+            end
+
+            -- จัดการกับ monster ที่เจอ
+            if closestMonster then
+                local mobRoot = closestMonster.HumanoidRootPart
+                
+                -- ถ้า monster อยู่ไกลจากผู้เล่น (>7) ให้ tween ไปหา
+                local distToMob = (root.Position - mobRoot.Position).Magnitude
+                if distToMob > 7 then
+                    if not isTweening then
+                        TweenTo(mobRoot.Position + Vector3.new(0, FarmDistance, 0))
+                    end
+                else
+                    -- ถ้าใกล้แล้ว ให้หยุด tween และโจมตี
+                    isTweening = false
+                    ManagePlatform(false)
+                    
+                    if root and mobRoot then
+                        -- ใช้ offset ตาม FarmMode
+                        local offset = CFrame.new(0, 0, 0)
+                        if FarmMode == "Above" then
+                            offset = CFrame.new(0, FarmDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                        elseif FarmMode == "Behind" then
+                            offset = CFrame.new(0, 0, FarmDistance)
+                        elseif FarmMode == "Below" then
+                            offset = CFrame.new(0, -FarmDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
+                        end
+                        
+                        root.CFrame = mobRoot.CFrame * offset
+                        root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        
+                        -- ยิงรีโมตตี
+                        local remote = ReplicatedStorage:FindFirstChild("CombatSystem") and
+                                       ReplicatedStorage.CombatSystem:FindFirstChild("Remotes") and
+                                       ReplicatedStorage.CombatSystem.Remotes:FindFirstChild("RequestHit")
+                        if remote then
+                            remote:FireServer()
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
 
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
@@ -557,175 +701,45 @@ Tab:Slider({
 
 
 
--- =============================================
---   FARM ZONE (วงแดง + หามอน + ตี + เข้าโซนแล้ว Tween/TP ตามระยะ)
--- =============================================
-
-local AutoFarmZone = Get("AutoFarmZone", false)
-local ZoneRadius = Get("ZoneRadius", 20)
-local ZoneCircleName = "RickHub_ZoneCircle"
-local TargetMobZone = nil
-
-local ZONE_CENTER_POS = nil
-
--- สร้าง/อัพเดทวง + บันทึกตำแหน่งกลาง
-local function CreateZoneCircleAtPlayer()
-    local root = GetRoot()
-    if not root then return end
-    
-    local oldCircle = workspace:FindFirstChild(ZoneCircleName)
-    if oldCircle then oldCircle:Destroy() end
-    
-    local circle = Instance.new("Part")
-    circle.Name = ZoneCircleName
-    circle.Shape = Enum.PartType.Cylinder
-    circle.Size = Vector3.new(ZoneRadius * 2, 0.4, ZoneRadius * 2)   -- ขนาดจริง = เส้นผ่านศูนย์กลาง = ZoneRadius * 2
-    circle.Color = Color3.fromRGB(255, 0, 0)
-    circle.Transparency = 0.70
-    circle.Anchored = true
-    circle.CanCollide = false
-    circle.CanQuery = false
-    circle.Parent = workspace
-    
-    local pos = root.Position - Vector3.new(0, 2.8, 0)
-    circle.CFrame = CFrame.new(pos) * CFrame.Angles(0, 0, math.rad(90))
-    
-    ZONE_CENTER_POS = pos + Vector3.new(0, 3, 0)  -- จุดรอตรงกลางวง
-end
-
-local function DestroyZoneCircle()
-    local circle = workspace:FindFirstChild(ZoneCircleName)
-    if circle then circle:Destroy() end
-    ZONE_CENTER_POS = nil
-end
-
--- หา mob ใกล้ที่สุดที่อยู่ในวง (รัศมี ZoneRadius)
-local function FindNearestMobInZone()
-    local root = GetRoot()
-    if not root or not ZONE_CENTER_POS then return nil, math.huge end
-    
-    local bestMob, bestDist = nil, math.huge
-    
-    for _, npc in ipairs(workspace.NPCs:GetChildren()) do
-        local hum = npc:FindFirstChild("Humanoid")
-        local hrp = npc:FindFirstChild("HumanoidRootPart")
-        if hum and hrp and hum.Health > 0.1 then
-            local distToCenter = (hrp.Position - ZONE_CENTER_POS).Magnitude
-            if distToCenter <= ZoneRadius then  -- อยู่ในวง
-                local distToPlayer = (root.Position - hrp.Position).Magnitude
-                if distToPlayer < bestDist then
-                    bestDist = distToPlayer
-                    bestMob = npc
-                end
-            end
-        end
-    end
-    
-    return bestMob, bestDist
-end
-
--- Toggle
 Tab:Toggle({
-    Title = "ฟาร์มโซน (วงแดง + ตีออโต้)",
-    Value = AutoFarmZone,
+    Title = "โหมด Farm Zone (วงแดง)",
+    Value = false,
     Callback = function(state) 
-        AutoFarmZone = state
-        Save("AutoFarmZone", state)
-        
+        FarmZone = state
         if state then
-            CreateZoneCircleAtPlayer()
-            TargetMobZone = nil
+            -- ถ้าเปิด: สร้างวงใหม่ที่ตำแหน่งปัจจุบัน
+            local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if root then
+                CreateZoneCircle(root.Position, ZoneRadius)
+                isAtZoneCenter = false
+            end
         else
-            DestroyZoneCircle()
-            TargetMobZone = nil
+            -- ถ้าปิด: ลบวง
+            if ZoneCircle then
+                ZoneCircle:Destroy()
+                ZoneCircle = nil
+            end
+            ZonePosition = nil
+            isAtZoneCenter = false
         end
     end
 })
 
--- Slider ขนาดวง (รัศมี ไม่ใช่เส้นผ่านศูนย์กลาง)
 Tab:Slider({
-    Title = "รัศมีวงแดง (สตัด)",
+    Title = "รัศมีวง Zone",
     Step = 1,
-    Value = { Min = 5, Max = 50, Default = ZoneRadius },
+    Min = 5,
+    Max = 50,
+    Default = 20,
     Callback = function(value)
         ZoneRadius = value
-        Save("ZoneRadius", value)
-        
-        if AutoFarmZone then
-            local circle = workspace:FindFirstChild(ZoneCircleName)
-            if circle then
-                circle.Size = Vector3.new(ZoneRadius * 2, 0.4, ZoneRadius * 2)
-            end
+        -- อัพเดทวงถ้ามีอยู่
+        if ZoneCircle and ZonePosition then
+            CreateZoneCircle(ZonePosition, value)
         end
     end
 })
 
--- Loop หลัก
-task.spawn(function()
-    while true do
-        task.wait(0.15)
-        
-        if not AutoFarmZone then
-            TargetMobZone = nil
-            continue
-        end
-        
-        local root = GetRoot()
-        if not root then continue end
-        
-        -- ถ้าอยากให้วงตามตัวตลอด ให้เปิดบรรทัดนี้ (แต่จะทำให้จุด Tween เปลี่ยนบ่อย)
-        -- CreateZoneCircleAtPlayer()
-        
-        local mob, playerToMobDist = FindNearestMobInZone()
-        
-        if mob then
-            TargetMobZone = mob
-            local mobRoot = mob.HumanoidRootPart
-            
-            -- มีมอนในวง → ไปหา
-            if playerToMobDist > 20 then
-                -- ไกลเกิน 20 → Tween ไป
-                if not isTweening then
-                    local targetPos = mobRoot.Position + Vector3.new(0, FarmDistance + 2, 0)  -- ไปเหนือหัวหน่อย
-                    TweenTo(targetPos)
-                end
-            else
-                -- ใกล้พอแล้ว → TP ทันที + ตี
-                isTweening = false
-                
-                local offset = CFrame.new(0, 0, 0)
-                if FarmMode == "Above" then
-                    offset = CFrame.new(0, FarmDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-                elseif FarmMode == "Behind" then
-                    offset = CFrame.new(0, 0, FarmDistance)
-                elseif FarmMode == "Below" then
-                    offset = CFrame.new(0, -FarmDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
-                end
-                
-                root.CFrame = mobRoot.CFrame * offset
-                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                
-                ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
-            end
-            
-        else
-            -- ไม่มีมอนในวง → Tween กลับไปกลางวง
-            TargetMobZone = nil
-            
-            if ZONE_CENTER_POS and not isTweening then
-                local distToCenter = (root.Position - ZONE_CENTER_POS).Magnitude
-                if distToCenter > 12 then
-                    TweenTo(ZONE_CENTER_POS)
-                end
-            end
-        end
-    end
-end)
-
--- ลบวงเมื่อตัวละครหาย
-player.CharacterRemoving:Connect(function()
-    DestroyZoneCircle()
-end)
 
 -- --------
 -- ออโต้ถือ
