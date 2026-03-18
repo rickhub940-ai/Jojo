@@ -743,6 +743,12 @@ Tab:Slider({
     end
 })
 
+Tab:Divider()
+
+Tab:Section({ 
+    Title = "FARM ZOME",
+})
+
 Tab:Toggle({
     Title = "Farm Zone",
     Value = false,
