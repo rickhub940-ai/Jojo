@@ -536,9 +536,7 @@ local FarmZoneMode = "Above"
 local ZonePosition = nil
 local circle
 local TargetMob = nil
-
 local isTweening = false
-local TweenSpeed = 75
 local PlatformName = "FarmZone_Floor"
 
 -- 📌 ROOT
@@ -748,7 +746,7 @@ end)
 
 -- 🔁 LOOP
 task.spawn(function()
-    while task.wait(0.3) do
+    while task.wait(0.01) do
         FarmZoneLogic()
     end
 end)
