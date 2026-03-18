@@ -519,6 +519,14 @@ end)
 -- ----------
 -- ฟามออร่า
 -- ----------
+
+-- 🔧 SERVICES
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
 -- ⚙️ CONFIG
 local FarmZoneEnabled = false
 local FarmZoneRadius = 30
@@ -528,6 +536,75 @@ local FarmZoneMode = "Above"
 local ZonePosition = nil
 local circle
 local TargetMob = nil
+
+local isTweening = false
+local TweenSpeed = 75
+local PlatformName = "FarmZone_Floor"
+
+-- 📌 ROOT
+local function GetRoot()
+    return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+end
+
+-- 🟫 พื้นกันตก
+local function ManagePlatform(state)
+    local root = GetRoot()
+    if not root then return end
+
+    local floor = workspace:FindFirstChild(PlatformName)
+
+    if state then
+        if not floor then
+            floor = Instance.new("Part")
+            floor.Name = PlatformName
+            floor.Size = Vector3.new(60,1,60)
+            floor.Transparency = 1
+            floor.Anchored = true
+            floor.CanCollide = true
+            floor.Parent = workspace
+        end
+
+        floor.CFrame = root.CFrame * CFrame.new(0,-3,0)
+    else
+        if floor then floor:Destroy() end
+    end
+end
+
+-- 🚶 Tween
+local function TweenTo(pos)
+    local root = GetRoot()
+    if not root or isTweening then return end
+
+    local dist = (root.Position - pos).Magnitude
+    if dist < 5 then return end
+
+    isTweening = true
+    ManagePlatform(true)
+
+    local duration = dist / TweenSpeed
+    local info = TweenInfo.new(duration, Enum.EasingStyle.Linear)
+
+    local playerTween = TweenService:Create(root, info, {
+        CFrame = CFrame.new(pos)
+    })
+
+    local floor = workspace:FindFirstChild(PlatformName)
+    local floorTween
+
+    if floor then
+        floorTween = TweenService:Create(floor, info, {
+            CFrame = CFrame.new(pos) * CFrame.new(0,-3,0)
+        })
+    end
+
+    playerTween:Play()
+    if floorTween then floorTween:Play() end
+
+    playerTween.Completed:Connect(function()
+        isTweening = false
+        ManagePlatform(false)
+    end)
+end
 
 -- 🔴 สร้างโซน
 local function CreateFarmZone()
@@ -539,6 +616,7 @@ local function CreateFarmZone()
     if not root then return end
 
     ZonePosition = root.Position
+    print("📍 Zone:", ZonePosition)
 
     circle = Instance.new("Part")
     circle.Name = "FarmZoneCircle"
@@ -559,11 +637,11 @@ local function RemoveFarmZone()
     if workspace:FindFirstChild("FarmZoneCircle") then
         workspace.FarmZoneCircle:Destroy()
     end
-    circle = nil
     ZonePosition = nil
+    circle = nil
 end
 
--- 🎯 หาเป้าในโซน
+-- 🎯 หาเป้าใน workspace.NPCs
 local function GetTargetInZone()
     if not ZonePosition then return end
 
@@ -576,9 +654,14 @@ local function GetTargetInZone()
 
         if hum and hrp and hum.Health > 0 then
             local dist = (hrp.Position - ZonePosition).Magnitude
-            if dist <= FarmZoneRadius and dist < shortest then
-                shortest = dist
-                closest = v
+
+            if dist <= FarmZoneRadius then
+                print("🎯 เจอ:", v.Name)
+
+                if dist < shortest then
+                    shortest = dist
+                    closest = v
+                end
             end
         end
     end
@@ -605,10 +688,10 @@ local function FarmZoneLogic()
             if dist > FarmZoneDistance then
                 TweenTo(hrp.Position)
             else
-                -- หันหน้าหามอน
+                -- 🧠 หันหน้าหามอน
                 root.CFrame = CFrame.new(root.Position, hrp.Position)
 
-                -- ตี
+                -- ⚔️ ตี
                 game:GetService("ReplicatedStorage")
                     .CombatSystem.Remotes.RequestHit:FireServer()
             end
@@ -616,7 +699,7 @@ local function FarmZoneLogic()
     else
         TargetMob = nil
 
-        -- ❌ ไม่มีมอน → กลับกลางโซน
+        -- 🔙 กลับกลางโซน
         if ZonePosition then
             local dist = (root.Position - ZonePosition).Magnitude
             if dist > 5 then
@@ -625,6 +708,8 @@ local function FarmZoneLogic()
         end
     end
 end
+
+-- 👻 NoClip + ลอยตี
 task.spawn(function()
     RunService.Stepped:Connect(function()
         if (FarmZoneEnabled or isTweening) and player.Character then
@@ -637,7 +722,7 @@ task.spawn(function()
     end)
 
     RunService.RenderStepped:Connect(function()
-        if FarmZoneEnabled and TargetMob and TargetMob.Parent and TargetMob:FindFirstChild("HumanoidRootPart") then
+        if FarmZoneEnabled and TargetMob and TargetMob:FindFirstChild("HumanoidRootPart") then
             local root = GetRoot()
             local mobRoot = TargetMob.HumanoidRootPart
 
@@ -649,6 +734,9 @@ task.spawn(function()
 
                 elseif FarmZoneMode == "Below" then
                     offset = CFrame.new(0, -FarmZoneDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
+
+                elseif FarmZoneMode == "Behind" then
+                    offset = CFrame.new(0, 0, FarmZoneDistance)
                 end
 
                 root.CFrame = mobRoot.CFrame * offset
@@ -656,6 +744,13 @@ task.spawn(function()
             end
         end
     end)
+end)
+
+-- 🔁 LOOP
+task.spawn(function()
+    while task.wait(0.3) do
+        FarmZoneLogic()
+    end
 end)
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
@@ -689,8 +784,6 @@ Tab:Slider({
     end
 })
 
-
-
 Tab:Toggle({
     Title = "Farm Zone",
     Value = false,
@@ -705,7 +798,6 @@ Tab:Toggle({
         end
     end
 })
-
 
 Tab:Slider({
     Title = "Zone Radius",
@@ -727,15 +819,17 @@ Tab:Slider({
         FarmZoneDistance = value
     end
 })
+
 Tab:Dropdown({
     Title = "Farm Zone Mode",
-    Values = { "Above", "Below" },
+    Values = { "Above", "Below", "Behind" },
     Value = FarmZoneMode,
     Callback = function(option)
         FarmZoneMode = option
-        Save("FarmZoneMode", option)
     end
 })
+
+
 
 -- --------
 -- ออโต้ถือ
