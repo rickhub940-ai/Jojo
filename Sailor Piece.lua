@@ -520,15 +520,10 @@ end)
 -- ฟามออร่า
 -- ----------
 
--- 🔧 SERVICES
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
 
-local player = Players.LocalPlayer
+
 local PlatformName = "FarmZone_Floor"
 
--- ⚙️ CONFIG
 local FarmZoneEnabled = false
 local FarmZoneRadius = 30
 local FarmZoneDistance = 15
@@ -539,12 +534,10 @@ local circle
 local TargetMob = nil
 local isTweening = false
 
--- 📌 ROOT
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
 
--- 🟫 พื้นกันตก
 local function ManagePlatform(state)
     local root = GetRoot()
     if not root then return end
@@ -565,7 +558,6 @@ local function ManagePlatform(state)
     end
 end
 
--- 🚶 Tween
 local function TweenTo(pos)
     local root = GetRoot()
     if not root or isTweening then return end
@@ -594,8 +586,6 @@ local function TweenTo(pos)
         ManagePlatform(false)
     end)
 end
-
--- 🔴 สร้างโซน
 local function CreateFarmZone()
     if workspace:FindFirstChild("FarmZoneCircle") then
         workspace.FarmZoneCircle:Destroy()
@@ -605,7 +595,6 @@ local function CreateFarmZone()
     if not root then return end
 
     ZonePosition = root.Position
-    print("📍 Zone:", ZonePosition)
 
     circle = Instance.new("Part")
     circle.Name = "FarmZoneCircle"
@@ -621,7 +610,6 @@ local function CreateFarmZone()
     circle.Parent = workspace
 end
 
--- ❌ ลบโซน
 local function RemoveFarmZone()
     if workspace:FindFirstChild("FarmZoneCircle") then
         workspace.FarmZoneCircle:Destroy()
@@ -630,7 +618,6 @@ local function RemoveFarmZone()
     circle = nil
 end
 
--- 🎯 หาเป้า
 local function GetTargetInZone()
     if not ZonePosition then return end
 
@@ -654,25 +641,20 @@ local function GetTargetInZone()
     return closest
 end
 
--- ⚔️ Logic หลัก + ตีรัว 0.01
 local function FarmZoneLogic()
-    if not FarmZoneEnabled then return end
-
-    local root = GetRoot()
+ if not FarmZoneEnabled then return end
+   local root = GetRoot()
     if not root then return end
+   local target = GetTargetInZone()
+   TargetMob = target
 
-    local target = GetTargetInZone()
-    TargetMob = target
-
-    if target and target:FindFirstChild("HumanoidRootPart") then
-        local hrp = target.HumanoidRootPart
-        local dist = (hrp.Position - root.Position).Magnitude
+   if target and target:FindFirstChild("HumanoidRootPart") then
+       local hrp = target.HumanoidRootPart
+local dist = (hrp.Position - root.Position).Magnitude
 
         if dist > 20 then
-            -- Tween ถ้าไกลเกิน 20
             TweenTo(hrp.Position)
-        else
-            -- TP เข้าใกล้ ≤20 + ล็อคหน้า + ตีรัว 0.01
+		else
             local offset
             if FarmZoneMode == "Above" then
                 offset = CFrame.new(0, FarmZoneDistance, 0)
@@ -680,11 +662,9 @@ local function FarmZoneLogic()
                 offset = CFrame.new(0, -FarmZoneDistance, 0)
             elseif FarmZoneMode == "Behind" then
                 offset = CFrame.new(0, 0, FarmZoneDistance)
-            end
-
-            root.CFrame = hrp.CFrame * offset
-            root.CFrame = CFrame.new(root.Position, hrp.Position)
-
+			end
+    root.CFrame = hrp.CFrame * offset
+        root.CFrame = CFrame.new(root.Position, hrp.Position)
             task.spawn(function()
                 while target and target.Parent and target:FindFirstChildOfClass("Humanoid") and target.Humanoid.Health > 0 do
                     game:GetService("ReplicatedStorage").CombatSystem.Remotes.RequestHit:FireServer()
@@ -692,8 +672,7 @@ local function FarmZoneLogic()
                 end
             end)
         end
-    else
-        -- กลับกลางวง
+	else
         if ZonePosition then
             local dist = (root.Position - ZonePosition).Magnitude
             if dist > 5 then
@@ -703,7 +682,7 @@ local function FarmZoneLogic()
     end
 end
 task.spawn(function()
-    while task.wait(0.01) do
+    while task.wait(0.3) do
         FarmZoneLogic()
     end
 end)
@@ -714,8 +693,13 @@ end)
 
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
+Tab:Section({ 
+    Title = "FARM Level",
+})
+
 Tab:Toggle({
     Title = "Auto Farm Level 0-MAX",
+	Desc = "ออโต้ฟามเวล0ถึงเวลตัน",
     Value = AutoFarm,
     Callback = function(state) 
         AutoFarm = state
@@ -725,6 +709,7 @@ Tab:Toggle({
 
 Tab:Dropdown({
     Title = "Farm Level Mode",
+	Desc = "เลือกโหมดการฟาม",
     Values = { "Above", "Behind", "Below" },
     Value = FarmMode,
     Callback = function(option) 
@@ -735,6 +720,7 @@ Tab:Dropdown({
 
 Tab:Slider({
     Title = "Attack Distance (AutoFarm Lv)",
+	Desc = "ระยะห่างจากมอน(ของฟามเวล)",
     Step = 1,
     Value = { Min = 5, Max = 30, Default = FarmDistance },
     Callback = function(value)
@@ -751,6 +737,7 @@ Tab:Section({
 
 Tab:Toggle({
     Title = "Farm Zone",
+	Desc = "ฟามโซน",
     Value = false,
     Callback = function(state)
         FarmZoneEnabled = state
@@ -760,6 +747,7 @@ Tab:Toggle({
 
 Tab:Slider({
     Title = "Zone Radius",
+	Desc = "ปรับวงการฟาม",
     Step = 5,
     Value = { Min = 10, Max = 100, Default = FarmZoneRadius },
     Callback = function(value)
@@ -772,6 +760,7 @@ Tab:Slider({
 
 Tab:Slider({
     Title = "Attack Distance (FarmZone)",
+	Desc = "ปรับระยะห่างจากมอน(ฟามโซน)",
     Step = 1,
     Value = { Min = 5, Max = 30, Default = FarmZoneDistance },
     Callback = function(value)
@@ -781,6 +770,7 @@ Tab:Slider({
 
 Tab:Dropdown({
     Title = "Farm Zone Mode",
+	Desc = "เลือกโหมดการฟาม(ฟามโซน)",
     Values = { "Above", "Below", "Behind" },
     Value = FarmZoneMode,
     Callback = function(option)
@@ -826,7 +816,8 @@ function equipandattack(v)
 end
 
 Dropdown = Tab:Dropdown({
-    Title = "เลือกอาวุธ",
+    Title = "Selected Weapon",
+	Desc = "เลือกอาวุธ",
     Values = GetTools(),
     Value = Config.SelectedTool,
     Multi = false,
@@ -838,13 +829,15 @@ Dropdown = Tab:Dropdown({
 })
 
 Tab:Button({
-    Title = "รีชื่ออาวุธ",
+    Title = "Refresh Weapon",
+	Desc = "รีเฟรชชื่ออาวุธ",
     Callback = function()
         Dropdown:Refresh(GetTools())
     end
 })
 Tab:Toggle({
-    Title = "Auto ถือ",
+    Title = "Auto Equip Weapon",
+	Desc = "ออโต้ถืออาวุธ",
     Value = Config.AutoEquip,
     Callback = function(v)
         Config.AutoEquip = v
@@ -881,7 +874,7 @@ local Amount = 1
 local Auto = false
 
 StatTab:Dropdown({
-    Title = "เลือกสตัดที่จะอัพ",
+    Title = "เลือกสตัด",
     Values = {"Melee","Defense","Sword","Power"},
     Multi = true,
     Callback = function(v)
@@ -903,7 +896,7 @@ StatTab:Slider({
 })
 
 StatTab:Toggle({
-    Title = "ออโต้อัพสตัด",
+    Title = "Auto up Stat",
     Value = false,
     Callback = function(v)
         Auto = v
