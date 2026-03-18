@@ -526,6 +526,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
+local PlatformName = "FarmZone_Floor"
 
 -- ⚙️ CONFIG
 local FarmZoneEnabled = false
@@ -537,7 +538,6 @@ local ZonePosition = nil
 local circle
 local TargetMob = nil
 local isTweening = false
-local PlatformName = "FarmZone_Floor"
 
 -- 📌 ROOT
 local function GetRoot()
@@ -548,9 +548,7 @@ end
 local function ManagePlatform(state)
     local root = GetRoot()
     if not root then return end
-
     local floor = workspace:FindFirstChild(PlatformName)
-
     if state then
         if not floor then
             floor = Instance.new("Part")
@@ -561,7 +559,6 @@ local function ManagePlatform(state)
             floor.CanCollide = true
             floor.Parent = workspace
         end
-
         floor.CFrame = root.CFrame * CFrame.new(0,-3,0)
     else
         if floor then floor:Destroy() end
@@ -579,20 +576,14 @@ local function TweenTo(pos)
     isTweening = true
     ManagePlatform(true)
 
-    local duration = dist / TweenSpeed
+    local duration = dist / 75
     local info = TweenInfo.new(duration, Enum.EasingStyle.Linear)
 
-    local playerTween = TweenService:Create(root, info, {
-        CFrame = CFrame.new(pos)
-    })
-
+    local playerTween = TweenService:Create(root, info, {CFrame = CFrame.new(pos)})
     local floor = workspace:FindFirstChild(PlatformName)
     local floorTween
-
     if floor then
-        floorTween = TweenService:Create(floor, info, {
-            CFrame = CFrame.new(pos) * CFrame.new(0,-3,0)
-        })
+        floorTween = TweenService:Create(floor, info, {CFrame = CFrame.new(pos) * CFrame.new(0,-3,0)})
     end
 
     playerTween:Play()
@@ -639,7 +630,7 @@ local function RemoveFarmZone()
     circle = nil
 end
 
--- 🎯 หาเป้าใน workspace.NPCs
+-- 🎯 หาเป้า
 local function GetTargetInZone()
     if not ZonePosition then return end
 
@@ -653,13 +644,9 @@ local function GetTargetInZone()
         if hum and hrp and hum.Health > 0 then
             local dist = (hrp.Position - ZonePosition).Magnitude
 
-            if dist <= FarmZoneRadius then
-                print("🎯 เจอ:", v.Name)
-
-                if dist < shortest then
-                    shortest = dist
-                    closest = v
-                end
+            if dist <= FarmZoneRadius and dist < shortest then
+                closest = v
+                shortest = dist
             end
         end
     end
@@ -667,7 +654,7 @@ local function GetTargetInZone()
     return closest
 end
 
--- ⚔️ Logic หลัก
+-- ⚔️ Logic หลัก + ตีรัว 0.01
 local function FarmZoneLogic()
     if not FarmZoneEnabled then return end
 
@@ -675,29 +662,38 @@ local function FarmZoneLogic()
     if not root then return end
 
     local target = GetTargetInZone()
+    TargetMob = target
 
-    if target then
-        TargetMob = target
+    if target and target:FindFirstChild("HumanoidRootPart") then
+        local hrp = target.HumanoidRootPart
+        local dist = (hrp.Position - root.Position).Magnitude
 
-        local hrp = target:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            local dist = (hrp.Position - root.Position).Magnitude
-
-            if dist > FarmZoneDistance then
-                TweenTo(hrp.Position)
-            else
-                -- 🧠 หันหน้าหามอน
-                root.CFrame = CFrame.new(root.Position, hrp.Position)
-
-                -- ⚔️ ตี
-                game:GetService("ReplicatedStorage")
-                    .CombatSystem.Remotes.RequestHit:FireServer()
+        if dist > 20 then
+            -- Tween ถ้าไกลเกิน 20
+            TweenTo(hrp.Position)
+        else
+            -- TP เข้าใกล้ ≤20 + ล็อคหน้า + ตีรัว 0.01
+            local offset
+            if FarmZoneMode == "Above" then
+                offset = CFrame.new(0, FarmZoneDistance, 0)
+            elseif FarmZoneMode == "Below" then
+                offset = CFrame.new(0, -FarmZoneDistance, 0)
+            elseif FarmZoneMode == "Behind" then
+                offset = CFrame.new(0, 0, FarmZoneDistance)
             end
+
+            root.CFrame = hrp.CFrame * offset
+            root.CFrame = CFrame.new(root.Position, hrp.Position)
+
+            task.spawn(function()
+                while target and target.Parent and target:FindFirstChildOfClass("Humanoid") and target.Humanoid.Health > 0 do
+                    game:GetService("ReplicatedStorage").CombatSystem.Remotes.RequestHit:FireServer()
+                    task.wait(0.01)
+                end
+            end)
         end
     else
-        TargetMob = nil
-
-        -- 🔙 กลับกลางโซน
+        -- กลับกลางวง
         if ZonePosition then
             local dist = (root.Position - ZonePosition).Magnitude
             if dist > 5 then
@@ -706,55 +702,20 @@ local function FarmZoneLogic()
         end
     end
 end
-
--- 👻 NoClip + ลอยตี
-task.spawn(function()
-    RunService.Stepped:Connect(function()
-        if (FarmZoneEnabled or isTweening) and player.Character then
-            for _, v in pairs(player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.CanCollide = false
-                end
-            end
-        end
-    end)
-
-    RunService.RenderStepped:Connect(function()
-        if FarmZoneEnabled and TargetMob and TargetMob:FindFirstChild("HumanoidRootPart") then
-            local root = GetRoot()
-            local mobRoot = TargetMob.HumanoidRootPart
-
-            if root then
-                local offset
-
-                if FarmZoneMode == "Above" then
-                    offset = CFrame.new(0, FarmZoneDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-
-                elseif FarmZoneMode == "Below" then
-                    offset = CFrame.new(0, -FarmZoneDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
-
-                elseif FarmZoneMode == "Behind" then
-                    offset = CFrame.new(0, 0, FarmZoneDistance)
-                end
-
-                root.CFrame = mobRoot.CFrame * offset
-                root.AssemblyLinearVelocity = Vector3.new(0,0,0)
-            end
-        end
-    end)
-end)
-
--- 🔁 LOOP
 task.spawn(function()
     while task.wait(0.01) do
         FarmZoneLogic()
     end
 end)
 
+
+
+
+
 local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 
 Tab:Toggle({
-    Title = "ออโต้ฟาม",
+    Title = "Auto Farm Level 0-MAX",
     Value = AutoFarm,
     Callback = function(state) 
         AutoFarm = state
@@ -763,7 +724,7 @@ Tab:Toggle({
 })
 
 Tab:Dropdown({
-    Title = "เลือกโหมดการฟาม",
+    Title = "Farm Level Mode",
     Values = { "Above", "Behind", "Below" },
     Value = FarmMode,
     Callback = function(option) 
@@ -773,7 +734,7 @@ Tab:Dropdown({
 })
 
 Tab:Slider({
-    Title = "ระยะห่างจากมอน",
+    Title = "Attack Distance (AutoFarm Lv)",
     Step = 1,
     Value = { Min = 5, Max = 30, Default = FarmDistance },
     Callback = function(value)
@@ -787,13 +748,7 @@ Tab:Toggle({
     Value = false,
     Callback = function(state)
         FarmZoneEnabled = state
-
-        if state then
-            CreateFarmZone()
-        else
-            RemoveFarmZone()
-            TargetMob = nil
-        end
+        if state then CreateFarmZone() else RemoveFarmZone() end
     end
 })
 
@@ -810,7 +765,7 @@ Tab:Slider({
 })
 
 Tab:Slider({
-    Title = "Attack Distance",
+    Title = "Attack Distance (FarmZone)",
     Step = 1,
     Value = { Min = 5, Max = 30, Default = FarmZoneDistance },
     Callback = function(value)
