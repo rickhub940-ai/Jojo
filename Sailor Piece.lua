@@ -682,7 +682,7 @@ local dist = (hrp.Position - root.Position).Magnitude
     end
 end
 task.spawn(function()
-    while task.wait(0.3) do
+    while task.wait(0.01) do
         FarmZoneLogic()
     end
 end)
