@@ -1002,19 +1002,19 @@ task.wait(2)
 
 local bossStatus = {}
 
--- ===== UI =====
-local bossTab = bossTab:Section({
-    Title = "Boss Tracker"
+FarmTab:Section({ Title = "Boss Tracker" })
+
+local BossLabel = FarmTab:Paragraph({
+    Title = "Boss Tracker",
+    Content = "กำลังโหลด..."
 })
 
 local function formatText(text)
-    if string.match(text, "%d") then
-        local num = tonumber(text:match("%d+"))
-        if not num then return text end
+    local num = tonumber(text:match("%d+"))
 
+    if num then
         local m = math.floor(num / 60)
         local s = num % 60
-
         return "🔴 " .. m .. "m " .. s .. "s"
     else
         return "🟢 SPAWNED"
@@ -1033,45 +1033,36 @@ local function updateUI()
     end
 
     pcall(function()
-        BossTab.Title = text
+        BossLabel:SetContent(text)
+        BossLabel:SetTitle("Boss Tracker (" .. tostring(#bossStatus) .. ")")
     end)
 end
 
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
-        
+
         local bossName = "Unknown"
         local parent = v.Parent
-        
+
         while parent do
-            if string.find(parent.Name, "TimedBossSpawn_") then
+            if parent.Name:find("TimedBossSpawn_") then
                 bossName = parent.Name
                 bossName = bossName:gsub("TimedBossSpawn_", "")
                 bossName = bossName:gsub("_Container", "")
-                bossName = bossName:gsub("Boss", "")
                 break
             end
             parent = parent.Parent
         end
 
-        print("CONNECTED TO:", bossName)
-
         if not v:GetAttribute("Connected") then
             v:SetAttribute("Connected", true)
 
-            local function refresh()
-                local formatted = formatText(v.Text)
-
-                bossStatus[bossName] = formatted
-
-                print(bossName .. " => " .. formatted)
-
+            v:GetPropertyChangedSignal("Text"):Connect(function()
+                bossStatus[bossName] = formatText(v.Text)
                 updateUI()
-            end
+            end)
 
-            v:GetPropertyChangedSignal("Text"):Connect(refresh)
-
-            refresh()
+            bossStatus[bossName] = formatText(v.Text)
         end
     end
 end
