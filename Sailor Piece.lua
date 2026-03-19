@@ -1009,7 +1009,7 @@ local BossLabel = bossTab:Paragraph({
     Content = "กำลังโหลด..."
 })
 
-local function formatText(text)
+local function formatTime(text)
     local num = tonumber(text:match("%d+"))
 
     if num then
@@ -1032,9 +1032,12 @@ local function updateUI()
         text = "No Boss Found"
     end
 
+    print("UI UPDATE =>", text)
+
     pcall(function()
+        -- 🔥 ใช้แบบเดียวกับระบบที่นายใช้ได้แน่นอน
+        BossLabel:SetTitle("Boss Tracker")
         BossLabel:SetContent(text)
-        BossLabel:SetTitle("Boss Tracker (" .. tostring(#bossStatus) .. ")")
     end)
 end
 
@@ -1054,15 +1057,17 @@ for _, v in pairs(workspace:GetDescendants()) do
             parent = parent.Parent
         end
 
+        print("CONNECTED:", bossName)
+
         if not v:GetAttribute("Connected") then
             v:SetAttribute("Connected", true)
 
             v:GetPropertyChangedSignal("Text"):Connect(function()
-                bossStatus[bossName] = formatText(v.Text)
+                bossStatus[bossName] = formatTime(v.Text)
                 updateUI()
             end)
 
-            bossStatus[bossName] = formatText(v.Text)
+            bossStatus[bossName] = formatTime(v.Text)
         end
     end
 end
