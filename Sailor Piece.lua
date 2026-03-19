@@ -1173,7 +1173,7 @@ task.spawn(function()
 end)
 
 --================ CONTROL UI ================
-boasTab:Dropdown({
+bossTab:Dropdown({
     Title = "Select Boss",
     Values = getBossNames(),
     Multi = true,
