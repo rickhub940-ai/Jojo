@@ -998,200 +998,132 @@ end
 
 local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
 
---================ SERVICES ================
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- ==============================
+-- Boss Monitor UI (REAL-TIME)
+-- วางล่างสุดของสคริปต์ได้เลย
+-- ==============================
 
-local LocalPlayer = Players.LocalPlayer
+task.wait(1) -- กัน UI / workspace ยังไม่โหลด
 
---================ STATE ================
-local farmBoss = false
-local selectedBosses = {}
-local attackConnection
-local currentTween
+-- ===== ฟังก์ชั่นแปลงเวลา =====
+local function formatTime(seconds)
+    local sec = tonumber(seconds)
+    if not sec then return seconds end
 
---================ UTILS ================
-local function getHRP()
-    local char = LocalPlayer.Character
-    return char and char:FindFirstChild("HumanoidRootPart")
-end
+    local mins = math.floor(sec / 60)
+    local remainingSecs = sec % 60
 
--- ฟังก์ชันดึงรายชื่อบอส (แก้ nil value)
-local function getBossNames()
-    local names = {}
-    for _, v in pairs(workspace:GetChildren()) do
-        if v.Name:find("TimedBossSpawn_") then
-            local cleanName = v.Name:gsub("TimedBossSpawn_", "")
-            table.insert(names, cleanName)
-        end
-    end
-    if #names == 0 then return {"Searching Boss..."} end
-    return names
-end
-
---================ PLATFORM ================
-local platformName = "FarmPlatform"
-local function getPlatform()
-    local p = workspace:FindFirstChild(platformName)
-    if not p then
-        p = Instance.new("Part")
-        p.Name = platformName
-        p.Size = Vector3.new(10,1,10)
-        p.Anchored = true
-        p.CanCollide = true
-        p.Transparency = 0.5
-        p.Parent = workspace
-    end
-    return p
-end
-
-local function removePlatform()
-    local p = workspace:FindFirstChild(platformName)
-    if p then p:Destroy() end
-end
-
---================ TWEEN ================
-local function tweenWithPlatform(pos)
-    local hrp = getHRP()
-    if not hrp then return end
-    local platform = getPlatform()
-    if currentTween then currentTween:Cancel() end
-
-    local dist = (hrp.Position - pos).Magnitude
-    local time = dist / 75
-    local targetCF = CFrame.new(pos + Vector3.new(0,3,0))
-    local platformCF = targetCF * CFrame.new(0,-3.5,0)
-
-    local t1 = TweenService:Create(hrp, TweenInfo.new(time), {CFrame = targetCF})
-    local t2 = TweenService:Create(platform, TweenInfo.new(time), {CFrame = platformCF})
-
-    currentTween = t1
-    t1:Play()
-    t2:Play()
-end
-
---================ FIND BOSS ================
-local function findBoss(name)
-    local folder = workspace:FindFirstChild("NPCs") or workspace
-    for _, v in pairs(folder:GetChildren()) do
-        local hum = v:FindFirstChild("Humanoid")
-        if hum and hum.Health > 0 then
-            if v.Name:lower():find(name:lower()) then
-                return v
-            end
-        end
+    if mins > 0 then
+        return string.format("%dm %ds", mins, remainingSecs)
+    else
+        return string.format("%ds", remainingSecs)
     end
 end
 
---================ ATTACK SYSTEM ================
-local function startAttack(boss)
-    if attackConnection then attackConnection:Disconnect() end
-    local remote = ReplicatedStorage:WaitForChild("CombatSystem"):WaitForChild("Remotes"):WaitForChild("RequestHit")
-
-    attackConnection = RunService.Heartbeat:Connect(function()
-        if not farmBoss or not boss or not boss.Parent then return end
-        local hrp = getHRP()
-        local bossHRP = boss:FindFirstChild("HumanoidRootPart") or boss:FindFirstChild("Torso")
-        if not hrp or not bossHRP then return end
-
-        if (hrp.Position - bossHRP.Position).Magnitude > 25 then
-            tweenWithPlatform(bossHRP.Position)
-        else
-            hrp.CFrame = CFrame.new(bossHRP.Position + Vector3.new(0,5,0))
-            hrp.CFrame = CFrame.lookAt(hrp.Position, bossHRP.Position)
-            remote:FireServer()
-        end
-    end)
+-- ===== หา Tab อัตโนมัติ =====
+local Tab = bossTab or Window:FindFirstChild("Tab") or _G.Tab
+if not Tab then
+    warn("Tab not found!")
+    return
 end
 
---================ MAIN FARM LOOP ================
-local function farmLoop()
-    while farmBoss do
-        for _, bossName in ipairs(selectedBosses) do
-            if not farmBoss then break end
-            local boss = findBoss(bossName)
-            if boss then
-                startAttack(boss)
-                repeat task.wait(0.5) until not boss or boss.Humanoid.Health <= 0 or not farmBoss
-            end
-        end
-        task.wait(0.5)
-    end
-end
-
---================ UI SETUP (WindUI) ================
--- *** ตรวจสอบว่าคุณมีตัวแปร Window และ Tab ที่สร้างไว้ก่อนหน้านี้แล้ว ***
-
-local BossInfo = bossTab:Section({ 
-    Title = "📊 BOSS INFO",
+-- ===== สร้าง Section =====
+local BossSection = bossTab:Section({ 
+    Title = "Boss Monitor",
     Box = false,
-    -- ลบ FontWeight ออกเพื่อแก้ Enum Error
+    FontWeight = "SemiBold",
+    TextTransparency = 0.05,
     TextXAlignment = "Left",
+    TextSize = 17,
     Opened = true,
 })
 
-local labels = {}
+-- ===== เก็บสถานะ =====
+local bossStatus = {}
 
-local function updateLabel(name, text, color)
-    if not labels[name] then
-        -- ใช้คำสั่งสร้าง Text ของ WindUI
-        labels[name] = BossInfo:Text({
-            Title = name .. " : " .. text,
-            Color = color
-        })
-    else
-        -- อัปเดต Title
-        if labels[name].SetTitle then
-            labels[name]:SetTitle(name .. " : " .. text)
-        else
-            labels[name].Title = name .. " : " .. text
-        end
+-- ===== อัปเดต Title =====
+local function updateTitle()
+    local text = ""
+
+    for name, status in pairs(bossStatus) do
+        text = text .. name .. " : " .. status .. "\n"
+    end
+
+    if BossSection.Set then
+        BossSection:Set({ Title = text })
+    elseif BossSection.Title ~= nil then
+        BossSection.Title = text
     end
 end
 
--- Loop เช็คเวลาบอส (Real-time)
-task.spawn(function()
-    while task.wait(1) do
-        pcall(function()
-            for _, v in pairs(workspace:GetChildren()) do
-                if v.Name:find("TimedBossSpawn_") then
-                    local name = v.Name:gsub("TimedBossSpawn_","")
-                    local timer = v:FindFirstChild("Timer", true)
-                    if timer and timer:IsA("TextLabel") then
-                        if timer.Text:match("%d+") then
-                            updateLabel(name, "⏳ "..timer.Text, Color3.fromRGB(255, 100, 100))
+-- ===== สแกนบอส =====
+local function scanBosses()
+    for _, v in pairs(workspace:GetChildren()) do
+        if string.find(v.Name, "TimedBossSpawn_") and string.find(v.Name, "_Container") then
+
+            local bossName = v.Name
+            bossName = bossName:gsub("TimedBossSpawn_", "")
+            bossName = bossName:gsub("Boss_Container", "")
+            bossName = bossName:gsub("_Container", "")
+
+            local timerLabel = v:FindFirstChild("Timer", true)
+
+            if timerLabel and timerLabel:IsA("TextLabel") then
+
+                if not timerLabel:GetAttribute("Connected") then
+                    timerLabel:SetAttribute("Connected", true)
+
+                    timerLabel:GetPropertyChangedSignal("Text"):Connect(function()
+                        local currentText = timerLabel.Text
+
+                        local display = ""
+                        local emoji = "🔴"
+
+                        if string.match(currentText, "%d+") then
+                            local seconds = tonumber(currentText:match("%d+"))
+
+                            if seconds then
+                                display = "🔴 Spawn in " .. formatTime(seconds)
+                            else
+                                display = "🔴 Spawn in " .. currentText
+                            end
                         else
-                            updateLabel(name, "🟢 SPAWNED", Color3.fromRGB(100, 255, 100))
+                            display = "🟢 SPAWNED NOW!"
                         end
+
+                        bossStatus[bossName] = display
+                        updateTitle()
+                    end)
+                end
+
+                -- ค่าเริ่มต้น
+                local currentText = timerLabel.Text
+                local display = "🟢 SPAWNED NOW!"
+
+                if string.match(currentText, "%d+") then
+                    local seconds = tonumber(currentText:match("%d+"))
+                    if seconds then
+                        display = "🔴 Spawn in " .. formatTime(seconds)
+                    else
+                        display = "🔴 Spawn in " .. currentText
                     end
                 end
+
+                bossStatus[bossName] = display
             end
-        end)
-    end
-end)
-
---================ CONTROL UI ================
-bossTab:Dropdown({
-    Title = "Select Boss",
-    Values = getBossNames(),
-    Multi = true,
-    Callback = function(v)
-        selectedBosses = v
-    end
-})
-
-bossTab:Toggle({
-    Title = "Auto Farm Boss",
-    Callback = function(state)
-        farmBoss = state
-        if state then
-            task.spawn(farmLoop)
-        else
-            if attackConnection then attackConnection:Disconnect() end
-            if currentTween then currentTween:Cancel() end
-            removePlatform()
         end
     end
-})
+
+    updateTitle()
+end
+
+-- ===== เริ่มทำงาน =====
+scanBosses()
+
+-- รองรับบอสเกิดใหม่
+workspace.ChildAdded:Connect(function()
+    task.wait(1)
+    scanBosses()
+end)
+
+updateTitle()
