@@ -1000,63 +1000,89 @@ local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
 
 task.wait(2)
 
+
+
 local BossParagraph = bossTab:Paragraph({
-    Title = "📊 Boss info",
-    Desc = "",
+    Title = "Boss info",
+    Desc = "Loading...",
 })
 
-local BossData = {}
+local BossMap = {}
+local Timers = {}
+
+local dirty = false
+local lastRender = 0
+
 local function formatText(text)
     text = tostring(text)
+
     if not string.match(text, "%d") then
         return "🟢 Spawned Now!!"
     end
+
     return "🔴 " .. text
+end
+
+-- เก็บ Timer
+for _, v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Timer" and v:IsA("TextLabel") then
+        table.insert(Timers, v)
+    end
 end
 
 local function renderUI()
     local result = ""
 
-    for name, status in pairs(BossData) do
+    for name, status in pairs(BossMap) do
         result = result .. name .. " : " .. status .. "\n"
     end
 
     if result == "" then
-        result = "กำลังรอgay..."
+        result = "Waiting Boss..."
     end
-    pcall(function()
-        BossParagraph:SetDesc(result)
-    end)
-end
-local function updateBoss(name, text)
-    BossData[name] = formatText(text)
-    renderUI()
-end
-for _, v in pairs(workspace:GetDescendants()) do
-    if v.Name == "Timer" and v:IsA("TextLabel") then
-local bossName = "Unknown"
-        local parent = v.Parent
-        while parent do
-	if string.find(parent.Name, "TimedBossSpawn_") then
-bossName = parent.Name
-        bossName = bossName:gsub("TimedBossSpawn_", "")
-          bossName = bossName:gsub("Boss", "")
-                break
-            end
-            parent = parent.Parent
-        end
-    if not v:GetAttribute("Connected") then
-          v:SetAttribute("Connected", true)
 
-        local last = v.Text
+    BossParagraph:SetDesc(result)
+end
 
-        updateBoss(bossName, v.Text)
- v:GetPropertyChangedSignal("Text"):Connect(function()
-                if v.Text ~= last then
-                    last = v.Text
-                    updateBoss(bossName, v.Text)
+-- 🔥 updater loop (auto throttle)
+task.spawn(function()
+    while true do
+
+        dirty = false
+
+        for _, v in pairs(Timers) do
+            if v and v.Parent then
+
+                local bossName = "Unknown"
+                local parent = v.Parent
+
+                while parent do
+                    if string.find(parent.Name, "TimedBossSpawn_") then
+                        bossName = parent.Name
+                        bossName = bossName:gsub("TimedBossSpawn_", "")
+                        bossName = bossName:gsub("Boss", "")
+                        break
+                    end
+                    parent = parent.Parent
                 end
-            end)
+
+                local newValue = formatText(v.Text)
+
+                -- update เฉพาะเปลี่ยนจริง
+                if BossMap[bossName] ~= newValue then
+                    BossMap[bossName] = newValue
+                    dirty = true
+                end
+            end
+        end
+
+        -- ⚡ render เฉพาะตอนมีการเปลี่ยน
+        if dirty then
+            renderUI()
+            lastRender = tick()
+            task.wait(0.01) -- เร่งตอนมีการเปลี่ยน
+        else
+            task.wait(0.2) -- ลดโหลดตอนนิ่ง
         end
     end
-end
+end)
