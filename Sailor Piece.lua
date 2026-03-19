@@ -998,17 +998,30 @@ end
 
 local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
 
--- ==============================
--- Boss Monitor (WORKING VERSION)
--- ใช้กับ FarmTab + Section:Set()
--- ==============================
-
 task.wait(2)
 
--- ===== เวลา =====
+-- ======================
+-- Boss Tab
+-- ======================
+local bossTab = Window:Tab({
+    Title = "Boss"
+})
+
+local BossSection = bossTab:Section({
+    Title = "Boss Tracker"
+})
+
+-- ======================
+-- เก็บสถานะบอส
+-- ======================
+local bossStatus = {}
+
+-- ======================
+-- แปลงเวลา
+-- ======================
 local function formatTime(seconds)
     local sec = tonumber(seconds)
-    if not sec then return seconds end
+    if not sec then return nil end
 
     local mins = math.floor(sec / 60)
     local remainingSecs = sec % 60
@@ -1020,15 +1033,9 @@ local function formatTime(seconds)
     end
 end
 
--- ===== UI SECTION (ของนาย) =====
-local BossSection = bossTab:Section({
-    Title = "Boss Monitor"
-})
-
--- ===== เก็บสถานะ =====
-local bossStatus = {}
-
--- ===== อัปเดต UI (สำคัญ) =====
+-- ======================
+-- อัปเดต UI
+-- ======================
 local function updateUI()
     local text = ""
 
@@ -1043,61 +1050,49 @@ local function updateUI()
     end)
 end
 
--- ===== สแกนบอส =====
-local function scanBosses()
-    for _, v in pairs(workspace:GetChildren()) do
-        if v.Name:find("TimedBossSpawn_") and v.Name:find("_Container") then
+-- ======================
+-- format สถานะ
+-- ======================
+local function formatText(text)
+    local num = tonumber(text:match("%d+"))
 
-            local bossName = v.Name
-            bossName = bossName:gsub("TimedBossSpawn_", "")
-            bossName = bossName:gsub("_Container", "")
-
-            local timer = v:FindFirstChildWhichIsA("TextLabel", true)
-
-            if timer then
-
-                if not timer:GetAttribute("Connected") then
-                    timer:SetAttribute("Connected", true)
-
-                    timer:GetPropertyChangedSignal("Text"):Connect(function()
-                        local txt = timer.Text
-                        local num = tonumber(txt:match("%d+"))
-
-                        local display
-
-                        if num then
-                            display = "🔴 Spawn in " .. formatTime(num)
-                        else
-                            display = "🟢 SPAWNED"
-                        end
-
-                        bossStatus[bossName] = display
-                        updateUI()
-                    end)
-                end
-
-                -- ค่าเริ่มต้น
-                local txt = timer.Text
-                local num = tonumber(txt:match("%d+"))
-
-                if num then
-                    bossStatus[bossName] = "🔴 Spawn in " .. formatTime(num)
-                else
-                    bossStatus[bossName] = "🟢 SPAWNED"
-                end
-            end
-        end
+    if num then
+        return "🔴 Spawn in " .. formatTime(num)
+    else
+        return "🟢 เกิด"
     end
-
-    updateUI()
 end
 
--- ===== START =====
-scanBosses()
+-- ======================
+-- scan boss
+-- ======================
+for _, v in pairs(workspace:GetDescendants()) do
+    if v.Name == "Timer" and v:IsA("TextLabel") then
 
-workspace.ChildAdded:Connect(function()
-    task.wait(1)
-    scanBosses()
-end)
+        local bossName = "Unknown"
+        local parent = v.Parent
+
+        while parent do
+            if parent.Name:find("TimedBossSpawn_") then
+                bossName = parent.Name
+                    :gsub("TimedBossSpawn_", "")
+                    :gsub("Boss", "")
+                break
+            end
+            parent = parent.Parent
+        end
+
+        if not v:GetAttribute("Connected") then
+            v:SetAttribute("Connected", true)
+
+            v:GetPropertyChangedSignal("Text"):Connect(function()
+                bossStatus[bossName] = formatText(v.Text)
+                updateUI()
+            end)
+
+            bossStatus[bossName] = formatText(v.Text)
+        end
+    end
+end
 
 updateUI()
