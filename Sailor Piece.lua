@@ -1000,42 +1000,27 @@ local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
 
 task.wait(2)
 
--- ======================
--- Boss Tab
--- ======================
-local bossTab = Window:Tab({
-    Title = "Boss"
-})
+local bossStatus = {}
 
-local BossSection = bossTab:Section({
+-- ===== UI =====
+local bossTab = FarmTab:Section({
     Title = "Boss Tracker"
 })
 
--- ======================
--- เก็บสถานะบอส
--- ======================
-local bossStatus = {}
+local function formatText(text)
+    if string.match(text, "%d") then
+        local num = tonumber(text:match("%d+"))
+        if not num then return text end
 
--- ======================
--- แปลงเวลา
--- ======================
-local function formatTime(seconds)
-    local sec = tonumber(seconds)
-    if not sec then return nil end
+        local m = math.floor(num / 60)
+        local s = num % 60
 
-    local mins = math.floor(sec / 60)
-    local remainingSecs = sec % 60
-
-    if mins > 0 then
-        return string.format("%dm %ds", mins, remainingSecs)
+        return "🔴 " .. m .. "m " .. s .. "s"
     else
-        return string.format("%ds", remainingSecs)
+        return "🟢 SPAWNED"
     end
 end
 
--- ======================
--- อัปเดต UI
--- ======================
 local function updateUI()
     local text = ""
 
@@ -1043,54 +1028,50 @@ local function updateUI()
         text = text .. name .. " : " .. status .. "\n"
     end
 
+    if text == "" then
+        text = "No Boss Found"
+    end
+
     pcall(function()
-        BossSection:Set({
-            Title = text
-        })
+        BossTab.Title = text
     end)
 end
 
--- ======================
--- format สถานะ
--- ======================
-local function formatText(text)
-    local num = tonumber(text:match("%d+"))
-
-    if num then
-        return "🔴 Spawn in " .. formatTime(num)
-    else
-        return "🟢 เกิด"
-    end
-end
-
--- ======================
--- scan boss
--- ======================
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
-
+        
         local bossName = "Unknown"
         local parent = v.Parent
-
+        
         while parent do
-            if parent.Name:find("TimedBossSpawn_") then
+            if string.find(parent.Name, "TimedBossSpawn_") then
                 bossName = parent.Name
-                    :gsub("TimedBossSpawn_", "")
-                    :gsub("Boss", "")
+                bossName = bossName:gsub("TimedBossSpawn_", "")
+                bossName = bossName:gsub("_Container", "")
+                bossName = bossName:gsub("Boss", "")
                 break
             end
             parent = parent.Parent
         end
 
+        print("CONNECTED TO:", bossName)
+
         if not v:GetAttribute("Connected") then
             v:SetAttribute("Connected", true)
 
-            v:GetPropertyChangedSignal("Text"):Connect(function()
-                bossStatus[bossName] = formatText(v.Text)
-                updateUI()
-            end)
+            local function refresh()
+                local formatted = formatText(v.Text)
 
-            bossStatus[bossName] = formatText(v.Text)
+                bossStatus[bossName] = formatted
+
+                print(bossName .. " => " .. formatted)
+
+                updateUI()
+            end
+
+            v:GetPropertyChangedSignal("Text"):Connect(refresh)
+
+            refresh()
         end
     end
 end
