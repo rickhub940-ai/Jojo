@@ -85,7 +85,7 @@ local Window = WindUI:CreateWindow({
     }
 })
 Window:Tag({
-    Title = "v0.1.0",
+    Title = "v0.1.1",
     Icon = "github",
     Color = Color3.fromHex("#00bfff"),
     Radius = 5,
@@ -749,7 +749,7 @@ Tab:Slider({
     Title = "Zone Radius",
 	Desc = "ปรับวงการฟาม",
     Step = 5,
-    Value = { Min = 10, Max = 100, Default = FarmZoneRadius },
+    Value = { Min = 10, Max = 200, Default = FarmZoneRadius },
     Callback = function(value)
         FarmZoneRadius = value
         if circle then
@@ -1006,14 +1006,11 @@ local BossParagraph = bossTab:Paragraph({
 })
 
 local BossData = {}
-
 local function formatText(text)
     text = tostring(text)
-
     if not string.match(text, "%d") then
         return "🟢 Spawned Now!!"
     end
-
     return "🔴 " .. text
 end
 
@@ -1025,43 +1022,36 @@ local function renderUI()
     end
 
     if result == "" then
-        result = "กำลังรอบอส..."
+        result = "กำลังรอgay..."
     end
-
     pcall(function()
         BossParagraph:SetDesc(result)
     end)
 end
-
 local function updateBoss(name, text)
     BossData[name] = formatText(text)
     renderUI()
 end
-
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
-
-        local bossName = "Unknown"
+local bossName = "Unknown"
         local parent = v.Parent
-
         while parent do
-            if string.find(parent.Name, "TimedBossSpawn_") then
-                bossName = parent.Name
-                bossName = bossName:gsub("TimedBossSpawn_", "")
-                bossName = bossName:gsub("Boss", "")
+	if string.find(parent.Name, "TimedBossSpawn_") then
+bossName = parent.Name
+        bossName = bossName:gsub("TimedBossSpawn_", "")
+          bossName = bossName:gsub("Boss", "")
                 break
             end
             parent = parent.Parent
         end
+    if not v:GetAttribute("Connected") then
+          v:SetAttribute("Connected", true)
 
-        if not v:GetAttribute("Connected") then
-            v:SetAttribute("Connected", true)
+        local last = v.Text
 
-            local last = v.Text
-
-            updateBoss(bossName, v.Text)
-
-            v:GetPropertyChangedSignal("Text"):Connect(function()
+        updateBoss(bossName, v.Text)
+ v:GetPropertyChangedSignal("Text"):Connect(function()
                 if v.Text ~= last then
                     last = v.Text
                     updateBoss(bossName, v.Text)
