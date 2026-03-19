@@ -1004,9 +1004,10 @@ local bossStatus = {}
 
 bossTab:Section({ Title = "Boss Tracker" })
 
-local BossLabel = bossTab:Paragraph({
+local BossParagraph = bossTab:Paragraph({
     Title = "Boss Tracker",
-    Content = "กำลังโหลด..."
+    Desc = "Loading bosses...",
+    Color = "Red"
 })
 
 local function formatTime(text)
@@ -1034,11 +1035,9 @@ local function updateUI()
 
     print("UI UPDATE =>", text)
 
-    pcall(function()
-        -- 🔥 ใช้แบบเดียวกับระบบที่นายใช้ได้แน่นอน
-        BossLabel:SetTitle("Boss Tracker")
-        BossLabel:SetContent(text)
-    end)
+    -- 🔥 ใช้ method ที่นายพิสูจน์แล้วว่าทำงาน
+    BossParagraph:SetTitle("Boss Tracker (" .. tostring(#bossStatus) .. ")")
+    BossParagraph:SetDesc(text)
 end
 
 for _, v in pairs(workspace:GetDescendants()) do
