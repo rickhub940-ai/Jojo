@@ -999,13 +999,13 @@ end
 local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
 
 -- ==============================
--- Boss Monitor UI (REAL-TIME)
--- วางล่างสุดของสคริปต์ได้เลย
+-- Boss Monitor (WORKING VERSION)
+-- ใช้กับ FarmTab + Section:Set()
 -- ==============================
 
-task.wait(1) -- กัน UI / workspace ยังไม่โหลด
+task.wait(2)
 
--- ===== ฟังก์ชั่นแปลงเวลา =====
+-- ===== เวลา =====
 local function formatTime(seconds)
     local sec = tonumber(seconds)
     if not sec then return seconds end
@@ -1020,110 +1020,84 @@ local function formatTime(seconds)
     end
 end
 
--- ===== หา Tab อัตโนมัติ =====
-local Tab = bossTab or Window:FindFirstChild("Tab") or _G.Tab
-if not Tab then
-    warn("Tab not found!")
-    return
-end
-
--- ===== สร้าง Section =====
-local BossSection = bossTab:Section({ 
-    Title = "Boss Monitor",
-    Box = false,
-    FontWeight = "SemiBold",
-    TextTransparency = 0.05,
-    TextXAlignment = "Left",
-    TextSize = 17,
-    Opened = true,
+-- ===== UI SECTION (ของนาย) =====
+local BossSection = bossTab:Section({
+    Title = "Boss Monitor"
 })
 
 -- ===== เก็บสถานะ =====
 local bossStatus = {}
 
--- ===== อัปเดต Title =====
-local function updateTitle()
+-- ===== อัปเดต UI (สำคัญ) =====
+local function updateUI()
     local text = ""
 
     for name, status in pairs(bossStatus) do
         text = text .. name .. " : " .. status .. "\n"
     end
 
-    if BossSection.Set then
-        BossSection:Set({ Title = text })
-    elseif BossSection.Title ~= nil then
-        BossSection.Title = text
-    end
+    pcall(function()
+        BossSection:Set({
+            Title = text
+        })
+    end)
 end
 
 -- ===== สแกนบอส =====
 local function scanBosses()
     for _, v in pairs(workspace:GetChildren()) do
-        if string.find(v.Name, "TimedBossSpawn_") and string.find(v.Name, "_Container") then
+        if v.Name:find("TimedBossSpawn_") and v.Name:find("_Container") then
 
             local bossName = v.Name
             bossName = bossName:gsub("TimedBossSpawn_", "")
-            bossName = bossName:gsub("Boss_Container", "")
             bossName = bossName:gsub("_Container", "")
 
-            local timerLabel = v:FindFirstChild("Timer", true)
+            local timer = v:FindFirstChildWhichIsA("TextLabel", true)
 
-            if timerLabel and timerLabel:IsA("TextLabel") then
+            if timer then
 
-                if not timerLabel:GetAttribute("Connected") then
-                    timerLabel:SetAttribute("Connected", true)
+                if not timer:GetAttribute("Connected") then
+                    timer:SetAttribute("Connected", true)
 
-                    timerLabel:GetPropertyChangedSignal("Text"):Connect(function()
-                        local currentText = timerLabel.Text
+                    timer:GetPropertyChangedSignal("Text"):Connect(function()
+                        local txt = timer.Text
+                        local num = tonumber(txt:match("%d+"))
 
-                        local display = ""
-                        local emoji = "🔴"
+                        local display
 
-                        if string.match(currentText, "%d+") then
-                            local seconds = tonumber(currentText:match("%d+"))
-
-                            if seconds then
-                                display = "🔴 Spawn in " .. formatTime(seconds)
-                            else
-                                display = "🔴 Spawn in " .. currentText
-                            end
+                        if num then
+                            display = "🔴 Spawn in " .. formatTime(num)
                         else
-                            display = "🟢 SPAWNED NOW!"
+                            display = "🟢 SPAWNED"
                         end
 
                         bossStatus[bossName] = display
-                        updateTitle()
+                        updateUI()
                     end)
                 end
 
                 -- ค่าเริ่มต้น
-                local currentText = timerLabel.Text
-                local display = "🟢 SPAWNED NOW!"
+                local txt = timer.Text
+                local num = tonumber(txt:match("%d+"))
 
-                if string.match(currentText, "%d+") then
-                    local seconds = tonumber(currentText:match("%d+"))
-                    if seconds then
-                        display = "🔴 Spawn in " .. formatTime(seconds)
-                    else
-                        display = "🔴 Spawn in " .. currentText
-                    end
+                if num then
+                    bossStatus[bossName] = "🔴 Spawn in " .. formatTime(num)
+                else
+                    bossStatus[bossName] = "🟢 SPAWNED"
                 end
-
-                bossStatus[bossName] = display
             end
         end
     end
 
-    updateTitle()
+    updateUI()
 end
 
--- ===== เริ่มทำงาน =====
+-- ===== START =====
 scanBosses()
 
--- รองรับบอสเกิดใหม่
 workspace.ChildAdded:Connect(function()
     task.wait(1)
     scanBosses()
 end)
 
-updateTitle()
+updateUI()
