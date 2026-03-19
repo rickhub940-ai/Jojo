@@ -1018,7 +1018,7 @@ local function getHRP()
     return char and char:FindFirstChild("HumanoidRootPart")
 end
 
--- ฟังก์ชันดึงรายชื่อบอสจาก Workspace (แก้ Error: nil value)
+-- ฟังก์ชันดึงรายชื่อบอส (แก้ nil value)
 local function getBossNames()
     local names = {}
     for _, v in pairs(workspace:GetChildren()) do
@@ -1027,8 +1027,7 @@ local function getBossNames()
             table.insert(names, cleanName)
         end
     end
-    -- ถ้าหาไม่เจอเลย ให้ใส่ค่า Default กัน Error
-    if #names == 0 then return {"No Boss Found"} end
+    if #names == 0 then return {"Searching Boss..."} end
     return names
 end
 
@@ -1086,15 +1085,7 @@ local function findBoss(name)
     end
 end
 
-local function getBossSpawn(name)
-    for _, v in pairs(workspace:GetChildren()) do
-        if v.Name:find("TimedBossSpawn_") and v.Name:lower():find(name:lower()) then
-            return v:GetPivot().Position
-        end
-    end
-end
-
---================ ATTACK ================
+--================ ATTACK SYSTEM ================
 local function startAttack(boss)
     if attackConnection then attackConnection:Disconnect() end
     local remote = ReplicatedStorage:WaitForChild("CombatSystem"):WaitForChild("Remotes"):WaitForChild("RequestHit")
@@ -1115,7 +1106,7 @@ local function startAttack(boss)
     end)
 end
 
---================ MAIN LOOP ================
+--================ MAIN FARM LOOP ================
 local function farmLoop()
     while farmBoss do
         for _, bossName in ipairs(selectedBosses) do
@@ -1124,9 +1115,6 @@ local function farmLoop()
             if boss then
                 startAttack(boss)
                 repeat task.wait(0.5) until not boss or boss.Humanoid.Health <= 0 or not farmBoss
-            else
-                local spawn = getBossSpawn(bossName)
-                if spawn then tweenWithPlatform(spawn) end
             end
         end
         task.wait(0.5)
@@ -1134,30 +1122,27 @@ local function farmLoop()
 end
 
 --================ UI SETUP (WindUI) ================
--- สมมติว่าคุณสร้าง Window และ Tab ไว้แล้วนะครับ
--- local Window = WindUI:CreateWindow(...)
--- local Tab = Window:Tab(...)
+-- *** ตรวจสอบว่าคุณมีตัวแปร Window และ Tab ที่สร้างไว้ก่อนหน้านี้แล้ว ***
 
 local BossInfo = bossTab:Section({ 
     Title = "📊 BOSS INFO",
     Box = false,
-    FontWeight = "SemiBold",
+    -- ลบ FontWeight ออกเพื่อแก้ Enum Error
     TextXAlignment = "Left",
     Opened = true,
 })
 
 local labels = {}
 
--- ฟังก์ชันอัปเดต Label (แก้ Error: invalid argument)
 local function updateLabel(name, text, color)
     if not labels[name] then
-        -- ใช้ BossInfo:Text ของ WindUI
+        -- ใช้คำสั่งสร้าง Text ของ WindUI
         labels[name] = BossInfo:Text({
             Title = name .. " : " .. text,
             Color = color
         })
     else
-        -- อัปเดตผ่าน Method ของ WindUI
+        -- อัปเดต Title
         if labels[name].SetTitle then
             labels[name]:SetTitle(name .. " : " .. text)
         else
@@ -1166,7 +1151,7 @@ local function updateLabel(name, text, color)
     end
 end
 
--- Loop เช็คเวลาบอสเกิด
+-- Loop เช็คเวลาบอส (Real-time)
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
@@ -1188,9 +1173,9 @@ task.spawn(function()
 end)
 
 --================ CONTROL UI ================
-bossTab:Dropdown({
+boasTab:Dropdown({
     Title = "Select Boss",
-    Values = getBossNames(), -- เรียกใช้ฟังก์ชันที่สร้างไว้ด้านบน
+    Values = getBossNames(),
     Multi = true,
     Callback = function(v)
         selectedBosses = v
@@ -1198,7 +1183,7 @@ bossTab:Dropdown({
 })
 
 bossTab:Toggle({
-    Title = "Auto Farm",
+    Title = "Auto Farm Boss",
     Callback = function(state)
         farmBoss = state
         if state then
