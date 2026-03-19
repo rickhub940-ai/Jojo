@@ -1009,7 +1009,6 @@ local LocalPlayer = Players.LocalPlayer
 --================ STATE ================
 local farmBoss = false
 local selectedBosses = {}
-
 local attackConnection
 local currentTween
 
@@ -1019,9 +1018,22 @@ local function getHRP()
     return char and char:FindFirstChild("HumanoidRootPart")
 end
 
+-- ฟังก์ชันดึงรายชื่อบอสจาก Workspace (แก้ Error: nil value)
+local function getBossNames()
+    local names = {}
+    for _, v in pairs(workspace:GetChildren()) do
+        if v.Name:find("TimedBossSpawn_") then
+            local cleanName = v.Name:gsub("TimedBossSpawn_", "")
+            table.insert(names, cleanName)
+        end
+    end
+    -- ถ้าหาไม่เจอเลย ให้ใส่ค่า Default กัน Error
+    if #names == 0 then return {"No Boss Found"} end
+    return names
+end
+
 --================ PLATFORM ================
 local platformName = "FarmPlatform"
-
 local function getPlatform()
     local p = workspace:FindFirstChild(platformName)
     if not p then
@@ -1045,14 +1057,11 @@ end
 local function tweenWithPlatform(pos)
     local hrp = getHRP()
     if not hrp then return end
-
     local platform = getPlatform()
-
     if currentTween then currentTween:Cancel() end
 
     local dist = (hrp.Position - pos).Magnitude
     local time = dist / 75
-
     local targetCF = CFrame.new(pos + Vector3.new(0,3,0))
     local platformCF = targetCF * CFrame.new(0,-3.5,0)
 
@@ -1067,10 +1076,8 @@ end
 --================ FIND BOSS ================
 local function findBoss(name)
     local folder = workspace:FindFirstChild("NPCs") or workspace
-
     for _, v in pairs(folder:GetChildren()) do
         local hum = v:FindFirstChild("Humanoid")
-
         if hum and hum.Health > 0 then
             if v.Name:lower():find(name:lower()) then
                 return v
@@ -1090,131 +1097,100 @@ end
 --================ ATTACK ================
 local function startAttack(boss)
     if attackConnection then attackConnection:Disconnect() end
-
-    local remote = ReplicatedStorage:WaitForChild("CombatSystem")
-        :WaitForChild("Remotes")
-        :WaitForChild("RequestHit")
+    local remote = ReplicatedStorage:WaitForChild("CombatSystem"):WaitForChild("Remotes"):WaitForChild("RequestHit")
 
     attackConnection = RunService.Heartbeat:Connect(function()
-        if not farmBoss then return end
-        if not boss or not boss.Parent then return end
-
+        if not farmBoss or not boss or not boss.Parent then return end
         local hrp = getHRP()
-        local bossHRP =
-            boss:FindFirstChild("HumanoidRootPart")
-            or boss:FindFirstChild("Torso")
-            or boss:FindFirstChild("UpperTorso")
-
+        local bossHRP = boss:FindFirstChild("HumanoidRootPart") or boss:FindFirstChild("Torso")
         if not hrp or not bossHRP then return end
 
-        local dist = (hrp.Position - bossHRP.Position).Magnitude
-
-        if dist > 25 then
+        if (hrp.Position - bossHRP.Position).Magnitude > 25 then
             tweenWithPlatform(bossHRP.Position)
         else
             hrp.CFrame = CFrame.new(bossHRP.Position + Vector3.new(0,5,0))
             hrp.CFrame = CFrame.lookAt(hrp.Position, bossHRP.Position)
-
             remote:FireServer()
         end
     end)
 end
 
---================ MAIN LOOP (REALTIME) ================
+--================ MAIN LOOP ================
 local function farmLoop()
     while farmBoss do
         for _, bossName in ipairs(selectedBosses) do
             if not farmBoss then break end
-
             local boss = findBoss(bossName)
-
             if boss then
                 startAttack(boss)
-
-                repeat
-                    task.wait(0.5)
-                until not boss or boss.Humanoid.Health <= 0 or not farmBoss
+                repeat task.wait(0.5) until not boss or boss.Humanoid.Health <= 0 or not farmBoss
             else
                 local spawn = getBossSpawn(bossName)
-                if spawn then
-                    tweenWithPlatform(spawn)
-                end
+                if spawn then tweenWithPlatform(spawn) end
             end
         end
-
         task.wait(0.5)
     end
 end
 
---================ CONTROL ================
-local function startFarming()
-    if farmBoss then return end
-    if #selectedBosses == 0 then return end
+--================ UI SETUP (WindUI) ================
+-- สมมติว่าคุณสร้าง Window และ Tab ไว้แล้วนะครับ
+-- local Window = WindUI:CreateWindow(...)
+-- local Tab = Window:Tab(...)
 
-    farmBoss = true
-    task.spawn(farmLoop)
-
-    print("START FARM")
-end
-
-local function stopFarming()
-    farmBoss = false
-
-    if attackConnection then attackConnection:Disconnect() end
-    if currentTween then currentTween:Cancel() end
-
-    removePlatform()
-
-    print("STOP FARM")
-end
-
---================ INFO BOSS ================
-local BossInfo = bossTab:Section({Title = "📊 BOSS INFO"})
+local BossInfo = bossTab:Section({ 
+    Title = "📊 BOSS INFO",
+    Box = false,
+    FontWeight = "SemiBold",
+    TextXAlignment = "Left",
+    Opened = true,
+})
 
 local labels = {}
 
+-- ฟังก์ชันอัปเดต Label (แก้ Error: invalid argument)
 local function updateLabel(name, text, color)
     if not labels[name] then
-        local t = Instance.new("TextLabel")
-        t.Size = UDim2.new(1,0,0,20)
-        t.BackgroundTransparency = 1
-        t.TextXAlignment = Enum.TextXAlignment.Left
-        t.Font = Enum.Font.GothamSemibold
-        t.TextSize = 14
-        t.Parent = BossInfo
-        labels[name] = t
+        -- ใช้ BossInfo:Text ของ WindUI
+        labels[name] = BossInfo:Text({
+            Title = name .. " : " .. text,
+            Color = color
+        })
+    else
+        -- อัปเดตผ่าน Method ของ WindUI
+        if labels[name].SetTitle then
+            labels[name]:SetTitle(name .. " : " .. text)
+        else
+            labels[name].Title = name .. " : " .. text
+        end
     end
-
-    labels[name].Text = name .. " : " .. text
-    labels[name].TextColor3 = color
 end
 
+-- Loop เช็คเวลาบอสเกิด
 task.spawn(function()
     while task.wait(1) do
-        for _, v in pairs(workspace:GetChildren()) do
-            if v.Name:find("TimedBossSpawn_") then
-                local name = v.Name:gsub("TimedBossSpawn_","")
-
-                local timer = v:FindFirstChild("Timer", true)
-
-                if timer and timer:IsA("TextLabel") then
-                    if timer.Text:match("%d+") then
-                        updateLabel(name, "⏳ "..timer.Text, Color3.fromRGB(255,0,0))
-                    else
-                        updateLabel(name, "🟢 SPAWNED", Color3.fromRGB(0,255,0))
+        pcall(function()
+            for _, v in pairs(workspace:GetChildren()) do
+                if v.Name:find("TimedBossSpawn_") then
+                    local name = v.Name:gsub("TimedBossSpawn_","")
+                    local timer = v:FindFirstChild("Timer", true)
+                    if timer and timer:IsA("TextLabel") then
+                        if timer.Text:match("%d+") then
+                            updateLabel(name, "⏳ "..timer.Text, Color3.fromRGB(255, 100, 100))
+                        else
+                            updateLabel(name, "🟢 SPAWNED", Color3.fromRGB(100, 255, 100))
+                        end
                     end
                 end
             end
-        end
+        end)
     end
 end)
 
---================ UI ================
-local bossNames = getBossNames()
-
+--================ CONTROL UI ================
 bossTab:Dropdown({
     Title = "Select Boss",
-    Values = bossNames,
+    Values = getBossNames(), -- เรียกใช้ฟังก์ชันที่สร้างไว้ด้านบน
     Multi = true,
     Callback = function(v)
         selectedBosses = v
@@ -1222,13 +1198,15 @@ bossTab:Dropdown({
 })
 
 bossTab:Toggle({
-    Title = "Farm Boss",
+    Title = "Auto Farm",
     Callback = function(state)
+        farmBoss = state
         if state then
-            startFarming()
+            task.spawn(farmLoop)
         else
-            stopFarming()
+            if attackConnection then attackConnection:Disconnect() end
+            if currentTween then currentTween:Cancel() end
+            removePlatform()
         end
     end
 })
-
