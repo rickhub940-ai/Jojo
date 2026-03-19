@@ -995,3 +995,251 @@ for _,place in ipairs(Teleports) do
 		end
 	})
 end
+
+local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
+
+
+
+-- 🔥 FULL AUTO BOSS FARM (USE farmBoss VARIABLE) 🔥
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- ================= STATE =================
+local farmBoss = false
+local selectedBosses = {}
+
+local attackConnection
+local currentTween
+
+-- ================= UTILS =================
+
+local function getHRP()
+    local char = LocalPlayer.Character
+    return char and char:FindFirstChild("HumanoidRootPart")
+end
+
+-- ================= PLATFORM =================
+
+local platformName = "RickHub_Platform"
+
+local function getPlatform()
+    local p = workspace:FindFirstChild(platformName)
+    
+    if not p then
+        p = Instance.new("Part")
+        p.Name = platformName
+        p.Size = Vector3.new(8,1,8)
+        p.Anchored = true
+        p.CanCollide = true
+        p.Transparency = 0.5
+        p.Parent = workspace
+    end
+    
+    return p
+end
+
+local function removePlatform()
+    local p = workspace:FindFirstChild(platformName)
+    if p then p:Destroy() end
+end
+
+-- ================= TWEEN =================
+
+local function tweenWithPlatform(targetPos)
+    local hrp = getHRP()
+    if not hrp then return end
+    
+    local platform = getPlatform()
+    
+    if currentTween then currentTween:Cancel() end
+    
+    local dist = (hrp.Position - targetPos).Magnitude
+    local speed = 75
+    local time = dist / speed
+    
+    local targetCF = CFrame.new(targetPos + Vector3.new(0,3,0))
+    local platformCF = targetCF * CFrame.new(0,-3.5,0)
+    
+    local tween1 = TweenService:Create(hrp, TweenInfo.new(time, Enum.EasingStyle.Linear), {CFrame = targetCF})
+    local tween2 = TweenService:Create(platform, TweenInfo.new(time, Enum.EasingStyle.Linear), {CFrame = platformCF})
+    
+    currentTween = tween1
+    
+    tween1:Play()
+    tween2:Play()
+    
+    tween1.Completed:Wait()
+end
+
+-- ================= FIND BOSS =================
+
+local function getBossNames()
+    local list = {}
+    
+    for _, v in pairs(workspace:GetChildren()) do
+        if v.Name:find("TimedBossSpawn_") then
+            local name = v.Name
+            name = name:gsub("TimedBossSpawn_", "")
+            name = name:gsub("Boss_Container", "")
+            name = name:gsub("_Container", "")
+            
+            table.insert(list, name)
+        end
+    end
+    
+    return list
+end
+
+local function getBossSpawn(name)
+    for _, v in pairs(workspace:GetChildren()) do
+        if v.Name:find("TimedBossSpawn_") and v.Name:find(name) then
+            return v:GetPivot().Position
+        end
+    end
+end
+
+local function findBoss(name)
+    local folder = workspace:FindFirstChild("NPCs") or workspace
+    
+    for _, v in pairs(folder:GetChildren()) do
+        if v.Name == name and v:FindFirstChild("Humanoid") then
+            if v.Humanoid.Health > 0 then
+                return v
+            end
+        end
+    end
+end
+
+-- ================= AUTO ATTACK =================
+
+local function startAttack(boss)
+    if attackConnection then attackConnection:Disconnect() end
+    
+    local remote = ReplicatedStorage:WaitForChild("CombatSystem")
+        :WaitForChild("Remotes")
+        :WaitForChild("RequestHit")
+    
+    attackConnection = RunService.Heartbeat:Connect(function()
+        if not farmBoss then return end
+        
+        local hrp = getHRP()
+        local bossHRP = boss and boss:FindFirstChild("HumanoidRootPart")
+        
+        if not hrp or not bossHRP then return end
+        
+        local dist = (hrp.Position - bossHRP.Position).Magnitude
+        
+        if dist > 25 then
+            tweenWithPlatform(bossHRP.Position)
+        else
+            hrp.CFrame = CFrame.new(bossHRP.Position + Vector3.new(0,5,0))
+            hrp.CFrame = CFrame.lookAt(hrp.Position, bossHRP.Position)
+            
+            remote:FireServer()
+            task.wait(0.05)
+        end
+    end)
+end
+
+-- ================= MAIN FARM =================
+
+local function farmLoop()
+    while farmBoss do
+        for _, bossName in ipairs(selectedBosses) do
+            if not farmBoss then break end
+            
+            print("🎯 ฟาร์ม:", bossName)
+            
+            local spawn = getBossSpawn(bossName)
+            if spawn then
+                tweenWithPlatform(spawn)
+            end
+            
+            local boss
+            local t = 0
+            
+            repeat
+                boss = findBoss(bossName)
+                task.wait(1)
+                t += 1
+            until boss or t > 300 or not farmBoss
+            
+            if boss then
+                print("⚔️ เจอ:", bossName)
+                
+                startAttack(boss)
+                
+                repeat
+                    task.wait(0.5)
+                until not boss or boss.Humanoid.Health <= 0 or not farmBoss
+                
+                print("💀 ตาย:", bossName)
+            end
+        end
+        
+        task.wait(1)
+    end
+end
+
+-- ================= CONTROL =================
+
+local function startFarming()
+    if farmBoss then return end
+    if #selectedBosses == 0 then
+        warn("❌ เลือกบอสก่อน")
+        return
+    end
+    
+    farmBoss = true
+    task.spawn(farmLoop)
+    
+    print("🚀 START FARM")
+end
+
+local function stopFarming()
+    farmBoss = false
+    
+    if attackConnection then attackConnection:Disconnect() end
+    if currentTween then currentTween:Cancel() end
+    
+    removePlatform()
+    
+    print("🛑 STOP FARM")
+end
+
+-- ================= UI =================
+
+local bossNames = getBossNames()
+
+local bossDropdown = bossTab:Dropdown({
+    Title = " Select Boss",
+    Values = bossNames,
+    Multi = true,
+    AllowNone = true,
+
+    Callback = function(selected)
+        selectedBosses = {}
+        for _, v in ipairs(selected) do
+            table.insert(selectedBosses, v)
+        end
+    end
+})
+
+Tab:Toggle({
+    Title = "Farm Boss",
+    Default = false,
+    Callback = function(state)
+        if state then
+            startFarming()
+        else
+            stopFarming()
+        end
+    end
+})
+
+print("✅ SYSTEM READY")
