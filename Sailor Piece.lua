@@ -1004,7 +1004,7 @@ local bossStatus = {}
 
 FarmTab:Section({ Title = "Boss Tracker" })
 
-local BossLabel = FarmTab:Paragraph({
+local BossLabel = bossTab:Paragraph({
     Title = "Boss Tracker",
     Content = "กำลังโหลด..."
 })
