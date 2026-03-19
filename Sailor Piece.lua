@@ -1023,7 +1023,6 @@ local function formatText(text)
     return "🔴 " .. text
 end
 
--- เก็บ Timer
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
         table.insert(Timers, v)
@@ -1032,57 +1031,43 @@ end
 
 local function renderUI()
     local result = ""
-
     for name, status in pairs(BossMap) do
         result = result .. name .. " : " .. status .. "\n"
     end
-
     if result == "" then
-        result = "Waiting Boss..."
+        result = "kuy..."
     end
-
     BossParagraph:SetDesc(result)
 end
-
--- 🔥 updater loop (auto throttle)
 task.spawn(function()
     while true do
-
         dirty = false
-
         for _, v in pairs(Timers) do
-            if v and v.Parent then
-
-                local bossName = "Unknown"
+        if v and v.Parent then
+            local bossName = "Unknown"
                 local parent = v.Parent
-
                 while parent do
                     if string.find(parent.Name, "TimedBossSpawn_") then
-                        bossName = parent.Name
-                        bossName = bossName:gsub("TimedBossSpawn_", "")
-                        bossName = bossName:gsub("Boss", "")
-                        break
-                    end
-                    parent = parent.Parent
+                    bossName = parent.Name
+                     bossName = bossName:gsub("TimedBossSpawn_", "")
+                    bossName = bossName:gsub("Boss", "")
+                 break
+            end
+                 parent = parent.Parent
                 end
-
                 local newValue = formatText(v.Text)
-
-                -- update เฉพาะเปลี่ยนจริง
                 if BossMap[bossName] ~= newValue then
                     BossMap[bossName] = newValue
                     dirty = true
                 end
             end
         end
-
-        -- ⚡ render เฉพาะตอนมีการเปลี่ยน
         if dirty then
             renderUI()
             lastRender = tick()
-            task.wait(0.01) -- เร่งตอนมีการเปลี่ยน
+            task.wait(0.01)
         else
-            task.wait(0.2) -- ลดโหลดตอนนิ่ง
+            task.wait(0.2)
         end
     end
 end)
