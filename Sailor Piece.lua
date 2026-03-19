@@ -1000,44 +1000,42 @@ local bossTab = Window:Tab({Title = "BOSS", Icon = "skull"})
 
 task.wait(2)
 
-local bossStatus = {}
-
-bossTab:Section({ Title = "Boss Tracker" })
-
 local BossParagraph = bossTab:Paragraph({
-    Title = "Boss Tracker",
-    Desc = "Loading bosses...",
-    Color = "Red"
+    Title = "📊 Boss info",
+    Desc = "",
 })
 
-local function formatTime(text)
-    local num = tonumber(text:match("%d+"))
+local BossData = {}
 
-    if num then
-        local m = math.floor(num / 60)
-        local s = num % 60
-        return "🔴 " .. m .. "m " .. s .. "s"
-    else
-        return "🟢 SPAWNED"
+local function formatText(text)
+    text = tostring(text)
+
+    if not string.match(text, "%d") then
+        return "🟢 Spawned Now!!"
     end
+
+    return "🔴 " .. text
 end
 
-local function updateUI()
-    local text = ""
+local function renderUI()
+    local result = ""
 
-    for name, status in pairs(bossStatus) do
-        text = text .. name .. " : " .. status .. "\n"
+    for name, status in pairs(BossData) do
+        result = result .. name .. " : " .. status .. "\n"
     end
 
-    if text == "" then
-        text = "No Boss Found"
+    if result == "" then
+        result = "กำลังรอบอส..."
     end
 
-    print("UI UPDATE =>", text)
+    pcall(function()
+        BossParagraph:SetDesc(result)
+    end)
+end
 
-    -- 🔥 ใช้ method ที่นายพิสูจน์แล้วว่าทำงาน
-    BossParagraph:SetTitle("Boss Tracker (" .. tostring(#bossStatus) .. ")")
-    BossParagraph:SetDesc(text)
+local function updateBoss(name, text)
+    BossData[name] = formatText(text)
+    renderUI()
 end
 
 for _, v in pairs(workspace:GetDescendants()) do
@@ -1047,28 +1045,28 @@ for _, v in pairs(workspace:GetDescendants()) do
         local parent = v.Parent
 
         while parent do
-            if parent.Name:find("TimedBossSpawn_") then
+            if string.find(parent.Name, "TimedBossSpawn_") then
                 bossName = parent.Name
                 bossName = bossName:gsub("TimedBossSpawn_", "")
-                bossName = bossName:gsub("_Container", "")
+                bossName = bossName:gsub("Boss", "")
                 break
             end
             parent = parent.Parent
         end
 
-        print("CONNECTED:", bossName)
-
         if not v:GetAttribute("Connected") then
             v:SetAttribute("Connected", true)
 
-            v:GetPropertyChangedSignal("Text"):Connect(function()
-                bossStatus[bossName] = formatTime(v.Text)
-                updateUI()
-            end)
+            local last = v.Text
 
-            bossStatus[bossName] = formatTime(v.Text)
+            updateBoss(bossName, v.Text)
+
+            v:GetPropertyChangedSignal("Text"):Connect(function()
+                if v.Text ~= last then
+                    last = v.Text
+                    updateBoss(bossName, v.Text)
+                end
+            end)
         end
     end
 end
-
-updateUI()
