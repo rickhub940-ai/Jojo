@@ -1003,7 +1003,7 @@ task.wait(2)
 local bossStatus = {}
 
 -- ===== UI =====
-local bossTab = FarmTab:Section({
+local bossTab = bossTab:Section({
     Title = "Boss Tracker"
 })
 
