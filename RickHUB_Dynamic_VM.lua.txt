@@ -1,0 +1,611 @@
+return (function(...)
+-- [[ DYNAMIC PROTECTION LOADED | SIZE_FACTOR: 750 ]] --
+local _SNz5ygHR6LPS = {['_uK8kpu87pLOp'] = function(...) return ... end}; _SNz5ygHR6LPS['_PJUFbzsaJYYA'] = _SNz5ygHR6LPS['_h6uIQK83EUYL']
+for i=1, 4 do local _hb1zwtOzEpyk = string.byte('_Ed5Ap2BQQlJ2', 1); end
+local _ = math.pow(5, 2) + math.pi;
+local _WNk1bAEAqdEo = {['_HdpvOCB7YFm9'] = function(...) return ... end}; _WNk1bAEAqdEo['_tT5kWLV2gXL2'] = _WNk1bAEAqdEo['_lhwIubZJ9E5L']
+for i=1, 4 do local _kVap2FqhTOdw = string.byte('_6nz9USVJR3Pp', 1); end
+local _EleRkzQCZkkz = {['_iuarYW4ydk5Q'] = function(...) return ... end}; _EleRkzQCZkkz['_UQTrm49vc0sO'] = _EleRkzQCZkkz['_fGO8RVXPcaPg']
+local _ = math.pow(3, 2) + math.pi;
+local _41gd2rbSIq4W = {['_AsloUUF0OZCW'] = function(...) return ... end}; _41gd2rbSIq4W['_IGBBxFY0L27y'] = _41gd2rbSIq4W['_CzQq1IafBnm3']
+local _ = math.pow(9, 2) + math.pi;
+local _7r06KAJV4w4d = setmetatable({}, {__call = function() return true end}); if _7r06KAJV4w4d() then end
+local _7fVgF6Kzq2Sk = {['_Mn9kylA4aFQO'] = function(...) return ... end}; _7fVgF6Kzq2Sk['_3JvXL5MQYlcr'] = _7fVgF6Kzq2Sk['_JhHrlBf2jlFc']
+for i=1, 5 do local _H4S9uorSuf8D = string.byte('_vrCRLmmynVOc', 1); end
+local _ = math.pow(3, 2) + math.pi;
+local _8cVH4V3aFUWS = setmetatable({}, {__call = function() return true end}); if _8cVH4V3aFUWS() then end
+local _7vsWH7he5O1z = setmetatable({}, {__call = function() return true end}); if _7vsWH7he5O1z() then end
+local _k3YT1wJrF3Ak = setmetatable({}, {__call = function() return true end}); if _k3YT1wJrF3Ak() then end
+local _6sFWIyIUqAMZ = setmetatable({}, {__call = function() return true end}); if _6sFWIyIUqAMZ() then end
+for i=1, 3 do local _DOdN7iyMrNjF = string.byte('_apH5xsfB9M1n', 1); end
+local _8ra48vrlixz4 = {['_dAOLTKa0HSTg'] = function(...) return ... end}; _8ra48vrlixz4['_bxueLg0XALfO'] = _8ra48vrlixz4['_xrzmL75cxDs0']
+local _ = math.pow(8, 2) + math.pi;
+local _ = math.pow(1, 2) + math.pi;
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 2 do local _xHSyub3j8NOv = string.byte('_mW9bBc2h5jpl', 1); end
+local _xDV5cVJ5jYsh = setmetatable({}, {__call = function() return true end}); if _xDV5cVJ5jYsh() then end
+local _amJ9xVkozEm7 = {['_ULVqnsbKLgkF'] = function(...) return ... end}; _amJ9xVkozEm7['_4cLYxphx4Rkw'] = _amJ9xVkozEm7['_swiMM39MWl08']
+local _OznooLwZzSBJ = {['_OQ7ljcuwvXfY'] = function(...) return ... end}; _OznooLwZzSBJ['_iYMx2ujFTtw1'] = _OznooLwZzSBJ['_8Lh1xLOgph5j']
+for i=1, 5 do local _ZNHsDubTZAhh = string.byte('_cDcVryxh4d10', 1); end
+local _ = math.pow(6, 2) + math.pi;
+local _Sa6yGGCzRbI2 = setmetatable({}, {__call = function() return true end}); if _Sa6yGGCzRbI2() then end
+for i=1, 5 do local _eDuwAYTZ0jD2 = string.byte('_OGevTrGeskra', 1); end
+for i=1, 4 do local _AppkDrjJtx4j = string.byte('_UAtWekoJICT8', 1); end
+local _hLJAbHhodv2o = {['_6jtg4ybzvQcR'] = function(...) return ... end}; _hLJAbHhodv2o['_thtGhB3v2myi'] = _hLJAbHhodv2o['_vL9u0cRji8Dc']
+for i=1, 3 do local _NutGctNpMo2Y = string.byte('_crHhAerGY23w', 1); end
+local _D5oduSt62E0i = {['_hVnuL1lGJzw3'] = function(...) return ... end}; _D5oduSt62E0i['_HLEC6qI5X4o0'] = _D5oduSt62E0i['_4quFhzdlR806']
+for i=1, 3 do local _5jzTHqXTE3wB = string.byte('_jjXMiTsKP24Y', 1); end
+local _OGUjSetMQ48U = {['_Rxcoioq8lMEG'] = function(...) return ... end}; _OGUjSetMQ48U['_EVNrlrgMx5EL'] = _OGUjSetMQ48U['_VzQD6po9DGBv']
+local _YQhWqF72cJSh = setmetatable({}, {__call = function() return true end}); if _YQhWqF72cJSh() then end
+local _cQCqUUgd2z6P = {['_Zru3b6iBz0G6'] = function(...) return ... end}; _cQCqUUgd2z6P['_UfBCBjYliOiK'] = _cQCqUUgd2z6P['_V6PI6HWtP4ic']
+local _9rTUrW8CR8ol = setmetatable({}, {__call = function() return true end}); if _9rTUrW8CR8ol() then end
+for i=1, 4 do local _lTR2p9ogxHCl = string.byte('_OyLGyDNisR8N', 1); end
+local _Yhfle2w6Zivm = {['_SGwMVu5OOb6O'] = function(...) return ... end}; _Yhfle2w6Zivm['_u9j2tdmDQaW5'] = _Yhfle2w6Zivm['_rlmApBDYuef3']
+local _GQB3f8cqzOpx = setmetatable({}, {__call = function() return true end}); if _GQB3f8cqzOpx() then end
+local _aTK8wcNbGLNz = setmetatable({}, {__call = function() return true end}); if _aTK8wcNbGLNz() then end
+local _gAhwxBlItXLJ = setmetatable({}, {__call = function() return true end}); if _gAhwxBlItXLJ() then end
+local _EfxWWAI5I00F = setmetatable({}, {__call = function() return true end}); if _EfxWWAI5I00F() then end
+local _ = math.pow(5, 2) + math.pi;
+local _Y0BroidTHV7r = {['_w2AMFMBQFMJi'] = function(...) return ... end}; _Y0BroidTHV7r['_4scRt8u75vaY'] = _Y0BroidTHV7r['_MN6pFwyxVf3e']
+for i=1, 4 do local _crdKwPCj1rkd = string.byte('_RgnWYdoOX2Ew', 1); end
+local _fudoTVcPLB1m = setmetatable({}, {__call = function() return true end}); if _fudoTVcPLB1m() then end
+for i=1, 3 do local _ySuXPVjsQI3H = string.byte('_pcbt0gVBSyvi', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _ = math.pow(10, 2) + math.pi;
+local _I71z7BrVEHok = {['_14BQbMeVVQ5f'] = function(...) return ... end}; _I71z7BrVEHok['_sUZ6jQuy5iUP'] = _I71z7BrVEHok['_1YkTAyZ9FoXP']
+local _bzipGlwUW6Qd = setmetatable({}, {__call = function() return true end}); if _bzipGlwUW6Qd() then end
+local _AnKNUcxoj3ov = {['_FVpCHPIwS9TY'] = function(...) return ... end}; _AnKNUcxoj3ov['_dIjkVdyZx8u8'] = _AnKNUcxoj3ov['_Tbn7Onytvpap']
+local _NEatMaxTyhfu = setmetatable({}, {__call = function() return true end}); if _NEatMaxTyhfu() then end
+local _ = math.pow(9, 2) + math.pi;
+local _jhr8kmQ3gKfU = setmetatable({}, {__call = function() return true end}); if _jhr8kmQ3gKfU() then end
+local _ = math.pow(8, 2) + math.pi;
+local _ = math.pow(10, 2) + math.pi;
+local _ONsOwKMGlGCD = setmetatable({}, {__call = function() return true end}); if _ONsOwKMGlGCD() then end
+local _oIpDDaCidR68 = {['_ZGTeUYWT6C2w'] = function(...) return ... end}; _oIpDDaCidR68['_jmPdCxgRyTVT'] = _oIpDDaCidR68['_ePrJQapxVIBQ']
+local _ = math.pow(4, 2) + math.pi;
+for i=1, 5 do local _pWBzOePCc104 = string.byte('_aMoWHfSTqgJ2', 1); end
+local _HeP2E9NSqkf2 = setmetatable({}, {__call = function() return true end}); if _HeP2E9NSqkf2() then end
+local _SW3cEMD36Gq5 = setmetatable({}, {__call = function() return true end}); if _SW3cEMD36Gq5() then end
+local _G2sYIDFc2RIx = setmetatable({}, {__call = function() return true end}); if _G2sYIDFc2RIx() then end
+local _ZA1UBNz1mQqh = {['_kRBgN0hnowf4'] = function(...) return ... end}; _ZA1UBNz1mQqh['_KkTRBYjmBqEL'] = _ZA1UBNz1mQqh['_qaq1VtOoiFQU']
+local _ = math.pow(5, 2) + math.pi;
+for i=1, 5 do local _r0286jd915Zw = string.byte('_DpmEYqWL5u4o', 1); end
+local _KeGDcmfPFvlY = setmetatable({}, {__call = function() return true end}); if _KeGDcmfPFvlY() then end
+for i=1, 4 do local _7ZdexfsmG3Oh = string.byte('_5dqDibx47uSq', 1); end
+local _ = math.pow(3, 2) + math.pi;
+local _ID98hnB2QpPj = setmetatable({}, {__call = function() return true end}); if _ID98hnB2QpPj() then end
+local _xaq5Mok36lHz = {['_xqh5TdonRBqJ'] = function(...) return ... end}; _xaq5Mok36lHz['_Fzz3FSi0AYHM'] = _xaq5Mok36lHz['_tb7UJb2H6aIj']
+local _ = math.pow(6, 2) + math.pi;
+local _JkaxmEpB0DgM = {['_lw16HQCWLe8V'] = function(...) return ... end}; _JkaxmEpB0DgM['_Bx8fkRWcVdvE'] = _JkaxmEpB0DgM['_MncY56oHY6fK']
+local _ghhzuAllu7Fy = {['_XmtWavayJ77A'] = function(...) return ... end}; _ghhzuAllu7Fy['_x7m2FNdHCEV5'] = _ghhzuAllu7Fy['_Q2uwF5eZggqk']
+for i=1, 4 do local _0fWmyQLWLjr1 = string.byte('_9CO4HDR0zf1y', 1); end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 3 do local _tVtp0BMkgxB6 = string.byte('_mdoqbdcippqK', 1); end
+for i=1, 4 do local _oXC6kfqAOZCG = string.byte('_0xEWDDMxh360', 1); end
+local _ = math.pow(10, 2) + math.pi;
+for i=1, 3 do local _Wm92upmZrqvD = string.byte('_yfHIWIL720fu', 1); end
+local _bASS01pHmKvo = setmetatable({}, {__call = function() return true end}); if _bASS01pHmKvo() then end
+local _RpoLdUlpo987 = {['_Ca9t1RYYTzaQ'] = function(...) return ... end}; _RpoLdUlpo987['_NrEKAzcdC43Z'] = _RpoLdUlpo987['_KLsTMTXx1Hcc']
+local _LISMQ0KqUgGF = setmetatable({}, {__call = function() return true end}); if _LISMQ0KqUgGF() then end
+local _hRTyYnzq7YPH = {['_TCClVqtb2AwI'] = function(...) return ... end}; _hRTyYnzq7YPH['_tggGcPVP84Ta'] = _hRTyYnzq7YPH['_tmeddyLW5jZM']
+local _ = math.pow(2, 2) + math.pi;
+local _iknBXeO4Ag9o = {['_m9ONpb1tXmti'] = function(...) return ... end}; _iknBXeO4Ag9o['_aOVHJ5QbEOvB'] = _iknBXeO4Ag9o['_vgZ757pbdFxl']
+for i=1, 2 do local _PYcSpJywP0Kk = string.byte('_CaPTokju5U2u', 1); end
+local _C1Orq0tuDHCp = {['_oTrnt2H6kdJV'] = function(...) return ... end}; _C1Orq0tuDHCp['_LmARTk9GZ6WC'] = _C1Orq0tuDHCp['_qzR10zYqbgd9']
+local _f5zRkGAm6KNg = {['_dD7cQ1lhahav'] = function(...) return ... end}; _f5zRkGAm6KNg['_XjCNNqCqIlEw'] = _f5zRkGAm6KNg['_saEpMgew0Dqf']
+local _qeM4evQwpHlf = {['_WFDBNaCWhosB'] = function(...) return ... end}; _qeM4evQwpHlf['_yZ3UeG1Ft1mV'] = _qeM4evQwpHlf['_LF4ATxvwFelb']
+local _ = math.pow(4, 2) + math.pi;
+local _njbMVZfxzNdL = {['_W2s4hfxvW5Fi'] = function(...) return ... end}; _njbMVZfxzNdL['_6yQLKXB8v3wv'] = _njbMVZfxzNdL['_vZNWcEtSQdgf']
+local _qkQus14aRQKV = setmetatable({}, {__call = function() return true end}); if _qkQus14aRQKV() then end
+local _brWrTi1vPnuV = {['_Fj0Kmzq3KUhh'] = function(...) return ... end}; _brWrTi1vPnuV['_uDFg4SYP66Mp'] = _brWrTi1vPnuV['_s4CpykBreCTY']
+local _ = math.pow(8, 2) + math.pi;
+local _hsyGBqbumytp = setmetatable({}, {__call = function() return true end}); if _hsyGBqbumytp() then end
+local _ = math.pow(2, 2) + math.pi;
+local _5QDdogNzzZKO = {['_GoBw3eE9wykb'] = function(...) return ... end}; _5QDdogNzzZKO['_Our0Mt4rDtJn'] = _5QDdogNzzZKO['_TxNb38PhHY5U']
+local _LMwHjy0fm6wY = {['_F4cndRJa2qsM'] = function(...) return ... end}; _LMwHjy0fm6wY['_BxF375jnuweb'] = _LMwHjy0fm6wY['_pTHjfDfWBgQ9']
+for i=1, 4 do local _oRQU18A4xZ8B = string.byte('_xx0bwQW4R3LL', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _W0avxA6BXEnD = {['_LFtMwPX5HtHS'] = function(...) return ... end}; _W0avxA6BXEnD['_aCjy779XIj3g'] = _W0avxA6BXEnD['_hHX7p4AdF0g8']
+for i=1, 3 do local _begeH7wyVwpl = string.byte('_TdRQuV9DoYWl', 1); end
+local _tkrsJIHGazkH = setmetatable({}, {__call = function() return true end}); if _tkrsJIHGazkH() then end
+local _ukg8in4FfA4Y = setmetatable({}, {__call = function() return true end}); if _ukg8in4FfA4Y() then end
+for i=1, 3 do local _oPy3w7xQV2S5 = string.byte('_CsR4mVEsm8Qd', 1); end
+local _7OKcRWArCaAc = {['_O4K4kxgRNBjt'] = function(...) return ... end}; _7OKcRWArCaAc['_MoqeiVwDCJMX'] = _7OKcRWArCaAc['_Dbd4aAqlJthl']
+local _3NLC8jLxfTVz = setmetatable({}, {__call = function() return true end}); if _3NLC8jLxfTVz() then end
+for i=1, 3 do local _yudlhE3ZShlA = string.byte('_X1zZa40mrKWz', 1); end
+for i=1, 4 do local _aEKRXLHjR0oN = string.byte('_ljiKrNVeAAPQ', 1); end
+for i=1, 5 do local _7Mz9UXpm3Ox7 = string.byte('_U0DPtLDTZD87', 1); end
+for i=1, 3 do local _9a1ooDeisgm2 = string.byte('_1WZZ80phgZj8', 1); end
+local _3jlyEXswbDVC = setmetatable({}, {__call = function() return true end}); if _3jlyEXswbDVC() then end
+for i=1, 5 do local _I0tLlIObu4cF = string.byte('_BtyvAPKwdo06', 1); end
+local _gC6IkpulDeeh = {['_b257NKFtq5HW'] = function(...) return ... end}; _gC6IkpulDeeh['_ROfOgIHRaHqL'] = _gC6IkpulDeeh['_31r8MmBJopOs']
+local _eOpVHdSv7TZY = setmetatable({}, {__call = function() return true end}); if _eOpVHdSv7TZY() then end
+local _QZJUOjUvBVdf = setmetatable({}, {__call = function() return true end}); if _QZJUOjUvBVdf() then end
+local _ = math.pow(6, 2) + math.pi;
+for i=1, 4 do local _T0ADvI6zaVn8 = string.byte('_hu2oQxG6kt0X', 1); end
+local _ = math.pow(3, 2) + math.pi;
+local _ = math.pow(10, 2) + math.pi;
+for i=1, 5 do local _QaC1ea8K3QlH = string.byte('_RzuymHOdpCrt', 1); end
+for i=1, 4 do local _Ccty0xB7eN21 = string.byte('_1czJG2iDL3Nk', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _PVxao7RjL6Xg = {['_tgl3fGs0JqG2'] = function(...) return ... end}; _PVxao7RjL6Xg['_vcBB2piFCtjH'] = _PVxao7RjL6Xg['_Mx7d86thTJRA']
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 3 do local _8ZWLCPTYoxAb = string.byte('_yOsxfOy6nI4c', 1); end
+local _PLpLyrhKmlrP = {['_AUXGc5nxfBQ0'] = function(...) return ... end}; _PLpLyrhKmlrP['_SqDJlfAvlh5x'] = _PLpLyrhKmlrP['_nscl6R07FATd']
+local _mDKVyExpBlfg = setmetatable({}, {__call = function() return true end}); if _mDKVyExpBlfg() then end
+local _ = math.pow(8, 2) + math.pi;
+local _joEMqC5ENs88 = {['_kyQ1CchIHMoS'] = function(...) return ... end}; _joEMqC5ENs88['_u8gAJtZ5Whiw'] = _joEMqC5ENs88['_97EdNj8QaTSb']
+for i=1, 4 do local _TWQxpK0vLEJC = string.byte('_iyvOGzKq1M6s', 1); end
+local _ = math.pow(6, 2) + math.pi;
+local _ = math.pow(8, 2) + math.pi;
+for i=1, 2 do local _1OPvoFraybJj = string.byte('_jmF7R6bVvM4Z', 1); end
+for i=1, 2 do local _AbgFBKk40EL0 = string.byte('_SKNOcmiTd93H', 1); end
+for i=1, 5 do local _e7QCVUwBZLKL = string.byte('_bvjBQw6ciism', 1); end
+local _FFD1vTcIbQ9f = setmetatable({}, {__call = function() return true end}); if _FFD1vTcIbQ9f() then end
+local _ = math.pow(5, 2) + math.pi;
+for i=1, 5 do local _OQu4h1XOB6gg = string.byte('_7SlWb9G01raj', 1); end
+local _5gpGAJNHlMN4 = setmetatable({}, {__call = function() return true end}); if _5gpGAJNHlMN4() then end
+local _96M5cW6xRmn4 = {['_cex8eCxKWCxt'] = function(...) return ... end}; _96M5cW6xRmn4['_33gcYo3NpZxB'] = _96M5cW6xRmn4['_R3PHnvU8ViF2']
+local _hcc4cSstOLGz = setmetatable({}, {__call = function() return true end}); if _hcc4cSstOLGz() then end
+local _ = math.pow(4, 2) + math.pi;
+local _KAyU3mGiYdt2 = setmetatable({}, {__call = function() return true end}); if _KAyU3mGiYdt2() then end
+local _ = math.pow(5, 2) + math.pi;
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 5 do local _4NadHr3TtVdk = string.byte('_XgSvLI7LkNNW', 1); end
+for i=1, 2 do local _wPd4wctUwccB = string.byte('_ybJZFmxLQBzr', 1); end
+local _ = math.pow(8, 2) + math.pi;
+local _OvZpEAqd3URA = setmetatable({}, {__call = function() return true end}); if _OvZpEAqd3URA() then end
+for i=1, 2 do local _1QyebQRQLXk1 = string.byte('_UOeDvBZSdU3b', 1); end
+local _MYMMWb2gtmlU = setmetatable({}, {__call = function() return true end}); if _MYMMWb2gtmlU() then end
+for i=1, 4 do local _LvFKvA5T8nWF = string.byte('_7qSMnQOsPQTP', 1); end
+local _97PiDoV2HZaI = setmetatable({}, {__call = function() return true end}); if _97PiDoV2HZaI() then end
+local _ = math.pow(10, 2) + math.pi;
+local _ = math.pow(4, 2) + math.pi;
+local _cr9gpGy1fIvi = setmetatable({}, {__call = function() return true end}); if _cr9gpGy1fIvi() then end
+for i=1, 4 do local _hzsaw5yczpN4 = string.byte('_Itw8vUcYZV0w', 1); end
+local _PoVZS6AJsimE = {['_ujr7fEW3IWO2'] = function(...) return ... end}; _PoVZS6AJsimE['_eq8uePNTqXsi'] = _PoVZS6AJsimE['_S4TbFDQ85kC0']
+for i=1, 3 do local _Ixw5sBsZPQ1Q = string.byte('_WB88rgkk6lqR', 1); end
+local _ = math.pow(9, 2) + math.pi;
+local _DnFtImGxj6XA = setmetatable({}, {__call = function() return true end}); if _DnFtImGxj6XA() then end
+local _ = math.pow(6, 2) + math.pi;
+local _ = math.pow(10, 2) + math.pi;
+local _mwJYt2ihyAOK = {['_ocfGT4HrREje'] = function(...) return ... end}; _mwJYt2ihyAOK['_97gQUBzZIyep'] = _mwJYt2ihyAOK['_8f6H2QMM8YyT']
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 3 do local _XwtwgU2Dg4OZ = string.byte('_BJefNeTQ5jHx', 1); end
+local _d42b9JiFc6ks = {['_tFBlSJDBQcVQ'] = function(...) return ... end}; _d42b9JiFc6ks['_qVoXMSHTcNsf'] = _d42b9JiFc6ks['_E9Pk0XSN3wbU']
+for i=1, 2 do local _fyHLzHpmPeLA = string.byte('_As2anJnQuxtd', 1); end
+local _ = math.pow(1, 2) + math.pi;
+local _W6v0mT0uqM0h = {['_Kz513wJHDGTz'] = function(...) return ... end}; _W6v0mT0uqM0h['_wZVV443KUdbU'] = _W6v0mT0uqM0h['_CSggtRzmnOBy']
+local _ = math.pow(10, 2) + math.pi;
+local _G01gnVf59lSz = setmetatable({}, {__call = function() return true end}); if _G01gnVf59lSz() then end
+local _RiGaKK8odZHZ = {['_rZpWr4xkAUpQ'] = function(...) return ... end}; _RiGaKK8odZHZ['_KG4dgJ2bwkbb'] = _RiGaKK8odZHZ['_qKaXU2w47DMI']
+for i=1, 2 do local _7g9HdaK6jB7l = string.byte('_LhcIL6iUaa1n', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _x14OjYt15RHF = {['_mRKnB3Iy8oU1'] = function(...) return ... end}; _x14OjYt15RHF['_Pm4KcWsTntmP'] = _x14OjYt15RHF['_KsRf9qp8ngjr']
+local _ = math.pow(4, 2) + math.pi;
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 3 do local _JOzKg4T7SOTB = string.byte('_77IfdsieB3FU', 1); end
+for i=1, 4 do local _7UYztzLqEzVZ = string.byte('_ZJWrcgpmXywd', 1); end
+for i=1, 5 do local _gKOL1stR9IyD = string.byte('_W5cWHnIttPqz', 1); end
+local _kzosTAanslIw = setmetatable({}, {__call = function() return true end}); if _kzosTAanslIw() then end
+local _ = math.pow(7, 2) + math.pi;
+local _ = math.pow(10, 2) + math.pi;
+for i=1, 3 do local _O9lBsL1cM3je = string.byte('_K6QWkPLJ2GpM', 1); end
+local _VcXxx3L4xFiK = {['_gQF0QRB6hnTK'] = function(...) return ... end}; _VcXxx3L4xFiK['_jUGxLtm2eLaB'] = _VcXxx3L4xFiK['_sPj4Rf6xR43w']
+local _5rA4XMfFxEJ1 = setmetatable({}, {__call = function() return true end}); if _5rA4XMfFxEJ1() then end
+for i=1, 4 do local _pFQF8L2uFZ7o = string.byte('_0XwMNcg4bwN4', 1); end
+local _gGWYHJqziRRX = setmetatable({}, {__call = function() return true end}); if _gGWYHJqziRRX() then end
+for i=1, 3 do local _RkwT3GocJ32n = string.byte('_aJC263XZ2v01', 1); end
+for i=1, 5 do local _jqPXUd7DnbTH = string.byte('_wdREz4aZlUQF', 1); end
+for i=1, 2 do local _522F9dmjuNhp = string.byte('_pNs8BusOed9u', 1); end
+local _vmjuTpk48QEU = setmetatable({}, {__call = function() return true end}); if _vmjuTpk48QEU() then end
+local _3BIhzq21PBs4 = setmetatable({}, {__call = function() return true end}); if _3BIhzq21PBs4() then end
+for i=1, 2 do local _e9KN89e0s2Ja = string.byte('_VSi7a2E9Diu3', 1); end
+local _f4ZxFkDyAgm0 = setmetatable({}, {__call = function() return true end}); if _f4ZxFkDyAgm0() then end
+local _MYAZhwqhtGit = {['_lJRzGcwn0b8M'] = function(...) return ... end}; _MYAZhwqhtGit['_9rzxI5gww9Lo'] = _MYAZhwqhtGit['_Src3HPVaSMvj']
+local _n3EpeAnB8PW3 = {['_MELJ51Chh9pc'] = function(...) return ... end}; _n3EpeAnB8PW3['_8dHwH2ENTGQv'] = _n3EpeAnB8PW3['_HnOHbG2lZkhP']
+local _j25wmWTjR7VL = {['_megj5JOGXI8U'] = function(...) return ... end}; _j25wmWTjR7VL['_QEu4EDYFPupo'] = _j25wmWTjR7VL['_lVZ2B2lvshdL']
+local _bEMkDmGGRTSx = setmetatable({}, {__call = function() return true end}); if _bEMkDmGGRTSx() then end
+local _DRK9IcXFonuF = setmetatable({}, {__call = function() return true end}); if _DRK9IcXFonuF() then end
+local _CIvdSi5yDZr7 = {['_dUTnKmxCKbUu'] = function(...) return ... end}; _CIvdSi5yDZr7['_aIhRgwQyJ3vZ'] = _CIvdSi5yDZr7['_01tDWV1sLnv8']
+local _XYFYmdZbe0cp = {['_k8vAtvepMW2W'] = function(...) return ... end}; _XYFYmdZbe0cp['_jFVHNcxADey5'] = _XYFYmdZbe0cp['_IcaUTtKkXPqm']
+for i=1, 2 do local _xv2VV9FID5SF = string.byte('_Pdvoe7okYQ8V', 1); end
+local _vFWxjA3unKNS = setmetatable({}, {__call = function() return true end}); if _vFWxjA3unKNS() then end
+local _XbPVTfmlykXz = setmetatable({}, {__call = function() return true end}); if _XbPVTfmlykXz() then end
+local _Hk1xxAQ3Dvp7 = {['_77uaBsEEQuS4'] = function(...) return ... end}; _Hk1xxAQ3Dvp7['_GvSzA0tByFFQ'] = _Hk1xxAQ3Dvp7['_qM1vfKKjRlCG']
+local _mWSKvO2zAWcS = {['_Q0pkOPBr5vBQ'] = function(...) return ... end}; _mWSKvO2zAWcS['_wB7sMlWjutqn'] = _mWSKvO2zAWcS['_mtcI7MHDbqcn']
+for i=1, 4 do local _l2QjdgYVgzDQ = string.byte('_tIsdeqB0Gqpx', 1); end
+local _sQZpS3RlLhy2 = {['_pSR1jHmKAQZ5'] = function(...) return ... end}; _sQZpS3RlLhy2['_s9pWG8m63zOs'] = _sQZpS3RlLhy2['_ZfCZt7E1pNuz']
+local _4DoqseWCXnhG = {['_BNt40KeJFjLI'] = function(...) return ... end}; _4DoqseWCXnhG['_FkrlUkOaFnFh'] = _4DoqseWCXnhG['_PR4nOvFGZUV5']
+local _HMAWcyC7MqWX = {['_bV62mNoClmbV'] = function(...) return ... end}; _HMAWcyC7MqWX['_TW6xnRWPOTxJ'] = _HMAWcyC7MqWX['_DBWHtvApmUhW']
+local _ = math.pow(2, 2) + math.pi;
+local _ign80KyZ3I2D = {['_BD8nJlXA8ipu'] = function(...) return ... end}; _ign80KyZ3I2D['_YaWhOe4OmXMU'] = _ign80KyZ3I2D['_aPgT5OU8Mxfb']
+for i=1, 4 do local _SAqpgHGLCwMJ = string.byte('_QQXXA1GGZfIP', 1); end
+for i=1, 2 do local _laowwp88q6AM = string.byte('_VWmsFdp3yLpa', 1); end
+local _nDRu1hb4TLMC = setmetatable({}, {__call = function() return true end}); if _nDRu1hb4TLMC() then end
+local _utIl4unCbCvR = setmetatable({}, {__call = function() return true end}); if _utIl4unCbCvR() then end
+local _MpUMW6XBbh40 = {['_mBKg5LgHrMxj'] = function(...) return ... end}; _MpUMW6XBbh40['_7m9uXm5YxL50'] = _MpUMW6XBbh40['_5nTOYadSefkX']
+local _ = math.pow(2, 2) + math.pi;
+for i=1, 3 do local _8KuTzk3ru8Gw = string.byte('_7GOubM3cX40Z', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _pEp2nLdoiUVu = {['_Q7Xmn66oxKTp'] = function(...) return ... end}; _pEp2nLdoiUVu['_tH7y5yQGuwlO'] = _pEp2nLdoiUVu['_EVPWAMd6UBFH']
+for i=1, 2 do local _gj6g3CbiT64e = string.byte('_WoriDSDXkEpH', 1); end
+for i=1, 5 do local _XArAtbIcZjAO = string.byte('_shzDz4mgNIWb', 1); end
+local _MgqEeHfptiO7 = {['_Kb1Lbdjn4Spf'] = function(...) return ... end}; _MgqEeHfptiO7['_rq4TjZ1pTr7g'] = _MgqEeHfptiO7['_4U280fg2bZBk']
+for i=1, 2 do local _Q60cWjazNfgi = string.byte('_uXS1tfsEJUHB', 1); end
+for i=1, 4 do local _kTSgWyGOH73j = string.byte('_8IoKwcqoEgVt', 1); end
+for i=1, 4 do local _WVXuYwmn3Doh = string.byte('_OYNItW6SHfdt', 1); end
+local _3f0b0F7dNfjT = {['_h2wllgwSYhm6'] = function(...) return ... end}; _3f0b0F7dNfjT['_IEWszjY4rhOF'] = _3f0b0F7dNfjT['_pFtZFFwsbnGe']
+for i=1, 2 do local _UmmuS2pmTryJ = string.byte('_xVXntG1It7LG', 1); end
+local _IZh5qVt5G8iU = setmetatable({}, {__call = function() return true end}); if _IZh5qVt5G8iU() then end
+local _ = math.pow(9, 2) + math.pi;
+local _pCQaKC37eHCr = setmetatable({}, {__call = function() return true end}); if _pCQaKC37eHCr() then end
+for i=1, 5 do local _qO22hq7EQ9mK = string.byte('_oGWPcoULOwXP', 1); end
+local _ = math.pow(7, 2) + math.pi;
+for i=1, 2 do local _YMAaeeyuygNl = string.byte('_U5z8HWHkMMTS', 1); end
+for i=1, 3 do local _O00JnvL9CeN3 = string.byte('_WfzkzfQw6dgy', 1); end
+local _ = math.pow(9, 2) + math.pi;
+local _IWu6xYcdcgXV = {['_P5GiJ1dVUytO'] = function(...) return ... end}; _IWu6xYcdcgXV['_RblBQ67UXkCa'] = _IWu6xYcdcgXV['_Htxv6QnAjvVC']
+local _eFnB4ZhuEGCV = setmetatable({}, {__call = function() return true end}); if _eFnB4ZhuEGCV() then end
+local _VegcRhLxW6Vm = {['_nJukmTUWnO91'] = function(...) return ... end}; _VegcRhLxW6Vm['_5I9XVWveKdIO'] = _VegcRhLxW6Vm['_MVXBSNVf9bGU']
+for i=1, 3 do local _iCmj0QSRb7xd = string.byte('_qbLBUmqOg58h', 1); end
+local _ = math.pow(8, 2) + math.pi;
+local _cScJPZo7GgHt = 'cHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsgcHJpbnQoInRlc3QiKTsg';
+local function _KYQp3Co7DB1j(_d) 
+local _OzYVzMBWXcrL = {['_2niGkN5wks8W'] = function(...) return ... end}; _OzYVzMBWXcrL['_K9vg6fw9pvB2'] = _OzYVzMBWXcrL['_d1k8yXw38T51']
+  local _b = game:GetService('HttpService'):Base64Decode(_d);
+  return (loadstring or load)(_b);
+end
+local _vxPsOIDR0S4g = {['_qB7vxYptSsam'] = function(...) return ... end}; _vxPsOIDR0S4g['_MKLkqNKy39tS'] = _vxPsOIDR0S4g['_cyvhng4USdLn']
+local _ = math.pow(10, 2) + math.pi;
+for i=1, 2 do local _QtGxDWuBqusq = string.byte('_sal8e2DbGhDQ', 1); end
+for i=1, 4 do local _RB7q5Lu4bVmW = string.byte('_gPTiqQCOWxp2', 1); end
+for i=1, 2 do local _68l58YVmec6Q = string.byte('_aSTFOMlGDeqN', 1); end
+local _ = math.pow(9, 2) + math.pi;
+local _PMIkSUJNBnR1 = {['_pd8x6pgMC6Wf'] = function(...) return ... end}; _PMIkSUJNBnR1['_7S3APPEt29Cf'] = _PMIkSUJNBnR1['_bGizyEUuNywW']
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 2 do local _hZwJysFS0DB7 = string.byte('_h1jOOTs3CT6t', 1); end
+local _T0jjBk7hxupx = {['_tI4FBcQgMF6G'] = function(...) return ... end}; _T0jjBk7hxupx['_xNfod8T3u8BG'] = _T0jjBk7hxupx['_4Sb130lNCS2h']
+local _PwyKu17VTCvu = {['_JESlsEtWK154'] = function(...) return ... end}; _PwyKu17VTCvu['_5tapUYxZOfRE'] = _PwyKu17VTCvu['_SAxr0TBVCLT1']
+local _ = math.pow(2, 2) + math.pi;
+for i=1, 5 do local _YJaXWbpqPmu4 = string.byte('_ITrJg56EkG8m', 1); end
+local _FsvihBclNgoE = setmetatable({}, {__call = function() return true end}); if _FsvihBclNgoE() then end
+local _f3A41pngCpYE = setmetatable({}, {__call = function() return true end}); if _f3A41pngCpYE() then end
+for i=1, 4 do local _ttYJishhzCmP = string.byte('_fbxv5Hqd9T8L', 1); end
+for i=1, 2 do local _1r9gckn9duei = string.byte('_cORbTukzmthJ', 1); end
+local _nl1CpfEFsZ4p = setmetatable({}, {__call = function() return true end}); if _nl1CpfEFsZ4p() then end
+for i=1, 3 do local _P5mSX1kzaSBt = string.byte('_QHoTVcbMgC2C', 1); end
+local _6HwzG9PfS9mz = setmetatable({}, {__call = function() return true end}); if _6HwzG9PfS9mz() then end
+for i=1, 4 do local _3JEneU04fT6w = string.byte('_JNEZ7Jzbvuue', 1); end
+local _4eDL8RQVyGyl = setmetatable({}, {__call = function() return true end}); if _4eDL8RQVyGyl() then end
+local _De3Nl9FCHiBy = setmetatable({}, {__call = function() return true end}); if _De3Nl9FCHiBy() then end
+for i=1, 5 do local _mZPqjUroOn4f = string.byte('_nvfN2LlDeVAy', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _vsyNEylbXB7J = setmetatable({}, {__call = function() return true end}); if _vsyNEylbXB7J() then end
+local _YAXzIttAkeGb = {['_QwCfgrsREamC'] = function(...) return ... end}; _YAXzIttAkeGb['_yAGC56S3wWLo'] = _YAXzIttAkeGb['_K2MIzwnZzkV4']
+local _wj7KcDxbmLIx = setmetatable({}, {__call = function() return true end}); if _wj7KcDxbmLIx() then end
+local _x0LTOl8jJw5t = setmetatable({}, {__call = function() return true end}); if _x0LTOl8jJw5t() then end
+local _ = math.pow(8, 2) + math.pi;
+for i=1, 5 do local _Y8OrTKUr4yBc = string.byte('_f0BRhUVLBvyj', 1); end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 4 do local _ikOqpekFFFH2 = string.byte('_gdxztEfsriX2', 1); end
+local _ = math.pow(8, 2) + math.pi;
+local _yjPNMVwQUY9f = {['_mNJnQlp7Epgy'] = function(...) return ... end}; _yjPNMVwQUY9f['_R2aukyVzxiOr'] = _yjPNMVwQUY9f['_V0OhKX2p1XVm']
+for i=1, 3 do local _1vhkibWdPdpg = string.byte('_YNzWARcSbcgK', 1); end
+for i=1, 2 do local _eJCrWTs6Wuxd = string.byte('_usTipW5eaE3e', 1); end
+for i=1, 3 do local _ElRcWJFPHKYz = string.byte('_DsTo5vaWIKly', 1); end
+local _BtHXuWRNSJas = {['_wYv07SFgHncw'] = function(...) return ... end}; _BtHXuWRNSJas['_saTx3nUzXnp0'] = _BtHXuWRNSJas['_Dnk7QW8JCuqF']
+local _ = math.pow(6, 2) + math.pi;
+local _ = math.pow(10, 2) + math.pi;
+local _w8aFzIIUWmhz = setmetatable({}, {__call = function() return true end}); if _w8aFzIIUWmhz() then end
+local _ = math.pow(3, 2) + math.pi;
+local _4R32Q3K7bGWX = {['_GKKA6UkMqEly'] = function(...) return ... end}; _4R32Q3K7bGWX['_OJC8CL9lEi9Q'] = _4R32Q3K7bGWX['_UoCQSLGPN47m']
+for i=1, 4 do local _Lglj2wkNgIMH = string.byte('_kcpHckNjJNnq', 1); end
+local _GB81e4YBWZgT = setmetatable({}, {__call = function() return true end}); if _GB81e4YBWZgT() then end
+local _y6WpqVQzdqUh = {['_adFiYZ12gd62'] = function(...) return ... end}; _y6WpqVQzdqUh['_VT0eDGKRLNGT'] = _y6WpqVQzdqUh['_g4Y49dthfbgx']
+for i=1, 5 do local _nrHOCOsPxKPY = string.byte('_C0KGgLKt1SKF', 1); end
+for i=1, 5 do local _y7jHbH0wMAff = string.byte('_tONWttkUsBbe', 1); end
+for i=1, 4 do local _lXaLcpbjrgnO = string.byte('_y2Or0TnWpZ01', 1); end
+local _rxuMuIY0Q0OQ = setmetatable({}, {__call = function() return true end}); if _rxuMuIY0Q0OQ() then end
+for i=1, 4 do local _IH7FFESkAhiD = string.byte('_KywVblfItDuX', 1); end
+local _qiXFeim68OdG = setmetatable({}, {__call = function() return true end}); if _qiXFeim68OdG() then end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 2 do local _lqOvJakOClJ9 = string.byte('_wd9jG3xVQSjW', 1); end
+local _ = math.pow(3, 2) + math.pi;
+local _pVSMwtY2IVzJ = setmetatable({}, {__call = function() return true end}); if _pVSMwtY2IVzJ() then end
+local _88dUeZa8kqdA = setmetatable({}, {__call = function() return true end}); if _88dUeZa8kqdA() then end
+for i=1, 4 do local _L8y5JLJFS24L = string.byte('_dtAT2k5PAOQa', 1); end
+for i=1, 5 do local _oG6AWGOYjFlz = string.byte('_Fy9kupdZcQxn', 1); end
+local _ = math.pow(1, 2) + math.pi;
+local _ = math.pow(4, 2) + math.pi;
+local _Xirpy04Cmmzh = setmetatable({}, {__call = function() return true end}); if _Xirpy04Cmmzh() then end
+local _Hki404aS5VIu = setmetatable({}, {__call = function() return true end}); if _Hki404aS5VIu() then end
+for i=1, 4 do local _yvHwhKnz40Fl = string.byte('_ZKnVHJGd0BS6', 1); end
+local _XoM72aM7Qn5Q = {['_YrCSgUHBZTod'] = function(...) return ... end}; _XoM72aM7Qn5Q['_XHRf7jLoE1XW'] = _XoM72aM7Qn5Q['_Ug2o13lJPZQ6']
+for i=1, 5 do local _uo9555Okowcs = string.byte('_J0T5VeiCKy1P', 1); end
+for i=1, 5 do local _SeLWzO54QFN8 = string.byte('_FfXCND4d25r3', 1); end
+local _cCyjVhMOi2aH = setmetatable({}, {__call = function() return true end}); if _cCyjVhMOi2aH() then end
+for i=1, 2 do local _ap00oFDlHKCz = string.byte('_Yad187czDJA3', 1); end
+local _ = math.pow(3, 2) + math.pi;
+local _ = math.pow(9, 2) + math.pi;
+local _ = math.pow(8, 2) + math.pi;
+for i=1, 3 do local _NcGsQR0KDmEN = string.byte('_gW7IPPU84RJo', 1); end
+local _ = math.pow(5, 2) + math.pi;
+local _qFSrUdCTDvM3 = {['_F8w7C2ugelaf'] = function(...) return ... end}; _qFSrUdCTDvM3['_uCr4IJ6ZUxSv'] = _qFSrUdCTDvM3['_IB2F7vilrExh']
+local _yZkMkY1iCIgu = setmetatable({}, {__call = function() return true end}); if _yZkMkY1iCIgu() then end
+local _vhrtEAQWQq3b = setmetatable({}, {__call = function() return true end}); if _vhrtEAQWQq3b() then end
+local _wo1fs7U9d2tO = setmetatable({}, {__call = function() return true end}); if _wo1fs7U9d2tO() then end
+local _WfZUJwT4ZlQJ = {['_kWWp3zGzF4ea'] = function(...) return ... end}; _WfZUJwT4ZlQJ['_J6kHpcs9Ql9F'] = _WfZUJwT4ZlQJ['_PHniESYFDmwy']
+local _ = math.pow(7, 2) + math.pi;
+local _OJuA5so7pxh5 = setmetatable({}, {__call = function() return true end}); if _OJuA5so7pxh5() then end
+local _ = math.pow(9, 2) + math.pi;
+local _Kg3BlbT9kyca = {['_8JFd7dACuI1e'] = function(...) return ... end}; _Kg3BlbT9kyca['_sDjUgnKIIZqI'] = _Kg3BlbT9kyca['_Z7AaIu7WkIJt']
+local _ = math.pow(2, 2) + math.pi;
+for i=1, 4 do local _zMiuhDGUBjL3 = string.byte('_k0Z8rKlSEukF', 1); end
+for i=1, 2 do local _7jatPf2NVeAh = string.byte('_bibrDgb6hFhD', 1); end
+for i=1, 4 do local _H1J28AUfeedR = string.byte('_PkvNqTJk1LxA', 1); end
+local _FqntmRrJgzpu = {['_j13blI1PUIPn'] = function(...) return ... end}; _FqntmRrJgzpu['_pC0HTQl4mJOE'] = _FqntmRrJgzpu['_lidQTtYe5TIK']
+local _7eLpNftPjOUL = {['_CTB32QuNUgYA'] = function(...) return ... end}; _7eLpNftPjOUL['_9nhVCGXt156b'] = _7eLpNftPjOUL['_O0ZQMAj1jN2w']
+local _ = math.pow(1, 2) + math.pi;
+local _ = math.pow(6, 2) + math.pi;
+for i=1, 2 do local _mg5RI1uOasIw = string.byte('_7P3vXwVxgNf4', 1); end
+for i=1, 3 do local _SvBqmAL0bV35 = string.byte('_fMSW6lJaE30L', 1); end
+local _ = math.pow(4, 2) + math.pi;
+local _zSS9JtarA3p7 = setmetatable({}, {__call = function() return true end}); if _zSS9JtarA3p7() then end
+local _skJrvdw8487T = {['_AcYGvJPLoGYm'] = function(...) return ... end}; _skJrvdw8487T['_NyHqrMOWw2G3'] = _skJrvdw8487T['_Ry20j5b5lIzc']
+for i=1, 3 do local _NPUScZdAriSi = string.byte('_ccVS7uNtV2Ox', 1); end
+local _9uj7uzowX93n = setmetatable({}, {__call = function() return true end}); if _9uj7uzowX93n() then end
+local _cVCNsyi93LHp = {['_PT39Ek4ABlrm'] = function(...) return ... end}; _cVCNsyi93LHp['_8M3xA5BnXikn'] = _cVCNsyi93LHp['_9HAAoBvPP3Xe']
+local _rLKCO3D1rjNl = _KYQp3Co7DB1j(_cScJPZo7GgHt);
+local _ = math.pow(8, 2) + math.pi;
+local _5Qvr2pN3jp9R = {['_Puk6PeztiqjS'] = function(...) return ... end}; _5Qvr2pN3jp9R['_VcnQYoyGAWxA'] = _5Qvr2pN3jp9R['_kH8YlQrHsciB']
+for i=1, 3 do local _D2g7PGFYbfj8 = string.byte('_L8PXn9OsDGDz', 1); end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 2 do local _NYski5xan9pw = string.byte('_mMyeoZpA9Ftr', 1); end
+for i=1, 4 do local _Y9qSSq9Vocgd = string.byte('_kHv0ofz7e4O7', 1); end
+for i=1, 2 do local _qhyntBK8OWxc = string.byte('_pJZJRniXOTij', 1); end
+local _6pXYwxScqFGw = setmetatable({}, {__call = function() return true end}); if _6pXYwxScqFGw() then end
+local _07gUnmYW72zd = setmetatable({}, {__call = function() return true end}); if _07gUnmYW72zd() then end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 5 do local _YlIsTZk93W1E = string.byte('_1tGwGHUOMPfZ', 1); end
+local _ = math.pow(8, 2) + math.pi;
+local _IE2r8i5IuOJJ = {['_yG6j9merDLAt'] = function(...) return ... end}; _IE2r8i5IuOJJ['_fNAloDys8Kuj'] = _IE2r8i5IuOJJ['_7oYyHK2zzHKI']
+local _RIO0hbzG3OZn = {['_S99sfRSubC6f'] = function(...) return ... end}; _RIO0hbzG3OZn['_gjpscWCd8Ee5'] = _RIO0hbzG3OZn['_SK9BX4S5Q0Zc']
+local _n4q4pnVp4mgb = {['_k0SsXJKBBLH7'] = function(...) return ... end}; _n4q4pnVp4mgb['_yzS1gx51vJOn'] = _n4q4pnVp4mgb['_Ffpn6fVnUEaS']
+for i=1, 4 do local _XBfhU1tVsjmC = string.byte('_0fTHJQIgn8Sp', 1); end
+for i=1, 2 do local _BEeCi0PGhG3y = string.byte('_W9sv5VVxwqP9', 1); end
+local _5AvsN0hAZDid = {['_Liz6lQe3pkQN'] = function(...) return ... end}; _5AvsN0hAZDid['_XTeIWIHWdXh3'] = _5AvsN0hAZDid['_LIKe6SuQ39WY']
+for i=1, 2 do local _5Cd59KhDBMC4 = string.byte('_K6AbQ0xceyEP', 1); end
+local _zPSLOP5xfYqf = setmetatable({}, {__call = function() return true end}); if _zPSLOP5xfYqf() then end
+for i=1, 3 do local _EjTbftpVAKHs = string.byte('_ka5YxfbV5Uzp', 1); end
+local _tQ12BMP3QDeg = setmetatable({}, {__call = function() return true end}); if _tQ12BMP3QDeg() then end
+local _dxwQeTHMv6LC = setmetatable({}, {__call = function() return true end}); if _dxwQeTHMv6LC() then end
+local _6jK3si8xjMD0 = setmetatable({}, {__call = function() return true end}); if _6jK3si8xjMD0() then end
+local _ = math.pow(7, 2) + math.pi;
+for i=1, 4 do local _YOm5C6VWqJXa = string.byte('_gu7Hgk0J4HgG', 1); end
+local _ToUTspkjVptY = {['_nicdik2WoRHd'] = function(...) return ... end}; _ToUTspkjVptY['_dyGAyBuc6arA'] = _ToUTspkjVptY['_ziO46iNnj16o']
+local _ = math.pow(1, 2) + math.pi;
+local _ = math.pow(7, 2) + math.pi;
+local _l6GccwNhXjH8 = {['_wMmgeVfWFTcM'] = function(...) return ... end}; _l6GccwNhXjH8['_x6dlPVAlKvLG'] = _l6GccwNhXjH8['_o0ipueQ6LTip']
+local _ = math.pow(7, 2) + math.pi;
+local _UnYa8ZsG6Wx1 = {['_SArsVENev183'] = function(...) return ... end}; _UnYa8ZsG6Wx1['_XulVpTDbd4Gb'] = _UnYa8ZsG6Wx1['_ldIj58zhISns']
+local _81FMoYtCChir = setmetatable({}, {__call = function() return true end}); if _81FMoYtCChir() then end
+local _ = math.pow(10, 2) + math.pi;
+local _AgXkpCcD4nVn = setmetatable({}, {__call = function() return true end}); if _AgXkpCcD4nVn() then end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 2 do local _wEJiC2RgtPR4 = string.byte('_JGWaqaoCVmYr', 1); end
+local _gPgv4xwBxDg3 = {['_2afV1oyJvuA9'] = function(...) return ... end}; _gPgv4xwBxDg3['_7bI45qafRaJt'] = _gPgv4xwBxDg3['_WEu6ajfsLBig']
+for i=1, 4 do local _U94E2FPxY5Sb = string.byte('_wg1lZlekCH8Y', 1); end
+local _3ckwRJBfDUpS = {['_zrLrAutZZqxl'] = function(...) return ... end}; _3ckwRJBfDUpS['_Na6vLTVH1VUF'] = _3ckwRJBfDUpS['_jcvzLq6rSKks']
+local _tcn2wIxFLeM5 = {['_4B7ZDkC3TAa7'] = function(...) return ... end}; _tcn2wIxFLeM5['_7g3ZROtG4JRy'] = _tcn2wIxFLeM5['_yekQvQfKtUSf']
+local _ = math.pow(7, 2) + math.pi;
+local _FGvgNRio1Dxw = setmetatable({}, {__call = function() return true end}); if _FGvgNRio1Dxw() then end
+local _kBszi7R4urHf = {['_xZcGr2ezfeem'] = function(...) return ... end}; _kBszi7R4urHf['_00l0QElpGguM'] = _kBszi7R4urHf['_bzRWxA7OuAMu']
+local _ = math.pow(10, 2) + math.pi;
+local _LIhAaYPEnCGR = {['_ct7Pgm7FuUxa'] = function(...) return ... end}; _LIhAaYPEnCGR['_ut0HzgmPcnVt'] = _LIhAaYPEnCGR['_gD8z5sHaMe3U']
+local _Yen0UsRMeueH = {['_RXXaORgU9MMI'] = function(...) return ... end}; _Yen0UsRMeueH['_EEXrQaXIfuXS'] = _Yen0UsRMeueH['_XLwwcSpSctne']
+local _FB5m77zVfbKX = {['_ckkfZVu9o7Oe'] = function(...) return ... end}; _FB5m77zVfbKX['_Enbd1l2Yc49J'] = _FB5m77zVfbKX['_n5QgHPWyKPh0']
+local _Mto8tx5zLG6r = {['_LN40dpcy9cMc'] = function(...) return ... end}; _Mto8tx5zLG6r['_2Ke1iVZREMSw'] = _Mto8tx5zLG6r['_fAthnmYQNXBx']
+for i=1, 2 do local _ktgmmqQEoNI8 = string.byte('_zJsT4N97Hvfx', 1); end
+local _UoxGJyYwDyC7 = {['_8vnR9l7uicGS'] = function(...) return ... end}; _UoxGJyYwDyC7['_PW8uwAivCK5K'] = _UoxGJyYwDyC7['_oPejIMBbMiqv']
+local _IwxIkb3vgdd5 = {['_2m959zSH2IPq'] = function(...) return ... end}; _IwxIkb3vgdd5['_cs10exSN5IS7'] = _IwxIkb3vgdd5['_Yl28ypYsCbhd']
+local _ = math.pow(9, 2) + math.pi;
+local _7tm67TKyOxin = {['_p6zbRpFSDgE4'] = function(...) return ... end}; _7tm67TKyOxin['_TylnfCUQACEl'] = _7tm67TKyOxin['_NlWwpoKQOdhz']
+for i=1, 4 do local _RNpWqg0c0Fs8 = string.byte('_ErK2L3KSiqFp', 1); end
+local _lf0k3IEzmFcq = {['_LWGHMU6mMcQc'] = function(...) return ... end}; _lf0k3IEzmFcq['_rDzAaF54R9Ui'] = _lf0k3IEzmFcq['_g7cN7rxgCBk9']
+local _giLithDBEanV = {['_uNWwQEV4LVCl'] = function(...) return ... end}; _giLithDBEanV['_TSSlIaa8Ca6I'] = _giLithDBEanV['_knW8JjAc18dy']
+local _ = math.pow(2, 2) + math.pi;
+local _mpxQ0p5ZjjEC = setmetatable({}, {__call = function() return true end}); if _mpxQ0p5ZjjEC() then end
+local _ = math.pow(8, 2) + math.pi;
+local _RV6T5wjPve35 = {['_cpWv5A73q04b'] = function(...) return ... end}; _RV6T5wjPve35['_1XoN4umAwXxA'] = _RV6T5wjPve35['_8IY4N7FTSo7t']
+local _bfm9Fj2ItuBI = setmetatable({}, {__call = function() return true end}); if _bfm9Fj2ItuBI() then end
+local _Pv1j0Qnk9Pop = {['_U6F3jQCd7wv3'] = function(...) return ... end}; _Pv1j0Qnk9Pop['_RpJjzSOuJyhJ'] = _Pv1j0Qnk9Pop['_5nKANJXvCw6J']
+local _VzfSjJouWd0d = {['_Et1FdbFd6ZTv'] = function(...) return ... end}; _VzfSjJouWd0d['_tJBLr0CgVbHv'] = _VzfSjJouWd0d['_dOY7gBKxJCJW']
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 3 do local _mbJpcTSg8LfE = string.byte('_qSQkT6OgolX0', 1); end
+for i=1, 3 do local _5xXPiNjRc3qX = string.byte('_Jrv4PFzJZMWE', 1); end
+local _ = math.pow(5, 2) + math.pi;
+local _jb17HyHJFsSi = {['_p1VjATbhAgMN'] = function(...) return ... end}; _jb17HyHJFsSi['_wQ4NvyBYRn9E'] = _jb17HyHJFsSi['_NAtfLsIjkQIf']
+local _ = math.pow(5, 2) + math.pi;
+local _ = math.pow(6, 2) + math.pi;
+local _ETjrmkaXesPr = setmetatable({}, {__call = function() return true end}); if _ETjrmkaXesPr() then end
+local _5ypJdqlIRa4n = {['_lmNuUd7czLzF'] = function(...) return ... end}; _5ypJdqlIRa4n['_Le5fXxQqMoWf'] = _5ypJdqlIRa4n['_4uNocB7mPVPR']
+for i=1, 5 do local _GxhD3KKeA4XT = string.byte('_RWMOpwCS8rpK', 1); end
+local _rOTvKJn7k2la = {['_Yn3bR4YePi7J'] = function(...) return ... end}; _rOTvKJn7k2la['_Zxvso9KUuYYZ'] = _rOTvKJn7k2la['_fy0n0TCfGX9o']
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 2 do local _bAGYq9fZhBZz = string.byte('_1eFRsOVeBMAw', 1); end
+for i=1, 2 do local _wbqha6TbD0E4 = string.byte('_HY7qe63D6rrJ', 1); end
+local _1tQK9AKSHVid = setmetatable({}, {__call = function() return true end}); if _1tQK9AKSHVid() then end
+local _OVeZHcMSmN5t = {['_GLjXNZwzkFhL'] = function(...) return ... end}; _OVeZHcMSmN5t['_Jh1SFwYWnGeu'] = _OVeZHcMSmN5t['_VrEGwstQy5zl']
+local _i0RFSUcmE1pS = setmetatable({}, {__call = function() return true end}); if _i0RFSUcmE1pS() then end
+for i=1, 4 do local _uiyuDJagFAVW = string.byte('_w8QjRnWC882r', 1); end
+for i=1, 3 do local _MR0dTDKeM2vA = string.byte('_0zxY7MKo1fhA', 1); end
+for i=1, 2 do local _yPMnQayptPHv = string.byte('_hUADyqbVELL4', 1); end
+local _H7X2hD5nLvOy = {['_qFTScQW5nvEn'] = function(...) return ... end}; _H7X2hD5nLvOy['_cYCVZMze86Si'] = _H7X2hD5nLvOy['_SYz9tAQLb503']
+local _USl7o8OQ0bTy = setmetatable({}, {__call = function() return true end}); if _USl7o8OQ0bTy() then end
+for i=1, 5 do local _H0F4sHyP044Q = string.byte('_jm0d2dtPLZlX', 1); end
+local _6gPBa9lHHKVS = setmetatable({}, {__call = function() return true end}); if _6gPBa9lHHKVS() then end
+local _ = math.pow(2, 2) + math.pi;
+local _qD2ZEEs0MSTQ = setmetatable({}, {__call = function() return true end}); if _qD2ZEEs0MSTQ() then end
+for i=1, 2 do local _g2f7XrZFDwd3 = string.byte('_wV6MccYDjXWk', 1); end
+local _PYeHEdblLynV = {['_zjmIkyyvGiPq'] = function(...) return ... end}; _PYeHEdblLynV['_tskVPFftxNo8'] = _PYeHEdblLynV['_C2oC76YmQliO']
+for i=1, 2 do local _Tt3InvqVNEaL = string.byte('_5FKbASoabb2I', 1); end
+local _ = math.pow(9, 2) + math.pi;
+for i=1, 3 do local _dE9akdMPzxCm = string.byte('_iYEjpibRAozL', 1); end
+local _6hqLTgSwiyuG = setmetatable({}, {__call = function() return true end}); if _6hqLTgSwiyuG() then end
+local _ = math.pow(4, 2) + math.pi;
+local _ = math.pow(4, 2) + math.pi;
+local _ = math.pow(6, 2) + math.pi;
+local _ = math.pow(5, 2) + math.pi;
+local _ = math.pow(3, 2) + math.pi;
+local _EZjKugEkPwts = {['_OpiO6adYsmhB'] = function(...) return ... end}; _EZjKugEkPwts['_ubFAnTJWbetO'] = _EZjKugEkPwts['_lVHjLcwt6E9R']
+for i=1, 3 do local _o6P0zZXU4Tla = string.byte('_50xpzIwpZ3Ja', 1); end
+local _nNjQ6lajSkNH = setmetatable({}, {__call = function() return true end}); if _nNjQ6lajSkNH() then end
+local _ = math.pow(5, 2) + math.pi;
+local _m1iw4YFHszUj = setmetatable({}, {__call = function() return true end}); if _m1iw4YFHszUj() then end
+for i=1, 5 do local _h68oJue5G6EZ = string.byte('_Bah5MyusDApM', 1); end
+local _elwxXn2eNmDK = setmetatable({}, {__call = function() return true end}); if _elwxXn2eNmDK() then end
+for i=1, 5 do local _E1tjp8PYcshH = string.byte('_bfzkNJYI6Ui2', 1); end
+local _IIHuAcaLLakg = {['_SZeDH3BXfbmD'] = function(...) return ... end}; _IIHuAcaLLakg['_O2JN4906yGTv'] = _IIHuAcaLLakg['_LsbSH38YE5M6']
+for i=1, 3 do local _Yowu8nDEdq5q = string.byte('_xGPQ3TiMkPRe', 1); end
+local _ = math.pow(5, 2) + math.pi;
+for i=1, 4 do local _02RV7FeLyRH3 = string.byte('_yRqM1v7Tfr4i', 1); end
+local _3qzPgtPWij0W = setmetatable({}, {__call = function() return true end}); if _3qzPgtPWij0W() then end
+local _SYDqSYfRJ6pm = setmetatable({}, {__call = function() return true end}); if _SYDqSYfRJ6pm() then end
+local _ = math.pow(1, 2) + math.pi;
+local _ = math.pow(8, 2) + math.pi;
+local _zvCr2ZyXKRC8 = {['_v4aiFInvdrVU'] = function(...) return ... end}; _zvCr2ZyXKRC8['_pWfTPWnuhr77'] = _zvCr2ZyXKRC8['_FiTgNVT2VaPb']
+for i=1, 2 do local _2djAGmm8yx2j = string.byte('_WldN7HBY8ZUW', 1); end
+local _Ct2vsurOMrRA = setmetatable({}, {__call = function() return true end}); if _Ct2vsurOMrRA() then end
+local _s0JzbVqOug1X = setmetatable({}, {__call = function() return true end}); if _s0JzbVqOug1X() then end
+local _9vWcOiw4gcKn = {['_dWBD43kZqOS8'] = function(...) return ... end}; _9vWcOiw4gcKn['_lHbnTZpet71S'] = _9vWcOiw4gcKn['_S8Touav6wCnQ']
+local _WriJ8K7wJONk = setmetatable({}, {__call = function() return true end}); if _WriJ8K7wJONk() then end
+for i=1, 5 do local _7kzhqndDmMGl = string.byte('_3Rwj2CEmZxDo', 1); end
+for i=1, 4 do local _ctJCZFGBa7NY = string.byte('_tZ246mO1zaef', 1); end
+local _A9FFGagFVvWz = setmetatable({}, {__call = function() return true end}); if _A9FFGagFVvWz() then end
+local _UO88JNGw6FZD = {['_q8LPviXeWZ0m'] = function(...) return ... end}; _UO88JNGw6FZD['_flNyTm616H5m'] = _UO88JNGw6FZD['_pj99aeKGa5i2']
+local _WmIEuiVJs4Hq = setmetatable({}, {__call = function() return true end}); if _WmIEuiVJs4Hq() then end
+local _J2JsYYDSQUf1 = setmetatable({}, {__call = function() return true end}); if _J2JsYYDSQUf1() then end
+local _ = math.pow(1, 2) + math.pi;
+local _ = math.pow(9, 2) + math.pi;
+local _ = math.pow(9, 2) + math.pi;
+local _WQSzbPTBTi4R = {['_u601JvwwBJPG'] = function(...) return ... end}; _WQSzbPTBTi4R['_evtEfPy8kJ4w'] = _WQSzbPTBTi4R['_64n2xZPXGaia']
+local _Okas8eKvsYo6 = setmetatable({}, {__call = function() return true end}); if _Okas8eKvsYo6() then end
+for i=1, 4 do local _Ky5TvK2a7ORI = string.byte('_WgmTdJd7fyoQ', 1); end
+for i=1, 3 do local _PkhybRBrdEIe = string.byte('_eDWbBAJhf85H', 1); end
+local _lQjj93lzHIyP = setmetatable({}, {__call = function() return true end}); if _lQjj93lzHIyP() then end
+local _WPTsst54nOnn = {['_lbCVUVHu68SP'] = function(...) return ... end}; _WPTsst54nOnn['_3wX3HdY8k2QU'] = _WPTsst54nOnn['_zhNv1G85BYag']
+local _V4snOOFVOiP8 = {['_37fxs5yOpwMw'] = function(...) return ... end}; _V4snOOFVOiP8['_VStcH0uePxRe'] = _V4snOOFVOiP8['_iDYaq2C71ThU']
+local _h9mVfSYfZ53i = {['_6nEnkPbAWEHX'] = function(...) return ... end}; _h9mVfSYfZ53i['_IKyGCfckDQNI'] = _h9mVfSYfZ53i['_wbG2NYHpFGkv']
+local _NKNQdtONiL2p = {['_Ofa2rkHqJ1iE'] = function(...) return ... end}; _NKNQdtONiL2p['_QgnL21bsQbbc'] = _NKNQdtONiL2p['_1TtW5AO42UTT']
+for i=1, 4 do local _ULTmNVQVuWpW = string.byte('_msw7eljJDBwl', 1); end
+local _ = math.pow(6, 2) + math.pi;
+local _JtBYiEYPpntc = setmetatable({}, {__call = function() return true end}); if _JtBYiEYPpntc() then end
+for i=1, 2 do local _Hdx2EqdhGJla = string.byte('_6wryEer0Hhhe', 1); end
+for i=1, 4 do local _l2l5fmHWCwWH = string.byte('_4hK6gu2ICiEY', 1); end
+local _eTNUjXnPlxd7 = {['_ecu8qVHfyGN7'] = function(...) return ... end}; _eTNUjXnPlxd7['_M2vPvmPH0BXH'] = _eTNUjXnPlxd7['_wb29XUqqazTX']
+for i=1, 2 do local _OIeHoHbDbCgU = string.byte('_NcJfJ7KZN3aE', 1); end
+for i=1, 4 do local _wuuue96A4kUg = string.byte('_V8PImQYKmq5m', 1); end
+local _ = math.pow(9, 2) + math.pi;
+local _vCadcFll70vT = {['_SbW7gdiSsi9C'] = function(...) return ... end}; _vCadcFll70vT['_V0aHYB5gxrYP'] = _vCadcFll70vT['_BOBgsY9eea1B']
+local _zoMigUPpHeBs = {['_TOF4gGMLC5A2'] = function(...) return ... end}; _zoMigUPpHeBs['_mAIhvb0lezMV'] = _zoMigUPpHeBs['_UDYoWSb3VlYn']
+for i=1, 5 do local _KzKu5TfeoOax = string.byte('_2nxMeshUjFzo', 1); end
+for i=1, 2 do local _DZDMCJRkppKd = string.byte('_IBZyKlzNvAR9', 1); end
+local _FvbHTX82s18k = setmetatable({}, {__call = function() return true end}); if _FvbHTX82s18k() then end
+local _ = math.pow(3, 2) + math.pi;
+local _ = math.pow(3, 2) + math.pi;
+local _ = math.pow(4, 2) + math.pi;
+local _rZcu9fXvJd3h = {['_FX3nzuicC1Nm'] = function(...) return ... end}; _rZcu9fXvJd3h['_xeRIqcgv3csu'] = _rZcu9fXvJd3h['_WpE53E5yBbgy']
+local _cE1elLU7Rupq = {['_VPjmIh36tsab'] = function(...) return ... end}; _cE1elLU7Rupq['_NSYYkh16rn3v'] = _cE1elLU7Rupq['_wYaIqCvo4Ku7']
+local _SFiOKxXrOqXo = {['_grw1H7nSKueF'] = function(...) return ... end}; _SFiOKxXrOqXo['_Wel0plKkAEbX'] = _SFiOKxXrOqXo['_IFccke66QEEL']
+local _yDNda2Ofr0iT = setmetatable({}, {__call = function() return true end}); if _yDNda2Ofr0iT() then end
+for i=1, 5 do local _5IugWmiFHWJf = string.byte('_Jaz7wh6h8vHt', 1); end
+local _ = math.pow(5, 2) + math.pi;
+local _Jt6hYowZU27W = {['_TIYiJCFrq0wh'] = function(...) return ... end}; _Jt6hYowZU27W['_wOdrLt2GeGVM'] = _Jt6hYowZU27W['_1N84nCDOTmwC']
+local _ = math.pow(8, 2) + math.pi;
+for i=1, 3 do local _eYJpZqFEQjKl = string.byte('_Z8B8GNwfVI1K', 1); end
+for i=1, 2 do local _8SGf7z6CYVV8 = string.byte('_CFAGZEEYaChg', 1); end
+local _ = math.pow(5, 2) + math.pi;
+local _Z7fKvPnoBK7K = setmetatable({}, {__call = function() return true end}); if _Z7fKvPnoBK7K() then end
+local _lClJYIKv32s2 = {['_qwFXvpDeGBuv'] = function(...) return ... end}; _lClJYIKv32s2['_uqRwPJjImMbk'] = _lClJYIKv32s2['_pl9DeZt9jyWS']
+local _T4Qwl3NeR5Qx = {['_DE3RyancWTw9'] = function(...) return ... end}; _T4Qwl3NeR5Qx['_ChIARZboOdG1'] = _T4Qwl3NeR5Qx['_WuYC7TelTaM6']
+for i=1, 2 do local _aRHsbEraZ13l = string.byte('_qQckRzo6GRiU', 1); end
+local _ = math.pow(3, 2) + math.pi;
+local _2q5NFRkkMHyN = {['_uVNgduDv5JR2'] = function(...) return ... end}; _2q5NFRkkMHyN['_nPlpcORUdtfe'] = _2q5NFRkkMHyN['_GM1uGs2qwKZe']
+for i=1, 2 do local _VEYCnedzwVH4 = string.byte('_7y0zrdqywB0u', 1); end
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 3 do local _MRZ4q4Or9wdI = string.byte('_pFdYzahP6E5M', 1); end
+local _ = math.pow(8, 2) + math.pi;
+local _U4136Rm6LwBF = setmetatable({}, {__call = function() return true end}); if _U4136Rm6LwBF() then end
+local _ = math.pow(2, 2) + math.pi;
+for i=1, 2 do local _nMVirToXFDJY = string.byte('_TBMlEv8goFOC', 1); end
+local _ = math.pow(5, 2) + math.pi;
+local _JisbokJNryqA = setmetatable({}, {__call = function() return true end}); if _JisbokJNryqA() then end
+for i=1, 5 do local _lTRFTzUgpsBq = string.byte('_4VBNuodeIYCZ', 1); end
+for i=1, 4 do local _WPlIMIcNm5fH = string.byte('_68sGPICrTZdK', 1); end
+local _ = math.pow(2, 2) + math.pi;
+local _KatCgxlVIPah = setmetatable({}, {__call = function() return true end}); if _KatCgxlVIPah() then end
+local _4qxchazaqlsg = setmetatable({}, {__call = function() return true end}); if _4qxchazaqlsg() then end
+for i=1, 4 do local _9dExahvl758I = string.byte('_5jgye5LPwkU4', 1); end
+local _ = math.pow(8, 2) + math.pi;
+local _ZPcTt8N58d5M = setmetatable({}, {__call = function() return true end}); if _ZPcTt8N58d5M() then end
+local _fF2kMsojRyoz = setmetatable({}, {__call = function() return true end}); if _fF2kMsojRyoz() then end
+local _vgsppQkkS3Lt = {['_Amli8ZUiW7Fq'] = function(...) return ... end}; _vgsppQkkS3Lt['_ZY6ZXIxR4VRv'] = _vgsppQkkS3Lt['_y6h6LUEjgce5']
+local _qp0CFRUmEDBm = setmetatable({}, {__call = function() return true end}); if _qp0CFRUmEDBm() then end
+local _v3MUnF7JZari = {['_GNoqVhaCVeJe'] = function(...) return ... end}; _v3MUnF7JZari['_tqGYBmiB2pkG'] = _v3MUnF7JZari['_sgmKEX1sneiz']
+local _ = math.pow(3, 2) + math.pi;
+for i=1, 2 do local _9AVzOTgnZzFj = string.byte('_UA4VZruFAcm6', 1); end
+local _5t1tccbML333 = {['_TYXbY8bz2vh7'] = function(...) return ... end}; _5t1tccbML333['_nccenEUd43ty'] = _5t1tccbML333['_10iX9wXeUoRm']
+for i=1, 3 do local _vHBmlmJyBAv3 = string.byte('_4XijO7xsbIxN', 1); end
+for i=1, 5 do local _uJK2Xbvhm1dp = string.byte('_GrMOEfeDr1n0', 1); end
+local _uwXvjcpyZVWu = {['_0EYXq8BOfi81'] = function(...) return ... end}; _uwXvjcpyZVWu['_K2ANHTNDAIIy'] = _uwXvjcpyZVWu['_PKspX9fZDmYQ']
+for i=1, 5 do local _ZTvGEywVZ1EB = string.byte('_Vzekj2jW2GSL', 1); end
+for i=1, 3 do local _T7k87O2vbC2k = string.byte('_luYHBD8lMKWS', 1); end
+for i=1, 4 do local _COn0Bi3x2eRZ = string.byte('_Sq49Edz7fCDY', 1); end
+for i=1, 2 do local _PcO3wnmlbAEs = string.byte('_bjuNIIYF0jr9', 1); end
+local _r0OXKMeOsfWq = {['_BDJrzQ2eRlmq'] = function(...) return ... end}; _r0OXKMeOsfWq['_RNLGXtaVwUJI'] = _r0OXKMeOsfWq['_ML1ovYkfY7px']
+local _xPa8nA1btyKj = setmetatable({}, {__call = function() return true end}); if _xPa8nA1btyKj() then end
+local _ = math.pow(4, 2) + math.pi;
+local _csyBw7ycX3bE = setmetatable({}, {__call = function() return true end}); if _csyBw7ycX3bE() then end
+local _ = math.pow(7, 2) + math.pi;
+local _hKoO5AtRxukw = setmetatable({}, {__call = function() return true end}); if _hKoO5AtRxukw() then end
+local _ = math.pow(8, 2) + math.pi;
+local _fyc8azWA8Qmi = setmetatable({}, {__call = function() return true end}); if _fyc8azWA8Qmi() then end
+local _AbtGh8LUmR4b = setmetatable({}, {__call = function() return true end}); if _AbtGh8LUmR4b() then end
+local _zYIWa2DldjWf = setmetatable({}, {__call = function() return true end}); if _zYIWa2DldjWf() then end
+for i=1, 3 do local _X5RhTLoyzrQi = string.byte('_GvxHu9vNcUJj', 1); end
+local _qVYdNQUqQHG6 = setmetatable({}, {__call = function() return true end}); if _qVYdNQUqQHG6() then end
+local _dGpBAPP3e73i = setmetatable({}, {__call = function() return true end}); if _dGpBAPP3e73i() then end
+local _xeiXQWcuTlkU = setmetatable({}, {__call = function() return true end}); if _xeiXQWcuTlkU() then end
+local _G5yRWJIx5UgH = {['_8QsQSYqdUTUQ'] = function(...) return ... end}; _G5yRWJIx5UgH['_GjGNGlg0E4kD'] = _G5yRWJIx5UgH['_1pRrbMkwDvQx']
+local _ldIruftxLjFd = setmetatable({}, {__call = function() return true end}); if _ldIruftxLjFd() then end
+local _ = math.pow(4, 2) + math.pi;
+local _ = math.pow(9, 2) + math.pi;
+local _6hcvBdoQmQGE = setmetatable({}, {__call = function() return true end}); if _6hcvBdoQmQGE() then end
+local _sjNpp7LpjsgT = {['_ON266VZfqR3t'] = function(...) return ... end}; _sjNpp7LpjsgT['_v4iiJY0guddS'] = _sjNpp7LpjsgT['_rS7b2ca0BQDO']
+for i=1, 4 do local _SKR0YbLvYytK = string.byte('_FwbCAzTAzes1', 1); end
+local _xehgU80Su3dN = setmetatable({}, {__call = function() return true end}); if _xehgU80Su3dN() then end
+local _ = math.pow(3, 2) + math.pi;
+local _JRh7MJziIStW = setmetatable({}, {__call = function() return true end}); if _JRh7MJziIStW() then end
+local _Pl2fLTpGxkx2 = setmetatable({}, {__call = function() return true end}); if _Pl2fLTpGxkx2() then end
+for i=1, 3 do local _4lYbgPvOdzzt = string.byte('_XYbFzWWL0UJv', 1); end
+local _aex1RjwBkEFW = setmetatable({}, {__call = function() return true end}); if _aex1RjwBkEFW() then end
+local _yhX65nsQmc9b = setmetatable({}, {__call = function() return true end}); if _yhX65nsQmc9b() then end
+local _JeO0gyV4sjL0 = setmetatable({}, {__call = function() return true end}); if _JeO0gyV4sjL0() then end
+for i=1, 3 do local _P6pwNt1YTySr = string.byte('_4fZxzFGzX56c', 1); end
+local _WbBOUiyYAh9o = {['_sQhP6BRZ3wrc'] = function(...) return ... end}; _WbBOUiyYAh9o['_iN0jmEKjjQei'] = _WbBOUiyYAh9o['_iXl1K2WvPzfE']
+local _qgJ1DE4NFFQ7 = setmetatable({}, {__call = function() return true end}); if _qgJ1DE4NFFQ7() then end
+local _11r2dsB1T0I0 = {['_XGT8wPkRrtrR'] = function(...) return ... end}; _11r2dsB1T0I0['_aI6Rc1NSJdPT'] = _11r2dsB1T0I0['_0XZPp17h3IiO']
+local _dLEibTFUE7aQ = setmetatable({}, {__call = function() return true end}); if _dLEibTFUE7aQ() then end
+for i=1, 4 do local _hYQksgIFNe0b = string.byte('_Ng68O3HPz3kI', 1); end
+local _Du9foHeFSQNC = setmetatable({}, {__call = function() return true end}); if _Du9foHeFSQNC() then end
+for i=1, 3 do local _3bcCsN8JGK1m = string.byte('_MW0XqwAXRR5x', 1); end
+local _8gtd7qmSNKWA = setmetatable({}, {__call = function() return true end}); if _8gtd7qmSNKWA() then end
+local _1gRZxnie5Mwm = {['_3Iygjh1BfDTl'] = function(...) return ... end}; _1gRZxnie5Mwm['_tZnMuPTRDwJ0'] = _1gRZxnie5Mwm['_WKtMqUAtd9VN']
+local _oiz40wtBSt1U = setmetatable({}, {__call = function() return true end}); if _oiz40wtBSt1U() then end
+local _NaJpSVxA25xm = {['_IqzFACsMzHLF'] = function(...) return ... end}; _NaJpSVxA25xm['_hTNbfsIZ2dDv'] = _NaJpSVxA25xm['_3fGd3fSSHuLN']
+local _ = math.pow(6, 2) + math.pi;
+local _dlSFyMA2gvVe = setmetatable({}, {__call = function() return true end}); if _dlSFyMA2gvVe() then end
+for i=1, 4 do local _9We3YxCAFIad = string.byte('_VLeOdMiM9uSi', 1); end
+return (function(...) return _rLKCO3D1rjNl(...) end)(...);
+end)(...);
