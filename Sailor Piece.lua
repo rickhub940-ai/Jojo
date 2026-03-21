@@ -1077,10 +1077,9 @@ end)
 -- Farm boss
 -- --------
 
-
 --[[ 
-    MON HUB - FULL AUTO BOSS SYSTEM (Constant Speed & Weld Platform)
-    โครงสร้าง: [1] SETTINGS -> [2] FUNCTIONS -> [3] LOOPS -> [4] UI SETUP
+    MON HUB - FULL AUTO BOSS SYSTEM (Fixed Speed 85)
+    [1] SETTINGS -> [2] FUNCTIONS -> [3] LOOPS -> [4] UI SETUP
 ]]
 
 --// ==========================================
@@ -1090,7 +1089,7 @@ local FarmBossRunning = false
 local FarmBossAutoHop = false       
 local FarmBossMode = "Above"        
 local FarmBossDistance = 5          
-local FarmBossTweenSpeed = 100      -- ความเร็วคงที่ (ปรับได้ใน UI)
+local FarmBossTweenSpeed = 85       -- [[ ล็อกความเร็วไว้ที่ 85 ตามสั่ง ]]
 local FarmBossCheckRadius = 50      
 
 --// Internal Data
@@ -1113,7 +1112,6 @@ local TeleportService = game:GetService("TeleportService")
 local plr = Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 
--- ฟังก์ชันคำนวณเวลาจาก TextLabel
 local function parseTime(text)
     text = tostring(text or ""):gsub("%s+", "")
     if text == "" or text:match("%a") then return 0 end
@@ -1124,7 +1122,6 @@ local function parseTime(text)
     return tonumber(text) or math.huge
 end
 
--- สแกนตำแหน่งจุดเกิดบอส
 local function scanPositions()
     allBosses = {}
     for _, v in pairs(workspace:GetChildren()) do
@@ -1136,7 +1133,6 @@ local function scanPositions()
     end
 end
 
--- ระบบย้ายเซิร์ฟเวอร์
 local function serverHop()
     pcall(function()
         local api = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
@@ -1150,11 +1146,9 @@ local function serverHop()
     end)
 end
 
--- สร้าง Part รองเท้าเชื่อมด้วย Weld (แม่นยำ 100%)
 local function createRootPart()
     if rootPart then rootPart:Destroy() end
     local hrp = char:WaitForChild("HumanoidRootPart")
-    
     rootPart = Instance.new("Part")
     rootPart.Name = "MonHub_RootPart"
     rootPart.Size = Vector3.new(8, 1, 8)
@@ -1163,12 +1157,10 @@ local function createRootPart()
     rootPart.CanCollide = true
     rootPart.Anchored = false 
     rootPart.Parent = char
-
     local weld = Instance.new("WeldConstraint")
     weld.Part0 = hrp
     weld.Part1 = rootPart
     weld.Parent = rootPart
-    
     rootPart.CFrame = hrp.CFrame * CFrame.new(0, -3.5, 0)
 end
 
@@ -1176,7 +1168,6 @@ end
 --// [3] MAIN LOOPS & LOGIC
 --// ==========================================
 
--- สแกน Timer บอสแบบ Real-time
 task.spawn(function()
     while true do
         for _, v in pairs(workspace:GetDescendants()) do
@@ -1202,17 +1193,14 @@ task.spawn(function()
     end
 end)
 
--- Loop การฟาร์มหลัก
 task.spawn(function()
     while true do
         task.wait(0.01)
         if not FarmBossRunning or #selectedBosses == 0 then continue end
-
         char = plr.Character or plr.CharacterAdded:Wait()
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if not hrp then continue end
 
-        -- เช็ค Auto Hop (ถ้าบอสที่เลือกไม่เกิดเลย)
         if FarmBossAutoHop then
             local anySpawned = false
             for _, name in pairs(selectedBosses) do
@@ -1221,7 +1209,6 @@ task.spawn(function()
             if not anySpawned then serverHop() task.wait(10) continue end
         end
 
-        -- เลือกบอสเป้าหมาย
         local best, lowest = nil, math.huge
         for _, name in pairs(selectedBosses) do
             local t = bossTimers[name] or math.huge
@@ -1246,20 +1233,17 @@ task.spawn(function()
 
                 if targetBoss and targetBoss:FindFirstChild("HumanoidRootPart") then
                     if currentTween then currentTween:Cancel() currentTween = nil end
-                    
                     local offset = CFrame.new(0, FarmBossDistance, 0)
                     if FarmBossMode == "Below" then offset = CFrame.new(0, -FarmBossDistance, 0)
                     elseif FarmBossMode == "Behind" then offset = CFrame.new(0, 0, FarmBossDistance) end
-                    
                     hrp.CFrame = targetBoss.HumanoidRootPart.CFrame * offset
                     hrp.CFrame = CFrame.new(hrp.Position, targetBoss.HumanoidRootPart.Position)
                     ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
                 else
-                    -- ระบบ Tween ความเร็วคงที่
                     local targetCFrame = CFrame.new(lockedPosition + Vector3.new(0, 5, 0))
                     local distance = (hrp.Position - targetCFrame.Position).Magnitude
-                    
                     if distance > 5 and not currentTween then
+                        -- ใช้ความเร็วคงที่ 85
                         local duration = distance / FarmBossTweenSpeed
                         currentTween = TweenService:Create(hrp, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
                         currentTween:Play()
@@ -1271,23 +1255,18 @@ task.spawn(function()
     end
 end)
 
--- เกิดใหม่แล้วสร้าง Platform ใหม่
 plr.CharacterAdded:Connect(function(newChar)
     char = newChar
     if FarmBossRunning then task.wait(1) createRootPart() end
 end)
 
 --// ==========================================
---// [4] UI SETUP (WIND UI - ALL BUTTONS AT BOTTOM)
+--// [4] UI SETUP (WIND UI - BOTTOM)
 --// ==========================================
 scanPositions()
 
-
-
-
 bossTab:Dropdown({
     Title = "Select Bosses",
-    Desc = "เลือกบอสที่ต้องการฟาร์ม",
     Values = allBosses,
     Multi = true,
     Callback = function(options) selectedBosses = options end
@@ -1300,27 +1279,34 @@ bossTab:Toggle({
         if state then createRootPart() elseif currentTween then currentTween:Cancel() end
     end
 })
-bossTab:Dropdown({
-    Title = "Farm mode (boss)",
-    Values = {"Above", "Below", "Behind"},
-    Value = "Above",
-    Callback = function(val) FarmBossMode = val end
-})
-
-bossTab:Slider({
-    Title = "Farm Distance",
-    Min = 0, Max = 30, Value = 5,
-    Callback = function(val) FarmBossDistance = val end
-})
-
-
-
 bossTab:Toggle({
     Title = "Auto Server Hop",
     Value = false,
     Callback = function(state) FarmBossAutoHop = state end
 })
 
-WindUI:Notify({Title = "MON HUB", Content = "Script Loaded!", Duration = 3})
+bossTab:Dropdown({
+    Title = "Farm Boss mode",
+    Values = {"Above", "Below", "Behind"},
+    Value = "Above",
+    Callback = function(val) FarmBossMode = val end
+})
+
+bossTab:Slider({
+    Title = "Farm Boss Distance",
+    Desc = "ระยะห่างจากบอส",
+    Step = 1,
+    Value = {
+        Min = 0,
+        Max = 30,
+        Default = 5,
+    },
+    Callback = function(value)
+        FarmBossDistance = value
+    end
+})
+
+
+
 
 
