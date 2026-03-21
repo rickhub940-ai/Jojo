@@ -1285,7 +1285,7 @@ scanPositions()
 
 
 
-boosTab:Dropdown({
+bossTab:Dropdown({
     Title = "Select Bosses",
     Desc = "เลือกบอสที่ต้องการฟาร์ม",
     Values = allBosses,
