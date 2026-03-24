@@ -1076,7 +1076,10 @@ end)
 -- -------
 -- Farm boss
 -- --------
---// SERVICES
+--// ==========================================
+--// 🛡️ BOSS FARMER ULTRA (FIXED VERSION 2026)
+--// ==========================================
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1086,7 +1089,7 @@ local TeleportService = game:GetService("TeleportService")
 local plr = Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 
---// DATA
+--// 📊 DATA STORAGE
 local bossPositions = {}
 local bossTimers = {}
 local selectedBosses = {}
@@ -1100,27 +1103,26 @@ local running = false
 local lastScan = 0
 local lastHit = 0
 
---// SETTINGS
+--// ⚙️ SETTINGS
 local SPAWN_CHECK_RADIUS = 50
-local SPEED = 120
+local SPEED = 150 -- ความเร็วในการเดินทาง (ปรับเพิ่ม/ลดได้)
 
---// 🎛 MODE
+--// 🎛️ CONFIGS (UI Control)
 local FarmBossMode = "Above"
 local FarmBossDistance = 5
-
---// 🌀 AUTO HOP
 local auto_hop = false
 
---// 🟫 PLATFORM
+--// 🟫 PLATFORM SYSTEM (ป้องกันตกโลก/ช่วยให้ Tween นิ่ง)
 local platform = Instance.new("Part")
-platform.Size = Vector3.new(6,1,6)
+platform.Size = Vector3.new(6, 1, 6)
 platform.Anchored = true
 platform.CanCollide = true
-platform.Transparency = 0.5
-platform.Color = Color3.fromRGB(255, 0, 0)
-platform.Parent = workspace
+platform.Transparency = 1
+platform.Color = Color3.fromRGB(255, 170, 0)
+platform.Name = "SafetyPlatform"
+platform.Parent = nil
 
---// function parse time
+--// 🕒 TIMER PARSER
 local function parseTime(text)
     text = tostring(text or ""):gsub("%s+", "")
     if text == "" then return 0 end
@@ -1131,7 +1133,7 @@ local function parseTime(text)
     return tonumber(text) or math.huge
 end
 
---// scan spawn positions
+--// 🔍 SCAN POSITIONS
 local function scanPositions()
     bossPositions = {}
     allBosses = {}
@@ -1146,7 +1148,7 @@ local function scanPositions()
 end
 scanPositions()
 
---// timer setup
+--// 📡 TIMER UPDATER
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
         local bossName = "Unknown"  
@@ -1167,7 +1169,7 @@ for _, v in pairs(workspace:GetDescendants()) do
     end
 end
 
---// logic functions
+--// 🧠 LOGIC FUNCTIONS
 local function getBestBoss()
     local best, lowest = nil, math.huge
     for _, name in pairs(selectedBosses) do  
@@ -1183,10 +1185,6 @@ local function hasSpawnedBoss()
         if bossTimers[name] == 0 then return true end
     end
     return false
-end
-
-local function hopServer()
-    TeleportService:Teleport(game.PlaceId)
 end
 
 local function findSpawnedBoss(name, pos)
@@ -1205,14 +1203,14 @@ local function findSpawnedBoss(name, pos)
     end
 end
 
---// 🚀 FIXED TWEEN SYSTEM (No Floating)
+--// 🚀 SMART TWEEN SYSTEM (No-Float & LookAhead)
 local moveConn = nil
 local function tweenTo(pos)
     local hrp = char:WaitForChild("HumanoidRootPart")
     if moveConn then moveConn:Disconnect() end  
 
     local startPos = hrp.Position
-    local targetPos = Vector3.new(pos.X, pos.Y + 3, pos.Z) -- ล็อคความสูงเป้าหมาย
+    local targetPos = Vector3.new(pos.X, pos.Y + 3, pos.Z) -- ล็อคความสูงที่จุดหมาย
     local dist = (startPos - targetPos).Magnitude
     local duration = dist / SPEED
     local startTime = tick()  
@@ -1221,40 +1219,38 @@ local function tweenTo(pos)
         local t = (tick() - startTime) / duration  
 
         if t >= 1 or not running then  
-            hrp.CFrame = CFrame.new(targetPos)  
-            platform.CFrame = CFrame.new(targetPos - Vector3.new(0, 3, 0))
+            hrp.CFrame = CFrame.new(targetPos)
+            platform.CFrame = hrp.CFrame * CFrame.new(0, -3, 0)
             if moveConn then moveConn:Disconnect() moveConn = nil end  
             return  
         end  
 
-        -- คำนวณตำแหน่งจากจุดเริ่ม (ไม่ใช้ตำแหน่งปัจจุบันของตัวละครมาคำนวณซ้ำ)
-        local currentLerpPos = startPos:Lerp(targetPos, t)  
-        
-        -- ล็อคตัวละครและแพลตฟอร์มให้สัมพันธ์กันเป๊ะๆ
-        hrp.CFrame = CFrame.new(currentLerpPos)  
-        hrp.AssemblyLinearVelocity = Vector3.new(0,0,0) -- ล้างแรงดีด
-        platform.CFrame = CFrame.new(currentLerpPos - Vector3.new(0, 3, 0))
+        local currentPos = startPos:Lerp(targetPos, t)  
+        -- หันหน้าไปทางจุดหมายขณะเดินทาง
+        hrp.CFrame = CFrame.new(currentPos, targetPos)  
+        hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+        platform.CFrame = hrp.CFrame * CFrame.new(0, -3, 0)
     end)
 end
 
---// attack
+--// ⚔️ ATTACK FUNCTION
 local function attack()
     if tick() - lastHit > 0.1 then
         lastHit = tick()
-        ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
+        local remote = ReplicatedStorage:FindFirstChild("RequestHit", true)
+        if remote then remote:FireServer() end
     end
 end
 
---// MAIN LOOP
+--// 🔄 MAIN LOOP
 task.spawn(function()
     while true do
         task.wait(0.1)
         if not running then 
-            platform.Parent = nil -- ซ่อน platform เมื่อไม่ทำงาน
+            platform.Parent = nil
             continue 
         end  
         platform.Parent = workspace
-
         char = plr.Character or plr.CharacterAdded:Wait()  
         local hrp = char:FindFirstChild("HumanoidRootPart")  
         if not hrp then continue end  
@@ -1279,8 +1275,7 @@ task.spawn(function()
             if found then 
                 targetBoss = found 
             else
-                -- ถ้าบอสยังไม่เกิด ให้ไปรอที่จุดเกิด
-                if (hrp.Position - lockedPosition).Magnitude > 10 and not moveConn then
+                if (hrp.Position - lockedPosition).Magnitude > 15 and not moveConn then
                     tweenTo(lockedPosition)
                 end
             end
@@ -1295,51 +1290,60 @@ task.spawn(function()
             end  
         end  
 
-        if auto_hop and #selectedBosses > 0 then  
-            if not hasSpawnedBoss() then hopServer() end  
+        if auto_hop and #selectedBosses > 0 and not hasSpawnedBoss() then 
+            TeleportService:Teleport(game.PlaceId)
         end  
     end
 end)
+
+--// 🎯 LOCK POSITION & LOOK AT BOSS (ทำงานทุกเฟรม)
 RunService.RenderStepped:Connect(function()
     if running and targetBoss and targetBoss:FindFirstChild("HumanoidRootPart") then
         local root = char:FindFirstChild("HumanoidRootPart")  
         local mobRoot = targetBoss.HumanoidRootPart  
-        if root then  
-            local offset = CFrame.new(0, FarmBossDistance, 0)
-            if FarmBossMode == "Behind" then offset = CFrame.new(0, 0, FarmBossDistance)
-            elseif FarmBossMode == "Below" then offset = CFrame.new(0, -FarmBossDistance, 0) end  
+        
+        if root and targetBoss.Humanoid.Health > 0 then  
+            -- 1. คำนวณตำแหน่ง (Position)
+            local finalPos = mobRoot.Position + Vector3.new(0, FarmBossDistance, 0) -- Above
+            if FarmBossMode == "Behind" then 
+                finalPos = mobRoot.Position + (mobRoot.CFrame.LookVector * -FarmBossDistance)
+            elseif FarmBossMode == "Below" then 
+                finalPos = mobRoot.Position + Vector3.new(0, -FarmBossDistance, 0) 
+            end  
 
-            root.CFrame = mobRoot.CFrame * offset  
+            -- 2. บังคับตำแหน่งและหันหน้าหาบอส (LookAt)
+            root.CFrame = CFrame.lookAt(finalPos, mobRoot.Position)
             root.AssemblyLinearVelocity = Vector3.new(0,0,0)  
+            
+            -- 3. แผ่นรองเท้าต้องขยับตามตัวละครเสมอ
             platform.CFrame = root.CFrame * CFrame.new(0, -3, 0)
         end  
     end
 end)
 
 
-
 bossTab:Dropdown({
-    Title = "เลือกบอส",
+    Title = "เลือกบอสที่ต้องการ",
     Values = allBosses,
     Multi = true,
     Callback = function(val) selectedBosses = (typeof(val) == "table" and val or {val}) end
 })
 
 bossTab:Dropdown({
-    Title = "Farm Mode",
+    Title = "ตำแหน่งการฟาร์ม",
     Values = {"Above", "Behind", "Below"},
     Callback = function(val) FarmBossMode = val end
 })
 
 bossTab:Slider({
-    Title = "Distance",
+    Title = "ระยะห่าง (Distance)",
     Step = 1,
     Value = {Min = 2, Max = 20, Default = 5},
     Callback = function(val) FarmBossDistance = val end
 })
 
 bossTab:Toggle({
-    Title = "Auto Boss",
+    Title = "Auto Farm boss",
     Callback = function(state)
         running = state
         lockedBoss = nil
@@ -1349,8 +1353,8 @@ bossTab:Toggle({
 })
 
 bossTab:Toggle({
-    Title = "Auto Hop",
+    Title = "Auto hop",
     Callback = function(state) auto_hop = state end
 })
 
-print("✅ FIXED VERSION LOADED: ANTI-FLOAT ACTIVE")
+print("✅ ระบบทั้งหมดถูกโหลดแล้ว: นิ่ง-หันหน้า-ไม่บิน")
