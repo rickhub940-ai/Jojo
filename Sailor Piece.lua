@@ -1114,10 +1114,10 @@ local auto_hop = false
 --// 🟫 PLATFORM
 local platform = Instance.new("Part")
 platform.Name = "PlatformBoss"
-platform.Size = Vector3.new(6,1,6)
+platform.Size = Vector3.new(60,-3,60)
 platform.Anchored = true
 platform.CanCollide = true
-platform.Transparency = 0.2
+platform.Transparency = 1
 platform.Parent = workspace
 
 --// parse time
