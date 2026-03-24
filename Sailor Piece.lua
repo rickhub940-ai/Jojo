@@ -1080,6 +1080,8 @@ end)
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
 
 local plr = Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
@@ -1093,7 +1095,6 @@ local allBosses = {}
 local lockedBoss = nil
 local lockedPosition = nil
 local targetBoss = nil
-local currentTween = nil
 
 local running = false
 local lastScan = 0
@@ -1101,8 +1102,25 @@ local lastHit = 0
 
 --// SETTINGS
 local SPAWN_CHECK_RADIUS = 50
+local SPEED = 120
 
---// parse เวลา
+--// 🎛 MODE
+local FarmBossMode = "Above"
+local FarmBossDistance = 5
+
+--// 🌀 AUTO HOP (ตัวเล็ก + ไม่มี delay)
+local auto_hop = false
+
+--// 🟫 PLATFORM
+local platform = Instance.new("Part")
+platform.Name = "PlatformBoss"
+platform.Size = Vector3.new(6,1,6)
+platform.Anchored = true
+platform.CanCollide = true
+platform.Transparency = 0.2
+platform.Parent = workspace
+
+--// parse time
 local function parseTime(text)
     text = tostring(text or ""):gsub("%s+", "")
     if text == "" then return 0 end
@@ -1122,16 +1140,16 @@ end
 local function scanPositions()
     bossPositions = {}
     allBosses = {}
-    
+
     for _, v in pairs(workspace:GetChildren()) do
         if string.find(v.Name, "TimedBossSpawn_") then
             local name = v.Name
             name = name:gsub("TimedBossSpawn_", "")
             name = name:gsub("Boss_Container", "")
             name = name:gsub("_Container", "")
-            
+
             table.insert(allBosses, name)
-            
+
             local pos = v:FindFirstChild("HumanoidRootPart")
             bossPositions[name] = pos and pos.Position or v:GetPivot().Position
         end
@@ -1142,7 +1160,7 @@ scanPositions()
 --// timer
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
-        
+
         local bossName = "Unknown"
         local parent = v.Parent
 
@@ -1172,7 +1190,7 @@ end
 --// เลือกบอส
 local function getBestBoss()
     local best, lowest = nil, math.huge
-    
+
     for _, name in pairs(selectedBosses) do
         local t = bossTimers[name]
         if t == 0 then return name end
@@ -1184,6 +1202,21 @@ local function getBestBoss()
     return best
 end
 
+--// เช็คมีบอสเกิดไหม
+local function hasSpawnedBoss()
+    for _, name in pairs(selectedBosses) do
+        if bossTimers[name] == 0 then
+            return true
+        end
+    end
+    return false
+end
+
+--// hop
+local function hopServer()
+    TeleportService:Teleport(game.PlaceId)
+end
+
 --// หา boss
 local function findSpawnedBoss(name, pos)
     local npc = workspace:FindFirstChild("NPCs")
@@ -1193,7 +1226,7 @@ local function findSpawnedBoss(name, pos)
         if obj:IsA("Model") and obj:FindFirstChild("Humanoid") then
             local hrp = obj:FindFirstChild("HumanoidRootPart")
             local hum = obj:FindFirstChild("Humanoid")
-            
+
             if hrp and hum and hum.Health > 0 then
                 if (hrp.Position - pos).Magnitude <= SPAWN_CHECK_RADIUS then
                     if string.find(string.lower(obj.Name), string.lower(name)) then
@@ -1205,19 +1238,37 @@ local function findSpawnedBoss(name, pos)
     end
 end
 
---// tween
+--// movement
+local moveConn = nil
+
 local function tweenTo(pos)
     local hrp = char:WaitForChild("HumanoidRootPart")
-    
-    if currentTween then currentTween:Cancel() end
-    
-    local dist = (hrp.Position - pos).Magnitude
-    local t = math.clamp(dist/100, 0.3, 3)
 
-    currentTween = TweenService:Create(hrp, TweenInfo.new(t), {
-        CFrame = CFrame.new(pos + Vector3.new(0,3,0))
-    })
-    currentTween:Play()
+    if moveConn then moveConn:Disconnect() end
+
+    local startPos = hrp.Position
+    local dist = (startPos - pos).Magnitude
+    local duration = dist / SPEED
+    local startTime = tick()
+
+    moveConn = RunService.Heartbeat:Connect(function()
+        local t = (tick() - startTime) / duration
+
+        if t >= 1 then
+            local final = pos + Vector3.new(0,3,0)
+            hrp.CFrame = CFrame.new(final, pos)
+            platform.Position = final - Vector3.new(0,3,0)
+            moveConn:Disconnect()
+            moveConn = nil
+            return
+        end
+
+        local newPos = startPos:Lerp(pos, t)
+        local final = newPos + Vector3.new(0,3,0)
+
+        hrp.CFrame = CFrame.new(final, pos)
+        platform.Position = final - Vector3.new(0,3,0)
+    end)
 end
 
 --// attack
@@ -1228,10 +1279,10 @@ local function attack()
     end
 end
 
---// LOOP (เทพแล้ว)
+--// LOOP
 task.spawn(function()
     while true do
-        task.wait(0.03)
+        task.wait(0.05)
 
         if not running then continue end
 
@@ -1239,7 +1290,6 @@ task.spawn(function()
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if not hrp then continue end
 
-        -- scan auto
         if tick() - lastScan > 1 then
             lastScan = tick()
             scanPositions()
@@ -1256,83 +1306,105 @@ task.spawn(function()
 
         if lockedBoss and lockedPosition then
             
-            -- 🔥 หาใหม่ตลอด (แก้บอสรี)
             local found = findSpawnedBoss(lockedBoss, lockedPosition)
-            if found then
-                targetBoss = found
-            end
+            if found then targetBoss = found end
 
-            -- เช็ค object หาย
-            if targetBoss and not targetBoss.Parent then
-                targetBoss = nil
-            end
-
-            if targetBoss 
-            and targetBoss:FindFirstChild("HumanoidRootPart") 
-            and targetBoss:FindFirstChild("Humanoid") then
-                
-                local hum = targetBoss.Humanoid
-                local bHRP = targetBoss.HumanoidRootPart
-
-                if hum.Health <= 0 then
+            if targetBoss and targetBoss:FindFirstChild("Humanoid") then
+                if targetBoss.Humanoid.Health <= 0 then
                     targetBoss = nil
                     lockedBoss = nil
                     lockedPosition = nil
                     continue
                 end
 
-                if (bHRP.Position - lockedPosition).Magnitude > SPAWN_CHECK_RADIUS * 2 then
-                    targetBoss = nil
-                    continue
-                end
-
-                -- TP + ตี
-                hrp.CFrame = hrp.CFrame:Lerp(
-                    bHRP.CFrame * CFrame.new(0,5,0), 0.5
-                )
-
                 attack()
 
             else
-                -- ไปรอ spawn
                 if (hrp.Position - lockedPosition).Magnitude > 8 then
                     tweenTo(lockedPosition)
                 end
             end
         end
+
+        -- 🌀 AUTO HOP (ทันที)
+        if auto_hop and #selectedBosses > 0 then
+            if not hasSpawnedBoss() then
+                hopServer()
+            end
+        end
+    end
+end)
+
+--// 🎯 RenderStepped
+RunService.RenderStepped:Connect(function()
+    if running and targetBoss 
+    and targetBoss.Parent 
+    and targetBoss:FindFirstChild("HumanoidRootPart") then
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local mobRoot = targetBoss.HumanoidRootPart
+
+        if root then
+            local offset = CFrame.new()
+
+            if FarmBossMode == "Above" then
+                offset = CFrame.new(0, FarmBossDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+            elseif FarmBossMode == "Behind" then
+                offset = CFrame.new(0, 0, FarmBossDistance)
+            elseif FarmBossMode == "Below" then
+                offset = CFrame.new(0, -FarmBossDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
+            end
+
+            root.CFrame = mobRoot.CFrame * offset
+            root.AssemblyLinearVelocity = Vector3.new(0,0,0)
+
+            platform.Position = root.Position - Vector3.new(0,3,0)
+        end
     end
 end)
 
 
--- Dropdown
 bossTab:Dropdown({
     Title = "เลือกบอส",
     Values = allBosses,
     Multi = true,
     Callback = function(val)
         if typeof(val) ~= "table" then val = {val} end
-        selectedBosses = val or {}
-
-        lockedBoss = nil
-        targetBoss = nil
-        if currentTween then currentTween:Cancel() end
-
-        print("เลือก:", table.concat(selectedBosses, ", "))
+        selectedBosses = val
     end
 })
 
--- Toggle
+bossTab:Dropdown({
+    Title = "Farm Boss Mode",
+    Values = {"Above", "Behind", "Below"},
+    Callback = function(val)
+        FarmBossMode = val
+    end
+})
+
+bossTab:Slider({
+    Title = "Farm Boss Distance",
+    Step = 1,
+    Value = {Min = 2, Max = 20, Default = 5},
+    Callback = function(val)
+        FarmBossDistance = val
+    end
+})
+
 bossTab:Toggle({
     Title = "Auto Boss",
     Callback = function(state)
         running = state
-        
         lockedBoss = nil
         targetBoss = nil
-        if currentTween then currentTween:Cancel() end
-
-        print(state and "เริ่ม" or "หยุด")
     end
 })
 
-print("🔥 Auto Boss Loaded (No Refresh Needed)")
+bossTab:Toggle({
+    Title = "Auto Hop Server",
+    Callback = function(state)
+        auto_hop = state
+    end
+})
+
+print("🔥 FULL AUTO BOSS + INSTANT HOP LOADED")
