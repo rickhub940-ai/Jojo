@@ -1255,7 +1255,7 @@ bossTab:Toggle({
     end
 })
 
-boasTab:Toggle({
+bossTab:Toggle({
     Title = "Auto Hop Server",
 	Desc = "ออโต้ย้ายเซิฟถ้าไม่มีบอส",
     Value = auto_hop,
@@ -1265,7 +1265,7 @@ boasTab:Toggle({
     end
 })
 
-boasTab:Dropdown({
+bossTab:Dropdown({
     Title = "FarmBossMode",
 	Desc = "โหมดการฟามบอส",
     Values = {"Above", "Behind", "Below"},
