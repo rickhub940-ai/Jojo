@@ -1078,14 +1078,16 @@ end)
 -- --------
 
 
-
-
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
+
 local plr = Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 
-
-
+--// 📊 DATA STORAGE
 local bossPositions = {}
 local bossTimers = {}
 local allBosses = {}
@@ -1094,19 +1096,22 @@ local selectedBosses = Get("SelectedBosses", {})
 local FarmBossMode = Get("FarmBossMode", "Above")
 local FarmBossDistance = Get("FarmBossDistance", 5)
 local auto_hop = Get("AutoHop", false)
+
 local targetBoss = nil
 local running = false
 local lastHit = 0
-local SPEED = 180 
+local SPEED = 180
 
-
+--// 🟫 PLATFORM
 local platform = Instance.new("Part")
 platform.Size = Vector3.new(8, 1, 8)
 platform.Anchored = true
 platform.CanCollide = true
 platform.Transparency = 1
 platform.Color = Color3.fromRGB(255, 0, 100)
+platform.Name = "RickHub_Platform"
 
+--// 🕒 TIME PARSER (ไม่ใช่ตัวเลข = เกิด)
 local function parseTime(text)
     text = tostring(text or ""):gsub("%s+", ""):lower()
     if text == "" then return 0 end
@@ -1114,25 +1119,33 @@ local function parseTime(text)
         local m, s = text:match("(%d+):(%d+)")  
         if m and s then return tonumber(m)*60 + tonumber(s) end  
     end
-    return tonumber(text) or 0
+    return tonumber(text) or 0 
 end
+
+--// 🔍 SCAN SPAWN POSITIONS
 local function scanPositions()
+    local tempPos = {}
+    local tempList = {}
     for _, v in pairs(workspace:GetChildren()) do  
-        if v.Name:find("TimedBossSpawn_") then  
+        if string.find(v.Name, "TimedBossSpawn_") then  
             local name = v.Name:gsub("TimedBossSpawn_", ""):gsub("Boss_Container", ""):gsub("_Container", "")  
-            if not table.find(allBosses, name) then table.insert(allBosses, name) end
+            table.insert(tempList, name)  
             local hrp = v:FindFirstChild("HumanoidRootPart")
-            bossPositions[name] = hrp and hrp.Position or v:GetPivot().Position  
+            tempPos[name] = hrp and hrp.Position or v:GetPivot().Position  
         end  
     end
+    bossPositions = tempPos
+    allBosses = tempList
 end
 scanPositions()
+
+--// 📡 TIMER UPDATER
 for _, v in pairs(workspace:GetDescendants()) do
     if v.Name == "Timer" and v:IsA("TextLabel") then
         local bossName = "Unknown"  
         local parent = v.Parent  
         while parent do  
-            if parent.Name:find("TimedBossSpawn_") then  
+            if string.find(parent.Name, "TimedBossSpawn_") then  
                 bossName = parent.Name:gsub("TimedBossSpawn_", ""):gsub("Boss", "")  
                 break  
             end  
@@ -1147,12 +1160,13 @@ for _, v in pairs(workspace:GetDescendants()) do
         end  
     end
 end
+
+--// 🚀 TWEEN SYSTEM
 local moveConn = nil
 local function tweenTo(pos)
     if not pos or moveConn then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-
     local startPos = hrp.Position
     local targetPos = Vector3.new(pos.X, pos.Y + 5, pos.Z)
     local duration = (startPos - targetPos).Magnitude / SPEED
@@ -1171,51 +1185,81 @@ local function tweenTo(pos)
     end)
 end
 
+--// ⚔️ ATTACK
+local function attack()
+    if tick() - lastHit > 0.1 then
+        lastHit = tick()
+        local remote = ReplicatedStorage:FindFirstChild("RequestHit", true) or ReplicatedStorage:FindFirstChild("Hit", true)
+        if remote then remote:FireServer() end
+    end
+end
+
+--// 🔄 NPC SCANNER (หัวใจหลัก: สแกนหาบอสเมื่อถึงจุด)
+local function checkBossNearSpawn(name, spawnPos)
+    local npcFolder = workspace:FindFirstChild("NPCs")
+    if not npcFolder then return nil end
+    for _, obj in pairs(npcFolder:GetChildren()) do
+        if obj:IsA("Model") and string.find(string.lower(obj.Name), string.lower(name)) then
+            local hrp = obj:FindFirstChild("HumanoidRootPart")
+            if hrp and (hrp.Position - spawnPos).Magnitude < 100 then -- เจอตัวในรัศมี 100 หน่วย
+                local hum = obj:FindFirstChild("Humanoid")
+                if hum and hum.Health > 0 then return obj end
+            end
+        end
+    end
+    return nil
+end
+
+--// 🔄 MAIN LOOP
 task.spawn(function()
     while true do
-        task.wait(0.2)
+        task.wait(0.1)
         if not running then platform.Parent = nil continue end
         platform.Parent = workspace
         char = plr.Character or plr.CharacterAdded:Wait()
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if not hrp then continue end
 
-        local bestBossName = nil
-        local lowestTime = math.huge
-        local bossFound = nil
-
+        -- 1. เลือกบอสที่ควรไปหา
+        local bestName = nil
+        local lowest = math.huge
         for _, name in pairs(selectedBosses) do
-            local npcFolder = workspace:FindFirstChild("NPCs")
-            if npcFolder then
-                local obj = npcFolder:FindFirstChild(name, true) 
-                if obj and obj:FindFirstChild("Humanoid") and obj.Humanoid.Health > 0 then
-                    bossFound = obj
-                    break
-                end
-            end
             local t = bossTimers[name] or 9999
-            if t < lowestTime then lowestTime = t bestBossName = name end
+            if t < lowest then lowest = t bestName = name end
         end
 
-        if bossFound then
-            targetBoss = bossFound
-            if tick() - lastHit > 0.1 then
-                lastHit = tick()
-                local remote = ReplicatedStorage:FindFirstChild("RequestHit", true) or ReplicatedStorage:FindFirstChild("Hit", true)
-                if remote then remote:FireServer() end
-            end
-        elseif bestBossName and bossPositions[bestBossName] then
-            targetBoss = nil
-            if (hrp.Position - bossPositions[bestBossName]).Magnitude > 20 then
-                tweenTo(bossPositions[bestBossName])
+        -- 2. ดำเนินการตามสถานะ
+        if bestName and bossPositions[bestName] then
+            local distToSpawn = (hrp.Position - bossPositions[bestName]).Magnitude
+            
+            -- ถ้าอยู่ใกล้จุดเกิด (ระยะ < 100) ให้เริ่มสแกนหาตัว NPC
+            if distToSpawn < 100 then
+                local npc = checkBossNearSpawn(bestName, bossPositions[bestName])
+                if npc then
+                    targetBoss = npc
+                    attack()
+                else
+                    targetBoss = nil
+                    -- ถ้าไม่เจอตัวบอส แต่ถึงจุดแล้ว ก็นั่งทับจุดรอไปเลย
+                    if distToSpawn > 5 and not moveConn then
+                        tweenTo(bossPositions[bestName])
+                    end
+                end
+            else
+                -- ถ้าอยู่ไกล ให้ Tween ไปหาจุดเกิดก่อน
+                targetBoss = nil
+                tweenTo(bossPositions[bestName])
             end
         end
-        if auto_hop and #selectedBosses > 0 and not bossFound and lowestTime > 15 then
+
+        -- Auto Hop
+        if auto_hop and #selectedBosses > 0 and lowest > 15 and not targetBoss then
             TeleportService:Teleport(game.PlaceId)
         end
     end
 end)
 
+--// 🎯 RENDER STEPPED (FACE BOSS)
 RunService.RenderStepped:Connect(function()
     if running and targetBoss and targetBoss:FindFirstChild("HumanoidRootPart") then
         local root = char:FindFirstChild("HumanoidRootPart")  
@@ -1236,56 +1280,23 @@ end)
 
 
 bossTab:Dropdown({
-    Title = "selectedBoss",
-    Values = allBosses,
-    Multi = true,
-    Default = selectedBosses,
-    Callback = function(val) 
-        selectedBosses = (typeof(val) == "table" and val or {val}) 
-        Save("SelectedBosses", selectedBosses)
-    end
+    Title = "เลือกบอสที่ต้องการ", Values = allBosses, Multi = true, Default = selectedBosses,
+    Callback = function(val) selectedBosses = (typeof(val) == "table" and val or {val}) Save("SelectedBosses", selectedBosses) end
 })
-
-bossTab:Toggle({
-    Title = "Auto Farm Boss",
-	Desc = "ฟามบอส",
-    Callback = function(state) 
-        running = state 
-        if not state then targetBoss = nil end
-    end
-})
-
-bossTab:Toggle({
-    Title = "Auto Hop Server",
-	Desc = "ออโต้ย้ายเซิฟถ้าไม่มีบอส",
-    Value = auto_hop,
-    Callback = function(state) 
-        auto_hop = state 
-        Save("AutoHop", state)
-    end
-})
-
 bossTab:Dropdown({
-    Title = "FarmBossMode",
-	Desc = "โหมดการฟามบอส",
-    Values = {"Above", "Behind", "Below"},
-    Default = FarmBossMode,
-    Callback = function(val) 
-        FarmBossMode = val 
-        Save("FarmBossMode", val)
-    end
+    Title = "ตำแหน่งฟาร์ม", Values = {"Above", "Behind", "Below"}, Default = FarmBossMode,
+    Callback = function(val) FarmBossMode = val Save("FarmBossMode", val) end
 })
-
 bossTab:Slider({
-    Title = "FarmBossDistance",
-	Desc = "ระยะห่างจากบอส",
-    Step = 1,
-    Value = {Min = 2, Max = 20, Default = FarmBossDistance},
-    Callback = function(val) 
-        FarmBossDistance = val 
-        Save("FarmBossDistance", val)
-    end
+    Title = "ระยะห่าง", Step = 1, Value = {Min = 2, Max = 20, Default = FarmBossDistance},
+    Callback = function(val) FarmBossDistance = val Save("FarmBossDistance", val) end
 })
-
-
+bossTab:Toggle({
+    Title = "Auto Hop (สลับเซิร์ฟ)", Value = auto_hop,
+    Callback = function(state) auto_hop = state Save("AutoHop", state) end
+})
+bossTab:Toggle({
+    Title = "เริ่มระบบฟาร์มบอส",
+    Callback = function(state) running = state if not state then targetBoss = nil end end
+})
 
