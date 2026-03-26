@@ -869,6 +869,132 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- -------_-
+-- AutoSukunaV2
+-- -----------
+
+
+local player = game.Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local workspace = game:GetService("Workspace")
+
+
+
+getgenv().Config = {
+    TweenSpeed = 100,
+    IdlePosition = Vector3.new(-16.07, 1.90, -1843.30),
+    PlatformName = "AutoQ",
+
+    AutoQDistance = 8, 
+    AutoQMode = "Above" -- "Above", "Below", "Behind"
+}
+
+local State = { 
+    Items = {
+        ["Awakened Cursed Finger"] = 0, ["Vessel Ring"] = 0, 
+        ["Malevolent Soul"] = 0, ["Cursed Flesh"] = 0, ["Malevolent Key"] = 0
+    },
+    Title = "Locked", 
+    IsRunning = false
+}
+
+local function updateInventoryData()
+    if not State.IsRunning then return end
+    local rem = ReplicatedStorage:FindFirstChild("Remotes")
+    local req = rem and rem:FindFirstChild("RequestInventory")
+    local upd = rem and rem:FindFirstChild("UpdateInventory")
+    if not req or not upd then return end
+    
+    local received = false
+    local c; c = upd.OnClientEvent:Connect(function(category, data)
+        if (category == "Items" or category == "Accessories") and not received then
+            received = true
+            c:Disconnect()
+            for _, v in pairs(data) do 
+                if State.Items[v.name] ~= nil then State.Items[v.name] = v.quantity or 1 end
+            end
+        end
+    end)
+    pcall(function() req:FireServer() end)
+    task.delay(1, function() if c then c:Disconnect() end end)
+end
+local function StartSukunaSystem()
+    local p = workspace:FindFirstChild(getgenv().Config.PlatformName) or Instance.new("Part", workspace)
+    p.Name = getgenv().Config.PlatformName; p.Size = Vector3.new(15, 1, 15); p.Anchored = true; p.Transparency = 1; p.CanCollide = true
+
+    task.spawn(function()
+        while State.IsRunning do
+            updateInventoryData()
+            pcall(function()
+                local ui = player.PlayerGui:FindFirstChild("TitlesUI")
+                State.Title = ui.MainFrame.Holder.Title_DisgracedOne.DisplayButtonsHolder.Txt.Text
+            end)
+            if State.Items["Awakened Cursed Finger"] >= 20 and State.Title == "Locked" then
+                local u = ReplicatedStorage:FindFirstChild("Remotes"):FindFirstChild("UseItem")
+                if u then u:FireServer("Use", "Awakened Cursed Finger", 1, false) end
+            end
+            task.wait(4)
+        end
+    end)
+    task.spawn(function()
+        local hb; hb = RunService.RenderStepped:Connect(function()
+            if not State.IsRunning then hb:Disconnect() return end
+            
+            local char = player.Character
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            if not root then return end
+            
+            local target = nil
+            local items = State.Items
+            
+            if items["Malevolent Key"] > 0 and items["Awakened Cursed Finger"] >= 20 and items["Vessel Ring"] >= 7 and items["Malevolent Soul"] >= 3 then
+                if State.Title == "Locked" then
+                    target = workspace:FindFirstChild("StrongestHistory", true)
+                    if not target then 
+                        local s = ReplicatedStorage:FindFirstChild("Remotes"):FindFirstChild("RequestSpawnStrongestBoss")
+                        if s then s:FireServer("StrongestHistory", "Normal") end
+                    end
+                else
+                    target = workspace:FindFirstChild("ServiceNPCs") and workspace.ServiceNPCs:FindFirstChild("StrongestinHistoryBuyerNPC")
+                end
+            else
+                for i = 1, 5 do
+                    local m = workspace:FindFirstChild("Curse"..i, true)
+                    if m and m:FindFirstChild("Humanoid") and m.Humanoid.Health > 0 then target = m break end
+                end
+            end
+            if target and target:FindFirstChild("HumanoidRootPart") then
+                local mobRoot = target.HumanoidRootPart
+                local dist = getgenv().Config.AutoQDistance
+                local mode = getgenv().Config.AutoQMode
+                local finalPos
+                if mode == "Behind" then 
+                    finalPos = mobRoot.Position + (mobRoot.CFrame.LookVector * -dist)
+                elseif mode == "Below" then 
+                    finalPos = mobRoot.Position + Vector3.new(0, -dist, 0)
+                else -- "Above"
+                    finalPos = mobRoot.Position + Vector3.new(0, dist, 0)
+                end
+                root.CFrame = CFrame.lookAt(finalPos, mobRoot.Position)
+                root.AssemblyLinearVelocity = Vector3.zero
+                p.CFrame = root.CFrame * CFrame.new(0, -4, 0)
+
+                local r = ReplicatedStorage:FindFirstChild("CombatSystem", true)
+                if r and r:FindFirstChild("RequestHit", true) then r.RequestHit:FireServer() end
+                
+                if target.Name == "StrongestinHistoryBuyerNPC" and (root.Position - target:GetPivot().Position).Magnitude < 8 then
+                    fireproximityprompt(target:FindFirstChildOfClass("ProximityPrompt"))
+                end
+            else
+   
+                root.CFrame = root.CFrame:Lerp(CFrame.new(getgenv().Config.IdlePosition), 0.1)
+                p.CFrame = root.CFrame * CFrame.new(0, -4, 0)
+            end
+        end)
+    end)
+end
+
+
 
 
 
@@ -1279,5 +1405,42 @@ bossTab:Slider({
     Callback = function(val) FarmBossDistance = val Save("FarmBossDistance", val) end
 })
 
+QuestTab:Toggle({
+    Title = "Auto Sukuna V2",
+    Desc = "ออโต้สุคุนะวี2",
+    Value = false,
+    Callback = function(state)
+        State.IsRunning = state
+        if state then 
+            StartSukunaSystem()
+        else
+            local p = workspace:FindFirstChild(getgenv().Config.PlatformName)
+            if p then p:Destroy() end
+        end
+    end
+})
 
+local QuestTab = Window:Tab({Title = "Quest", Icon = "clipboard-list"})
+
+QuestTab:Dropdown({
+    Title = "AutoQ Mode",
+    Desc = "เลือกตำแหน่ง",
+    Values = { "Above", "Below", "Behind" },
+    Value = { "Above" },
+    Multi = false,
+    AllowNone = false,
+    Callback = function(option)
+        getgenv().Config.AutoQMode = option[1]
+    end
+})
+
+QuestTab:Slider({
+    Title = "AutoQ Distance",
+    Desc = "ระยะห่างจากเป้าหมาย",
+    Step = 1,
+    Value = { Min = 1, Max = 30, Default = 8 },
+    Callback = function(value)
+        getgenv().Config.AutoQDistance = value
+    end
+})
 
