@@ -1418,7 +1418,7 @@ bossTab:Slider({
     Title = "FarmBossDistance", Step = 1, Value = {Min = 2, Max = 20, Default = FarmBossDistance},
     Callback = function(val) FarmBossDistance = val Save("FarmBossDistance", val) end
 })
-
+local QuestTab = Window:Tab({Title = "Quest", Icon = "clipboard-list"})
 QuestTab:Toggle({
     Title = "Auto Sukuna V2",
     Desc = "ออโต้สุคุนะวี2",
@@ -1434,7 +1434,6 @@ QuestTab:Toggle({
     end
 })
 
-local QuestTab = Window:Tab({Title = "Quest", Icon = "clipboard-list"})
 
 QuestTab:Dropdown({
     Title = "AutoQ Mode",
