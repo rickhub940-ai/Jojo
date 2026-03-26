@@ -309,7 +309,21 @@ local QuestData = {
         posspow = Vector3.new(-958.98, -2.08, -1060.27),
         posQ = Vector3.new(-1165.34, 2.50, -1191.39),
         NM = {"Swordsman1","Swordsman2","Swordsman3","Swordsman4","Swordsman5"}
-    }
+    },
+	{
+        LV = 11500,
+        NPC = "QuestNPC18",
+        posspow = Vector3.new(-1620.59, 8.51, -655.70),
+        posQ = Vector3.new(-1787.12, 6.93, -742.73),
+        NM = {"Ninja1","Ninja2","Ninja3","Ninja4","Ninja5"}
+	},
+	{
+        LV = 12000,
+        NPC = "QuestNPC19",
+        posspow = Vector3.new(105.86, -5.27, 1624.03),
+        posQ = Vector3.new(67.77, -1.14, 1760.41),
+        NM = {"ArenaFighter1","ArenaFighter2","ArenaFighter3","ArenaFighter4","ArenaFighter5"}
+	}
 }
 
 
