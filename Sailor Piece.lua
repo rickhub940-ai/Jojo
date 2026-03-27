@@ -1297,3 +1297,125 @@ bossTab:Slider({
     Callback = function(val) FarmBossDistance = val Save("FarmBossDistance", val) end
 })
 local QuestTab = Window:Tab({Title = "Quest", Icon = "clipboard-list"})
+
+
+
+local WebhookTab = Window:Tab({Title = "WEBHOOK", Icon = "webhook"})
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local request = request or http_request or syn.request
+
+-- 📦 โหลด item list จาก backup
+local backup = require(
+    game:GetService("ReplicatedStorage")
+    .Backups
+    :WaitForChild("ItemRarityConfig_v2_backup")
+)
+
+-- 🔥 แปลง Items → list
+local ITEM_LIST = {}
+for name,_ in pairs(backup.Items) do
+    table.insert(ITEM_LIST, name)
+end
+table.sort(ITEM_LIST)
+
+-- 🔧 CONFIG
+local CONFIG = {
+    webhook = "",
+    selectedItems = {}
+}
+
+-- ================= UI =================
+
+-- 🔗 Webhook Input
+Tab:Input({
+    Title = "Webhook URL",
+    Desc = "ใส่ลิงก์ webhook",
+    Value = "",
+    Placeholder = "https://discord.com/api/webhooks/...",
+    Callback = function(input)
+        CONFIG.webhook = input
+        print("Webhook set:", input)
+    end
+})
+
+-- 🎯 เลือก Item
+Tab:Dropdown({
+    Title = "Select Items",
+    Desc = "เลือกไอเท็มที่จะแจ้งเตือน",
+    Values = ITEM_LIST,
+    Value = {},
+    Multi = true,
+    AllowNone = true,
+    Callback = function(option)
+        CONFIG.selectedItems = option
+        print("Selected:", HttpService:JSONEncode(option))
+    end
+})
+
+-- 📊 ดึง Gems/Money
+local function getStats()
+    local data = player:FindFirstChild("Data")
+    if not data then return 0,0 end
+
+    local gems = data:FindFirstChild("Gems")
+    local money = data:FindFirstChild("Money")
+
+    return (gems and gems.Value or 0), (money and money.Value or 0)
+end
+
+-- 📡 ส่ง webhook
+local function sendWebhook()
+    if not request then
+        warn("Executor ไม่รองรับ request")
+        return
+    end
+
+    if CONFIG.webhook == "" then
+        warn("❌ ยังไม่ได้ใส่ webhook")
+        return
+    end
+
+    local gems, money = getStats()
+
+    local itemText = ""
+    for _, name in ipairs(CONFIG.selectedItems) do
+        itemText = itemText .. "- " .. name .. "\n"
+    end
+
+    if itemText == "" then
+        itemText = "ไม่มี item ที่เลือก"
+    end
+
+    local data = {
+        content = "Test Inventory",
+        embeds = {{
+            title = "Test Result",
+            description = "```"..itemText.."\n-----------------\nGems: "..gems.."\nMoney: "..money.."```",
+            color = 16711935
+        }}
+    }
+
+    request({
+        Url = CONFIG.webhook,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = HttpService:JSONEncode(data)
+    })
+
+    print("✅ Sent webhook")
+end
+
+-- 🧪 ปุ่ม TEST
+Tab:Button({
+    Title = "TEST WEBHOOK",
+    Desc = "กดเพื่อส่งข้อมูล",
+    Callback = function()
+        sendWebhook()
+    end
+})
