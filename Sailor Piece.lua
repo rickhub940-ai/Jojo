@@ -1331,7 +1331,7 @@ local CONFIG = {
 -- ================= UI =================
 
 -- 🔗 Webhook Input
-Tab:Input({
+WebhookTab:Input({
     Title = "Webhook URL",
     Desc = "ใส่ลิงก์ webhook",
     Value = "",
@@ -1343,7 +1343,7 @@ Tab:Input({
 })
 
 -- 🎯 เลือก Item
-Tab:Dropdown({
+WebhookTab:Dropdown({
     Title = "Select Items",
     Desc = "เลือกไอเท็มที่จะแจ้งเตือน",
     Values = ITEM_LIST,
@@ -1412,7 +1412,7 @@ local function sendWebhook()
 end
 
 -- 🧪 ปุ่ม TEST
-Tab:Button({
+WebhookTab:Button({
     Title = "TEST WEBHOOK",
     Desc = "กดเพื่อส่งข้อมูล",
     Callback = function()
