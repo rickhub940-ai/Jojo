@@ -164,8 +164,6 @@ local backpack = player:WaitForChild("Backpack")
 
 
 
-
-
 local ConfigFile = "RICK HUB [ Sailor Piece ].json"
 local Config = {}
 
@@ -200,6 +198,7 @@ local QuestData = {
     {
         LV = 0,
         NPC = "QuestNPC1",
+		NQ = "Thief",
         posspow = Vector3.new(-91.99,-3.46,-240.31),
         posQ = Vector3.new(169.20,16.33,-214.33),
         NM = {"Thief1","Thief2","Thief3","Thief4","Thief5"}
@@ -326,22 +325,21 @@ local QuestData = {
 	}
 }
 
-
-local function GetPlayerSpawn()
-    local customSpawn = workspace:FindFirstChild(player.Name.."_Spawn")
-    if customSpawn then return customSpawn end
-    if player.RespawnLocation then return player.RespawnLocation end
-    return nil
-end
-
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
+local function GetPlayerSpawn()
+    local customSpawn = workspace:FindFirstChild(player.Name.."_Spawn")
+    if customSpawn then return customSpawn end
+    return player.RespawnLocation
+end
+
 local function ManagePlatform(state)
     local root = GetRoot()
     if not root then return end
-    
+
     local floor = workspace:FindFirstChild(PlatformName)
+
     if state then
         if not floor then
             floor = Instance.new("Part")
@@ -352,144 +350,151 @@ local function ManagePlatform(state)
             floor.CanCollide = true
             floor.Parent = workspace
         end
-
         floor.CFrame = root.CFrame * CFrame.new(0,-3,0)
-
     else
         if floor then floor:Destroy() end
     end
 end
-
 local function TweenTo(pos)
     local root = GetRoot()
     if not root or isTweening then return end
 
     ManagePlatform(true)
-    local floor = workspace:FindFirstChild(PlatformName)
 
+    local floor = workspace:FindFirstChild(PlatformName)
     local dist = (root.Position - pos).Magnitude
     if dist < 5 then return end
 
     isTweening = true
 
-    local duration = dist / TweenSpeed
-    local info = TweenInfo.new(duration, Enum.EasingStyle.Linear)
-
-    local playerTween = TweenService:Create(
+    local tween = TweenService:Create(
         root,
-        info,
+        TweenInfo.new(dist / TweenSpeed, Enum.EasingStyle.Linear),
         {CFrame = CFrame.new(pos)}
     )
 
     local floorTween = TweenService:Create(
         floor,
-        info,
+        TweenInfo.new(dist / TweenSpeed, Enum.EasingStyle.Linear),
         {CFrame = CFrame.new(pos) * CFrame.new(0,-3,0)}
     )
 
-    playerTween:Play()
+    tween:Play()
     floorTween:Play()
 
-    playerTween.Completed:Connect(function()
+    tween.Completed:Connect(function()
         isTweening = false
         ManagePlatform(false)
     end)
 end
 
+local lastAbandon = 0
+local function HandleQuest(quest)
+    local ok, text = pcall(function()
+        return player.PlayerGui.QuestUI.Quest.Quest.Holder.Content.QuestInfo.QuestTitle.QuestTitle.Text
+    end)
 
+    local hasUI = pcall(function()
+        return player.PlayerGui.QuestUI.Quest.Visible
+    end)
 
-
-
-local function AutoScanSave()
-    local root = GetRoot()
-    if not root then return end
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("ProximityPrompt") and obj.Name == "CheckpointPrompt" then
-            local dist = (root.Position - obj.Parent.Position).Magnitude
-            if dist < 35 then
-                fireproximityprompt(obj)
-            end
+    if not hasUI then return false end
+    if ok and text and not string.find(text, quest.NQ) then
+        if tick() - lastAbandon > 2 then
+            lastAbandon = tick()
+            ReplicatedStorage.RemoteEvents.QuestAbandon:FireServer("repeatable")
         end
+        return false
     end
+
+    return ok and text and string.find(text, quest.NQ)
 end
 
 local function GetQuest()
     local level = player.Data.Level.Value
     local best = nil
     for _, v in ipairs(QuestData) do
-        if level >= v.LV then best = v end
+        if level >= v.LV then
+            best = v
+        end
     end
     return best
 end
-task.spawn(function()
-    RunService.Stepped:Connect(function()
-        if (AutoFarm or isTweening) and player.Character then
-            for _, v in pairs(player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
-            end
-        end
-    end)
-    RunService.RenderStepped:Connect(function()
-        if AutoFarm and TargetMob and TargetMob.Parent and TargetMob:FindFirstChild("HumanoidRootPart") then
-            local root = GetRoot()
-            local mobRoot = TargetMob.HumanoidRootPart
-            if root then
-                local offset = CFrame.new(0, 0, 0)
-                if FarmMode == "Above" then
-                    offset = CFrame.new(0, FarmDistance, 0) * CFrame.Angles(math.rad(-90), 0, 0)
-                elseif FarmMode == "Behind" then
-                    offset = CFrame.new(0, 0, FarmDistance)
-                elseif FarmMode == "Below" then
-                    offset = CFrame.new(0, -FarmDistance, 0) * CFrame.Angles(math.rad(90), 0, 0)
-                end
-                root.CFrame = mobRoot.CFrame * offset
-                root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-            end
-        end
-    end)
 
+local function AutoScanSave()
+    local root = GetRoot()
+    if not root then return end
+
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") and obj.Name == "CheckpointPrompt" then
+            if (root.Position - obj.Parent.Position).Magnitude < 35 then
+                fireproximityprompt(obj)
+            end
+        end
+    end
+end
+
+RunService.Stepped:Connect(function()
+    if (AutoFarm or isTweening) and player.Character then
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if AutoFarm and TargetMob and TargetMob:FindFirstChild("HumanoidRootPart") then
+        local root = GetRoot()
+        local mobRoot = TargetMob.HumanoidRootPart
+
+        if root then
+            local offset = CFrame.new()
+
+            if FarmMode == "Above" then
+                offset = CFrame.new(0, FarmDistance, 0) * CFrame.Angles(math.rad(-90),0,0)
+            elseif FarmMode == "Behind" then
+                offset = CFrame.new(0,0,FarmDistance)
+            elseif FarmMode == "Below" then
+                offset = CFrame.new(0,-FarmDistance,0) * CFrame.Angles(math.rad(90),0,0)
+            end
+
+            root.CFrame = mobRoot.CFrame * offset
+            root.AssemblyLinearVelocity = Vector3.new(0,0,0)
+        end
+    end
+end)
+
+task.spawn(function()
     while true do
         task.wait(0.1)
-        if not AutoFarm then 
+
+        if not AutoFarm then
             TargetMob = nil
             isTweening = false
-            continue 
+            continue
         end
 
         local root = GetRoot()
         local quest = GetQuest()
         if not root or not quest then continue end
-        local spawnObj = GetPlayerSpawn()
-        local isSpawnCorrect = false
-        
-        if spawnObj then
-            local dist = (spawnObj.Position - quest.posspow).Magnitude
-            if dist < 60 then
-                isSpawnCorrect = true
-            end
-        end
+        local spawn = GetPlayerSpawn()
+        local correctSpawn = spawn and (spawn.Position - quest.posspow).Magnitude < 60
 
-        if not isSpawnCorrect then
-            TargetMob = nil
-            if (root.Position - quest.posspow).Magnitude > 15 then
-                if not isTweening then TweenTo(quest.posspow) end
-            else
-                isTweening = false
-                AutoScanSave() 
-                task.wait(1)
-            end
+        if not correctSpawn then
+            if not isTweening then TweenTo(quest.posspow) end
+            AutoScanSave()
             continue
-        end
+			end
+        local hasQ = HandleQuest(quest)
 
-        local hasQ = player.PlayerGui:FindFirstChild("QuestUI") and player.PlayerGui.QuestUI.Quest.Visible
         if not hasQ then
-            TargetMob = nil
             if (root.Position - quest.posQ).Magnitude > 12 then
-                if not isTweening then TweenTo(quest.posQ + Vector3.new(0, 3, 0)) end
+                if not isTweening then TweenTo(quest.posQ + Vector3.new(0,3,0)) end
             else
-                isTweening = false
                 ReplicatedStorage.RemoteEvents.QuestAccept:FireServer(quest.NPC)
-                task.wait(1.5)
+                task.wait(1.2)
             end
             continue
         end
@@ -507,27 +512,22 @@ task.spawn(function()
 
         if monster then
             local mobRoot = monster.HumanoidRootPart
+
             if (root.Position - mobRoot.Position).Magnitude > 50 then
-                TargetMob = nil
-                if not isTweening then TweenTo(mobRoot.Position + Vector3.new(0, FarmDistance, 0)) end
+                if not isTweening then
+                    TweenTo(mobRoot.Position + Vector3.new(0, FarmDistance, 0))
+                end
             else
-                isTweening = false
                 TargetMob = monster
                 ReplicatedStorage.CombatSystem.Remotes.RequestHit:FireServer()
             end
         else
             TargetMob = nil
-
-            if (root.Position - quest.posQ).Magnitude > 15 then
-                if not isTweening then
-                    TweenTo(quest.posQ + Vector3.new(0,3,0))
-                end
-            end
-        end   
-
-    end   
-
+        end
+    end
 end)
+
+
 
 
 -- ----------
@@ -896,36 +896,32 @@ local Tab = Window:Tab({Title = "MAIN", Icon = "scan-search"})
 Tab:Section({ 
     Title = "FARM Level",
 })
-
 Tab:Toggle({
     Title = "Auto Farm Level 0-MAX",
-	Desc = "ออโต้ฟามเวล0ถึงเวลตัน",
     Value = AutoFarm,
-    Callback = function(state) 
+    Callback = function(state)
         AutoFarm = state
         Save("AutoFarm", state)
     end
 })
 
 Tab:Dropdown({
-    Title = "Farm Level Mode",
-	Desc = "เลือกโหมดการฟาม",
-    Values = { "Above", "Behind", "Below" },
+    Title = "Farm Mode",
+    Values = {"Above","Behind","Below"},
     Value = FarmMode,
-    Callback = function(option) 
-        FarmMode = option
-        Save("FarmMode", option)
+    Callback = function(v)
+        FarmMode = v
+        Save("FarmMode", v)
     end
 })
 
 Tab:Slider({
-    Title = "Attack Distance (AutoFarm Lv)",
-	Desc = "ระยะห่างจากมอน(ของฟามเวล)",
+    Title = "Distance",
     Step = 1,
-    Value = { Min = 5, Max = 30, Default = FarmDistance },
-    Callback = function(value)
-        FarmDistance = value
-        Save("FarmDistance", value)
+    Value = {Min=5,Max=30,Default=FarmDistance},
+    Callback = function(v)
+        FarmDistance = v
+        Save("FarmDistance", v)
     end
 })
 
