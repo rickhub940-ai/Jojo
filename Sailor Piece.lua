@@ -305,6 +305,7 @@ local QuestData = {
 {
         LV = 8000,
         NPC = "QuestNPC14",
+		NQ = "Slime Warrior Hunter",
         posspow = Vector3.new(-988.14, -3.80, 252.10),
         posQ = Vector3.new(-1186.31, 18.12, 338.01),
         NM = {"Slime1","Slime2","Slime3","Slime4","Slime5"}
@@ -312,6 +313,7 @@ local QuestData = {
 {
         LV = 9000,
         NPC = "QuestNPC15",
+		NQ = "Academy Challenge",
         posspow = Vector3.new(1036.72, -3.70, 1090.25),
         posQ = Vector3.new(1029.79, 1.46, 1241.60),
         NM = {"AcademyTeacher1","AcademyTeacher2","AcademyTeacher3","AcademyTeacher4","AcademyTeacher5"}
@@ -319,6 +321,7 @@ local QuestData = {
 {
         LV = 10000,
         NPC = "QuestNPC16",
+		NQ = "Blade Masters",
         posspow = Vector3.new(-958.98, -2.08, -1060.27),
         posQ = Vector3.new(-1165.34, 2.50, -1191.39),
         NM = {"Swordsman1","Swordsman2","Swordsman3","Swordsman4","Swordsman5"}
@@ -326,6 +329,7 @@ local QuestData = {
 	{
         LV = 11500,
         NPC = "QuestNPC18",
+		NQ = "Ninja Slayer",
         posspow = Vector3.new(-1620.59, 8.51, -655.70),
         posQ = Vector3.new(-1787.12, 6.93, -742.73),
         NM = {"Ninja1","Ninja2","Ninja3","Ninja4","Ninja5"}
@@ -333,11 +337,13 @@ local QuestData = {
 	{
         LV = 12000,
         NPC = "QuestNPC19",
+		NQ = "Arena Takedown",
         posspow = Vector3.new(105.86, -5.27, 1624.03),
         posQ = Vector3.new(67.77, -1.14, 1760.41),
         NM = {"ArenaFighter1","ArenaFighter2","ArenaFighter3","ArenaFighter4","ArenaFighter5"}
 	}
 }
+
 
 local function GetRoot()
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
