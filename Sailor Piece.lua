@@ -194,11 +194,13 @@ local AutoFarm = Get("AutoFarm", false)
 local FarmMode = Get("FarmMode", "Above")
 local FarmDistance = Get("FarmDistance", 10)
 
+
+
 local QuestData = {
     {
         LV = 0,
         NPC = "QuestNPC1",
-		NQ = "Thief",
+		NQ = "Thief Hunter",
         posspow = Vector3.new(-91.99,-3.46,-240.31),
         posQ = Vector3.new(169.20,16.33,-214.33),
         NM = {"Thief1","Thief2","Thief3","Thief4","Thief5"}
@@ -206,6 +208,7 @@ local QuestData = {
     {
         LV = 100,
         NPC = "QuestNPC2",
+		NQ = "Thief Boss",
         posspow = Vector3.new(-91.99,-3.46,-240.31),
         posQ = Vector3.new(-6.37,-2.58,-200.49),
         NM = {"ThiefBoss"}
@@ -213,6 +216,7 @@ local QuestData = {
     {
         LV = 250,
         NPC = "QuestNPC3",
+		NQ = "Monkey Hunter",
         posspow = Vector3.new(-443.18,-3.79,370.63),
         posQ = Vector3.new(-519.88,-1.46,432.28),
         NM = {"Monkey1","Monkey2","Monkey3","Monkey4","Monkey5"}
@@ -220,6 +224,7 @@ local QuestData = {
     {
         LV = 500,
         NPC = "QuestNPC4",
+		NQ = "Monkey Boss",
         posspow = Vector3.new(-443.18,-3.79,370.63),
         posQ = Vector3.new(-469.61,18.80,480.29),
         NM = {"MonkeyBoss"}
@@ -227,6 +232,7 @@ local QuestData = {
     {
         LV = 750,
         NPC = "QuestNPC5",
+		NQ = "Desert Bandit Hunter",
         posspow = Vector3.new(-690.42,-3.53,-349.94),
         posQ = Vector3.new(-689.33,-2.43,-458.65),
         NM = {"DesertBandit1","DesertBandit2","DesertBandit3","DesertBandit4","DesertBandit5"}
@@ -234,6 +240,7 @@ local QuestData = {
     {
         LV = 1000,
         NPC = "QuestNPC6",
+		NQ = "Desert Bandit Boss",
         posspow = Vector3.new(-690.42,-3.53,-349.94),
         posQ = Vector3.new(-861.01,-4.22,-386.42),
         NM = {"DesertBoss"}
@@ -241,6 +248,7 @@ local QuestData = {
     {
         LV = 1500,
         NPC = "QuestNPC7",
+		NQ = "Frost Rogue Hunter",
         posspow = Vector3.new(-233.31,-3.48,-976.06),
         posQ = Vector3.new(-388.83,-1.67,-947.04),
         NM = {"FrostRogue1","FrostRogue2","FrostRogue3","FrostRogue4","FrostRogue5"}
@@ -248,6 +256,7 @@ local QuestData = {
     {
         LV = 2000,
         NPC = "QuestNPC8",
+		NQ = "Winter Warden Boss",
         posspow = Vector3.new(-233.31,-3.48,-976.06),
         posQ = Vector3.new(-552.13,22.42,-1027.08),
         NM = {"SnowBoss"}
@@ -255,6 +264,7 @@ local QuestData = {
     {
         LV = 3000,
         NPC = "QuestNPC9",
+		NQ = "Sorcerer Hunter",
         posspow = Vector3.new(1360.44,8.84,246.16),
         posQ = Vector3.new(1420.58,8.84,374.21),
         NM = {"Sorcerer1","Sorcerer2","Sorcerer3","Sorcerer4","Sorcerer5"}
@@ -262,6 +272,7 @@ local QuestData = {
     {
         LV = 4000,
         NPC = "QuestNPC10",
+		NQ = "Panda Sorcerer Boss",
         posspow = Vector3.new(1360.44,8.84,246.16),
         posQ = Vector3.new(1606.04,8.84,428.96),
         NM = {"PandaMiniBoss"}
@@ -269,6 +280,7 @@ local QuestData = {
     {
         LV = 5000,
         NPC = "QuestNPC11",
+		NQ = "Hollow Hunter",
         posspow = Vector3.new(-485.79,-3.74,938.70),
         posQ = Vector3.new(-287.02,-3.37,1040.38),
         NM = {"Hollow1","Hollow2","Hollow3","Hollow4","Hollow5"}
@@ -277,6 +289,7 @@ local QuestData = {
 {
         LV = 6250,
         NPC = "QuestNPC12",
+		NQ = "Strong Sorcerer Hunter",
         posspow = Vector3.new(362.39, -2.35, -1631.44),
         posQ = Vector3.new(627.67, 1.89, -1611.04),
         NM = {"StrongSorcerer1","StrongSorcerer2","StrongSorcerer3","StrongSorcerer4","StrongSorcerer5"}
@@ -284,6 +297,7 @@ local QuestData = {
 {
         LV = 7000,
         NPC = "QuestNPC13",
+		NQ = "Curse Hunter",
         posspow = Vector3.new(362.39, -2.35, -1631.44),
         posQ = Vector3.new(-19.17, 1.89, -1983.12),
         NM = {"Curse1","Curse2","Curse3","Curse4","Curse5"}
