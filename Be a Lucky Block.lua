@@ -150,3 +150,120 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local RANGE = 50
+
+local TP_ESCAPE = Vector3.new(759.45, 38.71, -2136.69)
+local TP_SAFE   = Vector3.new(708.67, 38.71, -2115.42)
+
+local Enabled = false
+local lastState = nil
+
+local function onCharacterAdded(char)
+    lastState = nil
+end
+
+if player.Character then
+    onCharacterAdded(player.Character)
+end
+player.CharacterAdded:Connect(onCharacterAdded)
+
+
+local function getClosestBoss()
+    local bossFolder = workspace:FindFirstChild("BossSpawns")
+    if not bossFolder then return nil end
+
+    local char = player.Character
+    if not char then return nil end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+
+    local closestBoss = nil
+    local shortestDistance = math.huge
+
+    for _, base in pairs(bossFolder:GetChildren()) do
+        if base:IsA("Model") then
+            local bossModel = base:FindFirstChildWhichIsA("Model")
+            if bossModel then
+                local bossHRP = bossModel:FindFirstChild("HumanoidRootPart")
+                local humanoid = bossModel:FindFirstChild("Humanoid")
+
+                if bossHRP and humanoid then
+                    local dist = (hrp.Position - bossHRP.Position).Magnitude
+                    if dist < shortestDistance then
+                        shortestDistance = dist
+                        closestBoss = bossModel
+                    end
+                end
+            end
+        end
+    end
+
+    return closestBoss, shortestDistance
+end
+RunService.Heartbeat:Connect(function()
+    if not Enabled then return end
+
+    if not player.Character then return end
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then return end
+
+    local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local testFolder = workspace:FindFirstChild("robloxtestscrip_4")
+    local rootPart = testFolder and testFolder:FindFirstChild("RootPart")
+
+    local runningModels = workspace:FindFirstChild("RunningModels")
+    local myModule = runningModels and runningModels:FindFirstChild(tostring(player.UserId))
+
+    if rootPart then
+        hrp.CFrame = CFrame.new(TP_ESCAPE)
+        return
+    end
+    if testFolder and not rootPart and not myModule then
+        hrp.CFrame = CFrame.new(TP_SAFE)
+        return
+    end
+    if myModule then
+        if myModule:GetAttribute("MovementSpeed") ~= 999999 then
+            myModule:SetAttribute("MovementSpeed", 999999)
+        end
+        return
+    end
+    local boss, distance = getClosestBoss()
+    if not boss then return end
+
+    local bossHumanoid = boss:FindFirstChild("Humanoid")
+    if not bossHumanoid then return end
+    if distance <= RANGE then
+        if bossHumanoid.WalkSpeed ~= 0 then
+            bossHumanoid.WalkSpeed = 0
+        end
+    else
+        if bossHumanoid.WalkSpeed == 0 then
+            bossHumanoid.WalkSpeed = 16
+        end
+    end
+end)
+
+local Tab = Window:Tab({Title = "MAIN", Icon = "user"})
+
+Tab:Toggle({
+    Title = "Auto Farm",
+    Desc = "ออโต้ฟาม",
+    Default = false,
+    Callback = function(state)
+        Enabled = state
+        if not state then
+            lastState = nil
+        end
+    end
+})
