@@ -5,63 +5,62 @@ local WindUI = loadstring(game:HttpGet(
 local player = game.Players.LocalPlayer
 
 
-local BLUE   = Color3.fromHex("#3BA9FF")
-local SKY    = Color3.fromHex("#6FD3FF")
-local YELLOW = Color3.fromHex("#FFD93B")
-local WHITE  = Color3.fromHex("#FFFFFF")
+--// COLORS (โทน Xenon Hub)
+local TEAL1  = Color3.fromHex("#00D4FF")
+local TEAL2  = Color3.fromHex("#00FFA3")
+local DARK1  = Color3.fromHex("#0E1A22")
+local DARK2  = Color3.fromHex("#12232E")
+local DARK3  = Color3.fromHex("#162B38")
+local WHITE  = Color3.fromHex("#EAFBFF")
 
-local DARK_BG1 = Color3.fromHex("#0A1628")
-local DARK_BG2 = Color3.fromHex("#0F223F")
-
-local MAIN_GRADIENT = WindUI:Gradient({
-    ["0"]   = {Color = BLUE, Transparency = 0},
-    ["50"]  = {Color = SKY, Transparency = 0},
-    ["100"] = {Color = YELLOW, Transparency = 0},
+--// GRADIENTS
+local MAIN = WindUI:Gradient({
+    ["0"] = {Color = TEAL1, Transparency = 0},
+    ["100"] = {Color = TEAL2, Transparency = 0},
 },{Rotation = 45})
 
-local BACKGROUND_GRADIENT = WindUI:Gradient({
-    ["0"]   = {Color = BLUE, Transparency = 0.35},
-    ["50"]  = {Color = SKY, Transparency = 0.35},
-    ["100"] = {Color = YELLOW, Transparency = 0.35},
-},{Rotation = 45})
-
-local DARK_TAB_GRADIENT = WindUI:Gradient({
-    ["0"]   = {Color = DARK_BG1, Transparency = 0},
-    ["100"] = {Color = DARK_BG2, Transparency = 0},
+local BG = WindUI:Gradient({
+    ["0"] = {Color = DARK1, Transparency = 0.25},
+    ["100"] = {Color = DARK2, Transparency = 0.25},
 },{Rotation = 90})
 
---// =========================
+local TAB = WindUI:Gradient({
+    ["0"] = {Color = DARK2, Transparency = 0.1},
+    ["100"] = {Color = DARK3, Transparency = 0.1},
+},{Rotation = 90})
+
 --// THEME
---// =========================
 WindUI:AddTheme({
-    Name = "RickHUBTheme",
+    Name = "XenonLike",
 
-    Accent = MAIN_GRADIENT,
-    Hover  = MAIN_GRADIENT,
+    Accent = MAIN,
+    Hover = MAIN,
 
-    Background = BACKGROUND_GRADIENT,
-    BackgroundTransparency = 0.35,
+    Background = BG,
+    BackgroundTransparency = 0.3,
 
-    Outline = YELLOW,
+    Outline = Color3.fromRGB(255,255,255), -- เบามาก
+    OutlineTransparency = 0.9,
+
     Text = WHITE,
     Icon = WHITE,
 
-    WindowBackground = BACKGROUND_GRADIENT,
+    WindowBackground = BG,
     WindowShadow = Color3.fromRGB(0,0,0),
 
-    TabBackground = DARK_TAB_GRADIENT,
+    TabBackground = TAB,
     TabTitle = WHITE,
     TabIcon = WHITE,
 
-    ElementBackground = DARK_TAB_GRADIENT,
+    ElementBackground = TAB,
     ElementTitle = WHITE,
 
-    Button = MAIN_GRADIENT,
-    Toggle = MAIN_GRADIENT,
-    Slider = MAIN_GRADIENT,
+    Button = MAIN,
+    Toggle = MAIN,
+    Slider = MAIN,
 })
 
-WindUI:SetTheme("RickHUBTheme")
+WindUI:SetTheme("XenonLike")
 
 local avatar = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="
 ..player.UserId.."&size=420x420&format=Png"
@@ -72,7 +71,7 @@ local Window = WindUI:CreateWindow({
     Author = "Author[ 009.exe ]",
     Folder = "RICK HUB",
     Size = UDim2.fromOffset(730, 410),
-    Theme = "RickHUBTheme",
+    Theme = "XenonLike",
     Transparent = true,
     Resizable = true,
 
