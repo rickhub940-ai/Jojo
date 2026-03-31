@@ -144,3 +144,102 @@ UserInputService.InputBegan:Connect(function(input, gp)
 end)
 
 
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- ค่าเริ่มต้น
+local DefaultSpeed = 16
+local DefaultJumpPower = 50
+
+-- ค่าที่ปรับจาก Slider
+local BoostSpeed = 70
+local BoostJumpPower = 100
+
+local SpeedEnabled = false
+local JumpEnabled = false
+
+local function apply()
+    local char = player.Character
+    if not char then return end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+
+    -- 🏃‍♂️ Speed
+    hum.WalkSpeed = SpeedEnabled and BoostSpeed or DefaultSpeed
+
+    -- 🦘 Jump
+    hum.UseJumpPower = true
+    hum.JumpPower = JumpEnabled and BoostJumpPower or DefaultJumpPower
+end
+
+-- 🔁 กันโดนรีเซ็ต
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        apply()
+    end
+end)
+
+-- 🔄 ตอนเกิดใหม่
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    apply()
+end)
+
+
+local MainTab = Window:Tab({Title = "Main", Icon = "user"})
+
+
+MainTab:Toggle({
+    Title = "Speed",
+    Desc = "เปิด/ปิด วิ่งไว",
+    Default = false,
+    Callback = function(state)
+        SpeedEnabled = state
+        apply()
+    end
+})
+
+-- 🎚️ Slider Speed
+MainTab:Slider({
+    Title = "Speed Value",
+    Desc = "ปรับความเร็ว",
+    Step = 1,
+    Value = {
+        Min = 20,
+        Max = 120,
+        Default = 70,
+    },
+    Callback = function(value)
+        BoostSpeed = value
+        apply()
+    end
+})
+
+
+MainTab:Toggle({
+    Title = "Jump",
+    Desc = "กระโดดสูง",
+    Default = false,
+    Callback = function(state)
+        JumpEnabled = state
+        apply()
+    end
+})
+MainTab:Slider({
+    Title = "Jump Value",
+    Desc = "ปรับความสูงกระโดด",
+    Step = 1,
+    Value = {
+        Min = 50,
+        Max = 200,
+        Default = 100,
+    },
+    Callback = function(value)
+        BoostJumpPower = value
+        apply()
+    end
+})
