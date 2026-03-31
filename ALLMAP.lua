@@ -276,19 +276,14 @@ MainTab:Toggle({
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 
--- ⚙️ ตั้งค่า
 local flySpeed = 100
-local flyEnabled = false
 local flying = false
-local currentKeybind = Enum.KeyCode.F
 
-local bodyVelocity, bodyGyro, flyConnection
+local bv, bg, conn
 
--- 🧠 เริ่มบิน
 local function startFly()
     local char = player.Character
     if not char then return end
@@ -300,72 +295,50 @@ local function startFly()
     flying = true
     hum.PlatformStand = true
 
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-    bodyVelocity.Velocity = Vector3.zero
-    bodyVelocity.Parent = root
+    bv = Instance.new("BodyVelocity")
+    bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    bv.Parent = root
 
-    bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-    bodyGyro.P = 1e4
-    bodyGyro.CFrame = root.CFrame
-    bodyGyro.Parent = root
+    bg = Instance.new("BodyGyro")
+    bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.CFrame = root.CFrame
+    bg.Parent = root
 
-    flyConnection = RunService.Heartbeat:Connect(function()
+    conn = RunService.Heartbeat:Connect(function()
         if not flying then return end
 
         local cam = workspace.CurrentCamera
         local moveDir = hum.MoveDirection
 
         if moveDir.Magnitude > 0 then
-            bodyVelocity.Velocity = cam.CFrame:VectorToWorldSpace(moveDir) * flySpeed
+            bv.Velocity = cam.CFrame:VectorToWorldSpace(moveDir) * flySpeed
         else
-            bodyVelocity.Velocity = Vector3.zero
+            bv.Velocity = Vector3.zero
         end
 
-        bodyGyro.CFrame = cam.CFrame
+        bg.CFrame = cam.CFrame
     end)
 end
 
--- 🛑 หยุดบิน
 local function stopFly()
     flying = false
 
-    if flyConnection then flyConnection:Disconnect() end
-    if bodyVelocity then bodyVelocity:Destroy() end
-    if bodyGyro then bodyGyro:Destroy() end
+    if conn then conn:Disconnect() end
+    if bv then bv:Destroy() end
+    if bg then bg:Destroy() end
 
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.PlatformStand = false
-        end
-    end
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.PlatformStand = false end
 end
-
--- 🔘 Toggle จาก UI
 MainTab:Toggle({
-    Title = "Fly",
-    Desc = "บิน (กด F)",
+    Title = "Fly normol",
+    Desc = "บินปกติ",
     Default = false,
     Callback = function(state)
-        flyEnabled = state
-        if not state then
+        if state then
+            startFly()
+        else
             stopFly()
         end
     end
 })
-
--- ⌨️ ปุ่มกด
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-
-    if input.KeyCode == currentKeybind and flyEnabled then
-        if flying then
-            stopFly()
-        else
-            startFly()
-        end
-    end
-end)
