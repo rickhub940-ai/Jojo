@@ -5,20 +5,13 @@ local WindUI = loadstring(game:HttpGet(
 local player = game.Players.LocalPlayer
 
 
---// COLORS (โทน Xenon Hub)
-local TEAL1  = Color3.fromHex("#00D4FF")
-local TEAL2  = Color3.fromHex("#00FFA3")
-local DARK1  = Color3.fromHex("#0E1A22")
-local DARK2  = Color3.fromHex("#12232E")
-local DARK3  = Color3.fromHex("#162B38")
-local WHITE  = Color3.fromHex("#EAFBFF")
+--// COLORS (เทาใส)
+local DARK1 = Color3.fromHex("#1E1E1E")
+local DARK2 = Color3.fromHex("#2A2A2A")
+local DARK3 = Color3.fromHex("#242424")
+local WHITE = Color3.fromHex("#FFFFFF")
 
---// GRADIENTS
-local MAIN = WindUI:Gradient({
-    ["0"] = {Color = TEAL1, Transparency = 0},
-    ["100"] = {Color = TEAL2, Transparency = 0},
-},{Rotation = 45})
-
+--// GRADIENT (เรียบมาก)
 local BG = WindUI:Gradient({
     ["0"] = {Color = DARK1, Transparency = 0.25},
     ["100"] = {Color = DARK2, Transparency = 0.25},
@@ -31,16 +24,16 @@ local TAB = WindUI:Gradient({
 
 --// THEME
 WindUI:AddTheme({
-    Name = "XenonLike",
+    Name = "XenonReal",
 
-    Accent = MAIN,
-    Hover = MAIN,
+    Accent = WHITE, -- ไม่มีสีจัด
+    Hover = WHITE,
 
     Background = BG,
-    BackgroundTransparency = 0.3,
+    BackgroundTransparency = 0.35,
 
-    Outline = Color3.fromRGB(255,255,255), -- เบามาก
-    OutlineTransparency = 0.9,
+    Outline = Color3.fromRGB(255,255,255),
+    OutlineTransparency = 0.92, -- จางมาก
 
     Text = WHITE,
     Icon = WHITE,
@@ -55,12 +48,12 @@ WindUI:AddTheme({
     ElementBackground = TAB,
     ElementTitle = WHITE,
 
-    Button = MAIN,
-    Toggle = MAIN,
-    Slider = MAIN,
+    Button = TAB,
+    Toggle = TAB,
+    Slider = TAB,
 })
 
-WindUI:SetTheme("XenonLike")
+WindUI:SetTheme("XenonReal")
 
 local avatar = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="
 ..player.UserId.."&size=420x420&format=Png"
@@ -71,7 +64,7 @@ local Window = WindUI:CreateWindow({
     Author = "Author[ 009.exe ]",
     Folder = "RICK HUB",
     Size = UDim2.fromOffset(730, 410),
-    Theme = "XenonLike",
+    Theme = "XenonReal",
     Transparent = true,
     Resizable = true,
 
