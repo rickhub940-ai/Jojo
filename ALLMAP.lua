@@ -190,12 +190,33 @@ player.CharacterAdded:Connect(function()
 end)
 
 
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local InfiniteJumpEnabled = false
+
+-- 🦘 ทำงานตอนกดปุ่มกระโดด
+UserInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local char = player.Character
+        if not char then return end
+
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- 🔘 Toggle
+
 local MainTab = Window:Tab({Title = "Main", Icon = "user"})
 
 
 MainTab:Toggle({
-    Title = "Speed",
-    Desc = "เปิด/ปิด วิ่งไว",
+    Title = "walkSpeed",
+    Desc = "วิ่งไว",
     Default = false,
     Callback = function(state)
         SpeedEnabled = state
@@ -241,5 +262,14 @@ MainTab:Slider({
     Callback = function(value)
         BoostJumpPower = value
         apply()
+    end
+})
+
+MainTab:Toggle({
+    Title = "Infinite Jump",
+    Desc = "กระโดดไม่จำกัด",
+    Default = false,
+    Callback = function(state)
+        InfiniteJumpEnabled = state
     end
 })
