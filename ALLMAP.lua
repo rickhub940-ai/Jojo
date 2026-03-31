@@ -279,11 +279,35 @@ local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 
-local flySpeed = 100
+-- ⚙️ CONFIG (เหมือนของเดิม)
+local flySpeed = 50
+local rotationSpeed = 0.03
+local noclip = true
+
 local flying = false
+local bv, bg, conn, noclipConn
+local lastLook = Vector3.new(0,0,-1)
 
-local bv, bg, conn
+-- 👻 noclip
+local function enableNoclip()
+    noclipConn = RunService.Stepped:Connect(function()
+        if not flying then return end
+        local char = player.Character
+        if char then
+            for _,v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end)
+end
 
+local function disableNoclip()
+    if noclipConn then noclipConn:Disconnect() end
+end
+
+-- 🚀 เริ่มบิน (เหมือน V4)
 local function startFly()
     local char = player.Character
     if not char then return end
@@ -296,43 +320,67 @@ local function startFly()
     hum.PlatformStand = true
 
     bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    bv.MaxForce = Vector3.new(9e9,9e9,9e9)
     bv.Parent = root
 
     bg = Instance.new("BodyGyro")
-    bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
+    bg.P = 1e4
     bg.CFrame = root.CFrame
     bg.Parent = root
+
+    local cam = workspace.CurrentCamera
 
     conn = RunService.Heartbeat:Connect(function()
         if not flying then return end
 
-        local cam = workspace.CurrentCamera
         local moveDir = hum.MoveDirection
+        local target = Vector3.zero
 
         if moveDir.Magnitude > 0 then
-            bv.Velocity = cam.CFrame:VectorToWorldSpace(moveDir) * flySpeed
-        else
-            bv.Velocity = Vector3.zero
+            local dir = cam.CFrame:VectorToWorldSpace(moveDir)
+            target = dir.Unit * flySpeed
         end
 
-        bg.CFrame = cam.CFrame
+        bv.Velocity = bv.Velocity:Lerp(target, 0.25)
+
+        -- 🔄 หมุนเนียนเหมือนเดิม
+        local look = cam.CFrame.LookVector
+        lastLook = lastLook:Lerp(look, rotationSpeed)
+        bg.CFrame = CFrame.lookAt(root.Position, root.Position + lastLook)
+
+        if target.Magnitude == 0 then
+            bv.Velocity = Vector3.zero
+            root.AssemblyLinearVelocity = Vector3.zero
+        end
     end)
+
+    if noclip then enableNoclip() end
 end
 
+-- 🛑 หยุดบิน
 local function stopFly()
     flying = false
 
     if conn then conn:Disconnect() end
     if bv then bv:Destroy() end
     if bg then bg:Destroy() end
+    disableNoclip()
 
-    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.PlatformStand = false end
+    local char = player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.PlatformStand = false
+            hum:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end
 end
+
+-- 🔘 Toggle (ของคุณ)
 MainTab:Toggle({
-    Title = "Fly normol",
-    Desc = "บินปกติ",
+    Title = "Fly",
+    Desc = "normal",
     Default = false,
     Callback = function(state)
         if state then
