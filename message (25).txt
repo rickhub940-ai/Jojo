@@ -4330,7 +4330,7 @@ local function Func_ArtifactAutomation()
 end
 
 local Window = Library:CreateWindow({
-	Title = "celina",
+	Title = "RICK HUBV2 [ ReSkin🌚🌝 ]",
 	Footer = "" .. assetName .. " | by celina | LOVE YOU",
 	NotifySide = "Right",
     Icon = tostring(theChosenOne),
