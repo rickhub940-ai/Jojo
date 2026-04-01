@@ -231,7 +231,8 @@ end)
 
 
 -- Esp All
--- SERVICES
+
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
@@ -240,23 +241,19 @@ local LocalPlayer = Players.LocalPlayer
 local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local LocalHRP = LocalCharacter:WaitForChild("HumanoidRootPart")
 
--- 🔥 SETTINGS (Toggle)
 local ESPSettings = {
-    Box = true,
-    Name = true,
-    Distance = true,
-    Health = true,
-    Item = true
+    Box = false,
+    Name = false,
+    Distance = false,
+    Health = false,
+    Item = false
 }
 
--- ESP SYSTEM
 local ESP = {}
 ESP.__index = ESP
 
 function ESP.new()
-    local self = setmetatable({}, ESP)
-    self.cache = {}
-    return self
+    return setmetatable({cache = {}}, ESP)
 end
 
 function ESP:createDrawing(type, props)
@@ -275,35 +272,30 @@ function ESP:createComponents()
             Filled = false,
             Visible = false
         }),
-
         Name = self:createDrawing("Text", {
             Size = 16,
             Center = true,
             Outline = true,
             Visible = false
         }),
-
         Distance = self:createDrawing("Text", {
             Size = 14,
             Center = true,
             Outline = true,
             Visible = false
         }),
-
         Item = self:createDrawing("Text", {
             Size = 14,
             Center = true,
             Outline = true,
             Visible = false
         }),
-
         HealthOutline = self:createDrawing("Square", {
             Thickness = 1,
             Color = Color3.new(0,0,0),
             Filled = false,
             Visible = false
         }),
-
         Health = self:createDrawing("Square", {
             Thickness = 1,
             Filled = true,
@@ -325,65 +317,52 @@ function ESP:update(comp, char, plr)
 
     local dist = (LocalHRP.Position - hrp.Position).Magnitude
 
-    -- 📏 ขนาดกล่อง auto
     local scale = 1 / (pos.Z * math.tan(math.rad(Camera.FieldOfView/2)) * 2) * 100
     local w = math.floor(Camera.ViewportSize.Y / 25 * scale)
     local h = math.floor(Camera.ViewportSize.X / 27 * scale)
 
     local boxPos = Vector2.new(pos.X - w/2, pos.Y - h/2)
 
-    -- 🟩 BOX
+    comp.Box.Visible = ESPSettings.Box
     if ESPSettings.Box then
         comp.Box.Size = Vector2.new(w,h)
         comp.Box.Position = boxPos
-        comp.Box.Visible = true
-    else
-        comp.Box.Visible = false
     end
 
-    -- 🧠 NAME
+    comp.Name.Visible = ESPSettings.Name
     if ESPSettings.Name then
         comp.Name.Text = plr.Name
         comp.Name.Position = Vector2.new(pos.X, pos.Y - h/2 - 14)
-        comp.Name.Visible = true
-    else
-        comp.Name.Visible = false
+        if plr.Team and plr.TeamColor then
+            comp.Name.Color = plr.TeamColor.Color
+        else
+            comp.Name.Color = Color3.fromRGB(255,255,255)
+        end
     end
 
-    -- 📏 DISTANCE
+    comp.Distance.Visible = ESPSettings.Distance
     if ESPSettings.Distance then
         comp.Distance.Text = "["..math.floor(dist).."]"
         comp.Distance.Position = Vector2.new(pos.X, pos.Y + h/2 + 2)
-        comp.Distance.Visible = true
-    else
-        comp.Distance.Visible = false
     end
 
-    -- 🎒 ITEM
+    comp.Item.Visible = ESPSettings.Item
     if ESPSettings.Item then
         local tool = plr.Backpack:FindFirstChildOfClass("Tool") or char:FindFirstChildOfClass("Tool")
         comp.Item.Text = tool and tool.Name or "No Tool"
         comp.Item.Position = Vector2.new(pos.X, pos.Y + h/2 + 16)
-        comp.Item.Visible = true
-    else
-        comp.Item.Visible = false
     end
 
-    -- ❤️ HEALTH
+    comp.Health.Visible = ESPSettings.Health
+    comp.HealthOutline.Visible = ESPSettings.Health
+
     if ESPSettings.Health then
         local hp = hum.Health / hum.MaxHealth
-
         comp.HealthOutline.Size = Vector2.new(4,h)
         comp.HealthOutline.Position = Vector2.new(boxPos.X - 6, boxPos.Y)
-        comp.HealthOutline.Visible = true
-
         comp.Health.Size = Vector2.new(2, h * hp)
         comp.Health.Position = Vector2.new(boxPos.X - 5, boxPos.Y + h*(1-hp))
         comp.Health.Color = Color3.fromRGB(255*(1-hp),255*hp,0)
-        comp.Health.Visible = true
-    else
-        comp.Health.Visible = false
-        comp.HealthOutline.Visible = false
     end
 end
 
@@ -430,7 +409,6 @@ end)
 Players.PlayerRemoving:Connect(function(plr)
     esp:remove(plr)
 end)
-
 
 
 local MainTab = Window:Tab({Title = "Main", Icon = "user"})
@@ -527,7 +505,7 @@ local EspTab = Window:Tab({Title = "Esp", Icon = "eye"})
 
 EspTab:Toggle({
     Title = "ESP Box",
-    Default = true,
+    Default = false,
     Callback = function(v)
         ESPSettings.Box = v
     end
@@ -535,7 +513,7 @@ EspTab:Toggle({
 
 EspTab:Toggle({
     Title = "ESP Name",
-    Default = true,
+    Default = false,
     Callback = function(v)
         ESPSettings.Name = v
     end
@@ -543,7 +521,7 @@ EspTab:Toggle({
 
 EspTab:Toggle({
     Title = "ESP Distance",
-    Default = true,
+    Default = false,
     Callback = function(v)
         ESPSettings.Distance = v
     end
@@ -551,7 +529,7 @@ EspTab:Toggle({
 
 EspTab:Toggle({
     Title = "ESP Health",
-    Default = true,
+    Default = false,
     Callback = function(v)
         ESPSettings.Health = v
     end
@@ -559,7 +537,7 @@ EspTab:Toggle({
 
 EspTab:Toggle({
     Title = "ESP Item",
-    Default = true,
+    Default = false,
     Callback = function(v)
         ESPSettings.Item = v
     end
