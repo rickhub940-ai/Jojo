@@ -183,7 +183,6 @@ task.spawn(function()
     end
 end)
 
--- 🔄 ตอนเกิดใหม่
 player.CharacterAdded:Connect(function()
     task.wait(1)
     apply()
@@ -196,7 +195,7 @@ local player = Players.LocalPlayer
 
 local InfiniteJumpEnabled = false
 
--- 🦘 ทำงานตอนกดปุ่มกระโดด
+
 UserInputService.JumpRequest:Connect(function()
     if InfiniteJumpEnabled then
         local char = player.Character
@@ -209,7 +208,29 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
--- 🔘 Toggle
+-- --------------------------
+-- fly bypass api DayToDay2044
+-- -----------------------
+
+
+local API_Bypass = getgenv()
+API_Bypass["_CR.DayToDay2044_Fly"] = API_Bypass["_CR.DayToDay2044_Fly"] or false
+API_Bypass["_CR.DayToDay2044_Speed"] = API_Bypass["_CR.DayToDay2044_Speed"] or 100
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/SUNRTX22/What_happen_dafak/refs/heads/main/Fly_API"))()
+
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.F then
+        API_Bypass["_CR.DayToDay2044_Fly"] = not API_Bypass["_CR.DayToDay2044_Fly"]
+    end
+end)
+
+
+
+
 
 local MainTab = Window:Tab({Title = "Main", Icon = "user"})
 
@@ -224,7 +245,7 @@ MainTab:Toggle({
     end
 })
 
--- 🎚️ Slider Speed
+
 MainTab:Slider({
     Title = "Speed Value",
     Desc = "ปรับความเร็ว",
@@ -274,119 +295,25 @@ MainTab:Toggle({
     end
 })
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
-local player = Players.LocalPlayer
-
--- ⚙️ CONFIG (เหมือนของเดิม)
-local flySpeed = 50
-local rotationSpeed = 0.03
-local noclip = true
-
-local flying = false
-local bv, bg, conn, noclipConn
-local lastLook = Vector3.new(0,0,-1)
-
--- 👻 noclip
-local function enableNoclip()
-    noclipConn = RunService.Stepped:Connect(function()
-        if not flying then return end
-        local char = player.Character
-        if char then
-            for _,v in pairs(char:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.CanCollide = false
-                end
-            end
-        end
-    end)
-end
-
-local function disableNoclip()
-    if noclipConn then noclipConn:Disconnect() end
-end
-
--- 🚀 เริ่มบิน (เหมือน V4)
-local function startFly()
-    local char = player.Character
-    if not char then return end
-
-    local root = char:FindFirstChild("HumanoidRootPart")
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not root or not hum then return end
-
-    flying = true
-    hum.PlatformStand = true
-
-    bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(9e9,9e9,9e9)
-    bv.Parent = root
-
-    bg = Instance.new("BodyGyro")
-    bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
-    bg.P = 1e4
-    bg.CFrame = root.CFrame
-    bg.Parent = root
-
-    local cam = workspace.CurrentCamera
-
-    conn = RunService.Heartbeat:Connect(function()
-        if not flying then return end
-
-        local moveDir = hum.MoveDirection
-        local target = Vector3.zero
-
-        if moveDir.Magnitude > 0 then
-            local dir = cam.CFrame:VectorToWorldSpace(moveDir)
-            target = dir.Unit * flySpeed
-        end
-
-        bv.Velocity = bv.Velocity:Lerp(target, 0.25)
-
-        -- 🔄 หมุนเนียนเหมือนเดิม
-        local look = cam.CFrame.LookVector
-        lastLook = lastLook:Lerp(look, rotationSpeed)
-        bg.CFrame = CFrame.lookAt(root.Position, root.Position + lastLook)
-
-        if target.Magnitude == 0 then
-            bv.Velocity = Vector3.zero
-            root.AssemblyLinearVelocity = Vector3.zero
-        end
-    end)
-
-    if noclip then enableNoclip() end
-end
-
--- 🛑 หยุดบิน
-local function stopFly()
-    flying = false
-
-    if conn then conn:Disconnect() end
-    if bv then bv:Destroy() end
-    if bg then bg:Destroy() end
-    disableNoclip()
-
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.PlatformStand = false
-            hum:ChangeState(Enum.HumanoidStateType.Running)
-        end
-    end
-end
-
--- 🔘 Toggle (ของคุณ)
 MainTab:Toggle({
-    Title = "Fly",
-    Desc = "normal",
-    Default = false,
-    Callback = function(state)
-        if state then
-            startFly()
-        else
-            stopFly()
-        end
+    Title = "Bypass Fly",
+    Desc = "บินแบบบายพาส",
+    Default = API_Bypass["_CR.DayToDay2044_Fly"],
+    Callback = function(v)
+        API_Bypass["_CR.DayToDay2044_Fly"] = v
+    end
+})
+
+MainTab:Slider({
+    Title = "Fly Speed",
+    Desc = "ความเร็วในการบิน",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 500,
+        Default = API_Bypass["_CR.DayToDay2044_Speed"]
+    },
+    Callback = function(v)
+        API_Bypass["_CR.DayToDay2044_Speed"] = tonumber(v) or 100
     end
 })
