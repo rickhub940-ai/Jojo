@@ -230,6 +230,207 @@ end)
 
 
 
+-- Esp All
+-- SERVICES
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+local LocalPlayer = Players.LocalPlayer
+local LocalCharacter = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local LocalHRP = LocalCharacter:WaitForChild("HumanoidRootPart")
+
+-- 🔥 SETTINGS (Toggle)
+local ESPSettings = {
+    Box = true,
+    Name = true,
+    Distance = true,
+    Health = true,
+    Item = true
+}
+
+-- ESP SYSTEM
+local ESP = {}
+ESP.__index = ESP
+
+function ESP.new()
+    local self = setmetatable({}, ESP)
+    self.cache = {}
+    return self
+end
+
+function ESP:createDrawing(type, props)
+    local d = Drawing.new(type)
+    for i,v in pairs(props) do
+        d[i] = v
+    end
+    return d
+end
+
+function ESP:createComponents()
+    return {
+        Box = self:createDrawing("Square", {
+            Thickness = 1,
+            Color = Color3.fromRGB(255,255,255),
+            Filled = false,
+            Visible = false
+        }),
+
+        Name = self:createDrawing("Text", {
+            Size = 16,
+            Center = true,
+            Outline = true,
+            Visible = false
+        }),
+
+        Distance = self:createDrawing("Text", {
+            Size = 14,
+            Center = true,
+            Outline = true,
+            Visible = false
+        }),
+
+        Item = self:createDrawing("Text", {
+            Size = 14,
+            Center = true,
+            Outline = true,
+            Visible = false
+        }),
+
+        HealthOutline = self:createDrawing("Square", {
+            Thickness = 1,
+            Color = Color3.new(0,0,0),
+            Filled = false,
+            Visible = false
+        }),
+
+        Health = self:createDrawing("Square", {
+            Thickness = 1,
+            Filled = true,
+            Visible = false
+        })
+    }
+end
+
+function ESP:update(comp, char, plr)
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+
+    local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+    if not onScreen then
+        self:hide(comp)
+        return
+    end
+
+    local dist = (LocalHRP.Position - hrp.Position).Magnitude
+
+    -- 📏 ขนาดกล่อง auto
+    local scale = 1 / (pos.Z * math.tan(math.rad(Camera.FieldOfView/2)) * 2) * 100
+    local w = math.floor(Camera.ViewportSize.Y / 25 * scale)
+    local h = math.floor(Camera.ViewportSize.X / 27 * scale)
+
+    local boxPos = Vector2.new(pos.X - w/2, pos.Y - h/2)
+
+    -- 🟩 BOX
+    if ESPSettings.Box then
+        comp.Box.Size = Vector2.new(w,h)
+        comp.Box.Position = boxPos
+        comp.Box.Visible = true
+    else
+        comp.Box.Visible = false
+    end
+
+    -- 🧠 NAME
+    if ESPSettings.Name then
+        comp.Name.Text = plr.Name
+        comp.Name.Position = Vector2.new(pos.X, pos.Y - h/2 - 14)
+        comp.Name.Visible = true
+    else
+        comp.Name.Visible = false
+    end
+
+    -- 📏 DISTANCE
+    if ESPSettings.Distance then
+        comp.Distance.Text = "["..math.floor(dist).."]"
+        comp.Distance.Position = Vector2.new(pos.X, pos.Y + h/2 + 2)
+        comp.Distance.Visible = true
+    else
+        comp.Distance.Visible = false
+    end
+
+    -- 🎒 ITEM
+    if ESPSettings.Item then
+        local tool = plr.Backpack:FindFirstChildOfClass("Tool") or char:FindFirstChildOfClass("Tool")
+        comp.Item.Text = tool and tool.Name or "No Tool"
+        comp.Item.Position = Vector2.new(pos.X, pos.Y + h/2 + 16)
+        comp.Item.Visible = true
+    else
+        comp.Item.Visible = false
+    end
+
+    -- ❤️ HEALTH
+    if ESPSettings.Health then
+        local hp = hum.Health / hum.MaxHealth
+
+        comp.HealthOutline.Size = Vector2.new(4,h)
+        comp.HealthOutline.Position = Vector2.new(boxPos.X - 6, boxPos.Y)
+        comp.HealthOutline.Visible = true
+
+        comp.Health.Size = Vector2.new(2, h * hp)
+        comp.Health.Position = Vector2.new(boxPos.X - 5, boxPos.Y + h*(1-hp))
+        comp.Health.Color = Color3.fromRGB(255*(1-hp),255*hp,0)
+        comp.Health.Visible = true
+    else
+        comp.Health.Visible = false
+        comp.HealthOutline.Visible = false
+    end
+end
+
+function ESP:hide(comp)
+    for _,v in pairs(comp) do
+        if typeof(v) == "table" then
+            for _,x in pairs(v) do x.Visible = false end
+        else
+            v.Visible = false
+        end
+    end
+end
+
+function ESP:remove(plr)
+    local comp = self.cache[plr]
+    if comp then
+        for _,v in pairs(comp) do
+            if typeof(v) == "table" then
+                for _,x in pairs(v) do x:Remove() end
+            else
+                v:Remove()
+            end
+        end
+        self.cache[plr] = nil
+    end
+end
+
+local esp = ESP.new()
+
+RunService.RenderStepped:Connect(function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local char = plr.Character
+            if char then
+                if not esp.cache[plr] then
+                    esp.cache[plr] = esp:createComponents()
+                end
+                esp:update(esp.cache[plr], char, plr)
+            end
+        end
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+    esp:remove(plr)
+end)
+
 
 
 local MainTab = Window:Tab({Title = "Main", Icon = "user"})
@@ -315,5 +516,51 @@ MainTab:Slider({
     },
     Callback = function(v)
         API_Bypass["_CR.DayToDay2044_Speed"] = tonumber(v) or 100
+    end
+})
+
+
+
+
+local EspTab = Window:Tab({Title = "Esp", Icon = "eye"})
+
+
+EspTab:Toggle({
+    Title = "ESP Box",
+    Default = true,
+    Callback = function(v)
+        ESPSettings.Box = v
+    end
+})
+
+EspTab:Toggle({
+    Title = "ESP Name",
+    Default = true,
+    Callback = function(v)
+        ESPSettings.Name = v
+    end
+})
+
+EspTab:Toggle({
+    Title = "ESP Distance",
+    Default = true,
+    Callback = function(v)
+        ESPSettings.Distance = v
+    end
+})
+
+EspTab:Toggle({
+    Title = "ESP Health",
+    Default = true,
+    Callback = function(v)
+        ESPSettings.Health = v
+    end
+})
+
+EspTab:Toggle({
+    Title = "ESP Item",
+    Default = true,
+    Callback = function(v)
+        ESPSettings.Item = v
     end
 })
