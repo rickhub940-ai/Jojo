@@ -1,0 +1,343 @@
+local WindUI = loadstring(game:HttpGet(
+"https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
+))()
+
+local player = game.Players.LocalPlayer
+
+
+local BLUE   = Color3.fromHex("#3BA9FF")
+local SKY    = Color3.fromHex("#6FD3FF")
+local YELLOW = Color3.fromHex("#FFD93B")
+local WHITE  = Color3.fromHex("#FFFFFF")
+
+local DARK_BG1 = Color3.fromHex("#0A1628")
+local DARK_BG2 = Color3.fromHex("#0F223F")
+
+local MAIN_GRADIENT = WindUI:Gradient({
+    ["0"]   = {Color = BLUE, Transparency = 0},
+    ["50"]  = {Color = SKY, Transparency = 0},
+    ["100"] = {Color = YELLOW, Transparency = 0},
+},{Rotation = 45})
+
+local BACKGROUND_GRADIENT = WindUI:Gradient({
+    ["0"]   = {Color = BLUE, Transparency = 0.35},
+    ["50"]  = {Color = SKY, Transparency = 0.35},
+    ["100"] = {Color = YELLOW, Transparency = 0.35},
+},{Rotation = 45})
+
+local DARK_TAB_GRADIENT = WindUI:Gradient({
+    ["0"]   = {Color = DARK_BG1, Transparency = 0},
+    ["100"] = {Color = DARK_BG2, Transparency = 0},
+},{Rotation = 90})
+
+--// =========================
+--// THEME
+--// =========================
+WindUI:AddTheme({
+    Name = "RickHUBTheme",
+
+    Accent = MAIN_GRADIENT,
+    Hover  = MAIN_GRADIENT,
+
+    Background = BACKGROUND_GRADIENT,
+    BackgroundTransparency = 0.35,
+
+    Outline = YELLOW,
+    Text = WHITE,
+    Icon = WHITE,
+
+    WindowBackground = BACKGROUND_GRADIENT,
+    WindowShadow = Color3.fromRGB(0,0,0),
+
+    TabBackground = DARK_TAB_GRADIENT,
+    TabTitle = WHITE,
+    TabIcon = WHITE,
+
+    ElementBackground = DARK_TAB_GRADIENT,
+    ElementTitle = WHITE,
+
+    Button = MAIN_GRADIENT,
+    Toggle = MAIN_GRADIENT,
+    Slider = MAIN_GRADIENT,
+})
+
+WindUI:SetTheme("RickHUBTheme")
+
+local avatar = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds="
+..player.UserId.."&size=420x420&format=Png"
+
+local Window = WindUI:CreateWindow({
+    Title = "RICK HUB [ rivals ] ",
+    Icon = "rbxassetid://108958018844079",
+    Author = "Author[ 009.exe ]",
+    Size = UDim2.fromOffset(730, 410),
+    Theme = "RickHUBTheme",
+    Transparent = true,
+    Resizable = true,
+
+    User = {
+        Enabled = true,
+        Custom = {
+            Name = player.Name,
+            Bio = "RickHUB USER",
+            Image = avatar
+        }
+    }
+})
+Window:Tag({
+    Title = "v0.0.1",
+    Icon = "github",
+    Color = Color3.fromHex("#00bfff"),
+    Radius = 5,
+})
+
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+
+Window:EditOpenButton({ Enabled = false })
+
+local ScreenGui = Instance.new("ScreenGui")
+local ToggleBtn = Instance.new("ImageButton")
+
+ScreenGui.Name = "Rickhub_Toggle"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
+ToggleBtn.BackgroundTransparency = 1
+ToggleBtn.Image = "rbxassetid://108958018844079"
+ToggleBtn.Active = true
+ToggleBtn.Draggable = true
+ToggleBtn.Parent = ScreenGui
+
+local opened = true
+
+local function toggle()
+    opened = not opened
+    if Window.UI then
+        Window.UI.Enabled = opened
+    else
+        Window:Toggle()
+    end
+end
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    ToggleBtn:TweenSize(
+        UDim2.new(0, 56, 0, 56),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.12,
+        true,
+        function()
+            ToggleBtn:TweenSize(
+                UDim2.new(0, 50, 0, 50),
+                Enum.EasingDirection.Out,
+                Enum.EasingStyle.Quad,
+                0.12,
+                true
+            )
+        end
+    )
+    toggle()
+end)
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.T then
+        toggle()
+    end
+end)
+
+
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Utility = require(ReplicatedStorage.Modules.Utility)
+
+
+local Enabled = false
+
+
+local line = Drawing.new("Line")
+line.Visible = false
+line.Color = Color3.fromRGB(255, 0, 0)
+line.Thickness = 2
+line.Transparency = 0.5
+
+local camera = workspace.CurrentCamera
+
+
+local lastTarget = nil
+local lastTargetTime = 0
+local TARGET_TIMEOUT = 0.5
+
+local function isDead(target)
+    local humanoid = target:FindFirstChildOfClass("Humanoid")
+    return humanoid and humanoid.Health <= 0
+end
+
+local function isSameTeam(target)
+    local targetTeam = target:GetAttribute("Team")
+    local myTeam = LocalPlayer.Character and LocalPlayer.Character:GetAttribute("Team")
+    return targetTeam and myTeam and targetTeam == myTeam
+end
+
+local function isValidTarget(target)
+    if not target then return false end
+    if isDead(target) then return false end
+    if isSameTeam(target) then return false end
+    if target == LocalPlayer.Character then return false end
+    if not target:FindFirstChildOfClass("Humanoid") then return false end
+    return true
+end
+
+local function getTargets()
+    local targets = {}
+    local myChar = LocalPlayer.Character
+    if not myChar then return targets end
+    
+    for _, v in ipairs(workspace:GetChildren()) do
+        if v == myChar then continue end
+        
+        local humanoid = v:FindFirstChildOfClass("Humanoid")
+        if not humanoid then continue end
+        if isDead(v) then continue end
+        if isSameTeam(v) then continue end
+        
+        table.insert(targets, v)
+    end
+    return targets
+end
+
+local function getPosition(target)
+    local head = target:FindFirstChild("Head")
+    if head then return head.Position end
+    
+    local root = target:FindFirstChild("HumanoidRootPart")
+    if root then return root.Position end
+    
+    return nil
+end
+
+local function getNearestTarget()
+    if not Enabled then return nil end -- <<<<<< สำคัญ
+    
+    local char = LocalPlayer.Character
+    if not char then return nil end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    
+    local now = tick()
+    
+    if lastTarget and isValidTarget(lastTarget) and (now - lastTargetTime) < TARGET_TIMEOUT then
+        return lastTarget
+    end
+    
+    local nearest, minDist = nil, math.huge
+    for _, target in ipairs(getTargets()) do
+        local pos = getPosition(target)
+        if pos then
+            local dist = (pos - root.Position).Magnitude
+            if dist < minDist then
+                nearest, minDist = target, dist
+            end
+        end
+    end
+    
+    if nearest then
+        lastTarget = nearest
+        lastTargetTime = now
+    end
+    
+    return nearest
+end
+
+local function updateLine()
+    if not Enabled then
+        line.Visible = false
+        return
+    end
+    
+    local target = lastTarget
+    if not target then
+        line.Visible = false
+        return
+    end
+    
+    local pos = getPosition(target)
+    if not pos then
+        line.Visible = false
+        return
+    end
+    
+    local screenPos, onScreen = camera:WorldToViewportPoint(pos)
+    local center = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
+    
+    if onScreen then
+        line.From = center
+        line.To = Vector2.new(screenPos.X, screenPos.Y)
+    else
+        local dir = (Vector2.new(screenPos.X, screenPos.Y) - center).Unit
+        local edge = center + dir * (camera.ViewportSize.X / 2)
+        
+        edge = Vector2.new(
+            math.clamp(edge.X, 50, camera.ViewportSize.X - 50),
+            math.clamp(edge.Y, 50, camera.ViewportSize.Y - 50)
+        )
+        
+        line.From = center
+        line.To = edge
+    end
+    
+    line.Visible = true
+end
+
+RunService.RenderStepped:Connect(function()
+    if not Enabled then return end
+    getNearestTarget()
+    updateLine()
+end)
+local oldRaycast = Utility.Raycast
+Utility.Raycast = function(...)
+    local args = {...}
+    
+    if Enabled and args[4] == 999 then
+        local target = getNearestTarget()
+        if target then
+            local pos = getPosition(target)
+            if pos then
+                args[3] = pos
+            end
+        end
+    end
+    
+    return oldRaycast(unpack(args))
+end
+
+function SetESP(state)
+    Enabled = state
+    if not state then
+        line.Visible = false
+        lastTarget = nil
+    end
+end
+
+
+
+local Tab = Window:Tab({Title = "MAIN", Icon = "user"})
+
+MainTab:Toggle({
+    Title = "Silent aim",
+    Desc = "ล็อคหัว",
+    Default = false,
+    Callback = function(state)
+        SetESP(state)
+    end
+})
