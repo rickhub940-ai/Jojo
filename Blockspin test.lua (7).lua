@@ -1503,55 +1503,6 @@ end)
 
 -- Anti Aim
 
-getgenv().AntiAimAssiant = false
-
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
-local Client = Players.LocalPlayer
-local Char = require(game.ReplicatedStorage.Modules.Core.Char)
-
-RunService.Heartbeat:Connect(function()
-    if getgenv().AntiAimAssiant then
-        local HumanoidModule = Char.get_hum()
-
-        if HumanoidModule and not HumanoidModule:GetAttribute("HasBeenDowned") then
-            local RootPartModule = Char.get_hrp()
-
-            local A = RootPartModule.Velocity
-            local B = RootPartModule.AssemblyLinearVelocity
-            local C = RootPartModule.AssemblyAngularVelocity
-
-            RootPartModule.Velocity = Vector3.new(
-                math.random(-99999999,99999999),
-                math.random(-99999999,99999999),
-                math.random(-99999999,99999999)
-            )
-
-            RootPartModule.AssemblyLinearVelocity = Vector3.new(
-                math.random(-99999999,99999999),
-                math.random(-99999999,99999999),
-                math.random(-99999999,99999999)
-            )
-
-            RootPartModule.AssemblyAngularVelocity = Vector3.new(
-                math.random(-99999999,99999999),
-                math.random(-99999999,99999999),
-                math.random(-99999999,99999999)
-            )
-
-            RunService.RenderStepped:Wait()
-
-            RootPartModule.Velocity = A
-            RootPartModule.AssemblyLinearVelocity = B
-            RootPartModule.AssemblyAngularVelocity = C
-        end
-    end
-end)
-
-
-
 
 
 
@@ -1960,14 +1911,7 @@ end})
 
 
 ChaterTab:Slider({Title = "Jump power valu (ปรับความสูง)", Step = 5, Value = {Min = 20, Max = 80, Default = 70}, Callback = function(v) jumpPower = v end})
-ChaterTab:Toggle({
-    Title = "Anti Aim",
-    Desc = "กันล็อค (เปิดละจะกระโดดสูงไม่ได้)",
-    Default = getgenv().AntiAimAssiant,
-    Callback = function(v)
-        getgenv().AntiAimAssiant = v
-    end
-})
+
 
 
 ChaterTab:Divider()
