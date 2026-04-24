@@ -1503,6 +1503,8 @@ end)
 
 -- Anti Aim
 
+getgenv().AntiAimAssiant = false
+
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -1510,35 +1512,33 @@ local RunService = game:GetService("RunService")
 local Client = Players.LocalPlayer
 local Char = require(game.ReplicatedStorage.Modules.Core.Char)
 
-getgenv().AntiAim = false
-
 RunService.Heartbeat:Connect(function()
-    if getgenv().AntiAim then   
+    if getgenv().AntiAimAssiant then
         local HumanoidModule = Char.get_hum()
-        if HumanoidModule and not HumanoidModule:GetAttribute("HasBeenDowned") then 
+
+        if HumanoidModule and not HumanoidModule:GetAttribute("HasBeenDowned") then
             local RootPartModule = Char.get_hrp()
-            if not RootPartModule then return end
 
             local A = RootPartModule.Velocity
             local B = RootPartModule.AssemblyLinearVelocity
             local C = RootPartModule.AssemblyAngularVelocity
 
             RootPartModule.Velocity = Vector3.new(
-                math.random(-100000,999999),
-                math.random(-100000,999999),
-                math.random(-100000,999999)
+                math.random(-99999999,99999999),
+                math.random(-99999999,99999999),
+                math.random(-99999999,99999999)
             )
 
             RootPartModule.AssemblyLinearVelocity = Vector3.new(
-                math.random(-100000,999999),
-                math.random(-100000,999999),
-                math.random(-100000,999999)
+                math.random(-99999999,99999999),
+                math.random(-99999999,99999999),
+                math.random(-99999999,99999999)
             )
 
             RootPartModule.AssemblyAngularVelocity = Vector3.new(
-                math.random(-100000,999999),
-                math.random(-100000,999999),
-                math.random(-100000,999999)
+                math.random(-99999999,99999999),
+                math.random(-99999999,99999999),
+                math.random(-99999999,99999999)
             )
 
             RunService.RenderStepped:Wait()
@@ -2113,13 +2113,13 @@ end})
 ChaterTab:Slider({Title = "Jump power valu (ปรับความสูง)", Step = 5, Value = {Min = 20, Max = 80, Default = 70}, Callback = function(v) jumpPower = v end})
 ChaterTab:Toggle({
     Title = "Anti Aim",
-	Desc = "กันล็อค(ถ้าเปิดจะกระโดดสูงไม่ได้)",
-    Flag = "antiaim",
-    Value = false,
+    Desc = "กันล็อค (เปิดละจะกระโดดสูงไม่ได้)",
+    Default = getgenv().AntiAimAssiant,
     Callback = function(v)
-        getgenv().AntiAim = v
+        getgenv().AntiAimAssiant = v
     end
 })
+
 
 ChaterTab:Divider()
 
@@ -2133,7 +2133,7 @@ local AntiKillToggle = ChaterTab:Toggle({
         enabled = state
         if state then
             if WindUI then
-                WindUI:Notify({
+                WindUI:Notify{
                     Title = "🛡️ Anti Kill Enabled",
                     Description = "",
                     Duration = 3
