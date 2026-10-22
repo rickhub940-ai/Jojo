@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>999MS HUB — Premium Roblox Scripts</title>
+
+  <!-- 1. Inter (UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- 2. BubbledotICG-FinePos (Display - Dot-matrix) -->
+  <link href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos" rel="stylesheet" />
+
+  <!-- 3. Font Awesome 6.5.2 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ===== Fallback Font ===== */
+    @font-face {
+      font-family: "Geist Pixel Circle";
+      src: url("fonts/GeistPixel-Circle.woff2") format("woff2");
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    /* ===== Variables ===== */
+    :root {
+      --bg: #000000;
+      --text: #ffffff;
+      --muted: #8e8e93;
+      --pill-dark: #1a1a1a;
+      --nav-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+      
+      /* ฟอนต์ Dot-matrix ทั้งหน้า */
+      --font-sans: "BubbledotICG-FinePos", "Geist Pixel Circle", monospace;
+      --font-display: "BubbledotICG-FinePos", "Geist Pixel Circle", monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      letter-spacing: 0.02em;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; border: none; background: none; cursor: pointer; }
+    img { display: block; max-width: 100%; }
+
+    /* ===== Background ===== */
+    .bg-wave {
+      position: fixed; inset: 0; z-index: 0;
+      background-color: #000; overflow: hidden;
+    }
+
+    .bg-wave::before {
+      content: ""; position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%);
+      filter: blur(80px);
+      animation: waveMove1 20s ease-in-out infinite alternate;
+    }
+
+    .bg-wave::after {
+      content: ""; position: absolute; bottom: -50%; right: -50%;
+      width: 150%; height: 150%;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+      filter: blur(100px);
+      animation: waveMove2 25s ease-in-out infinite alternate;
+    }
+
+    .green-orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(60px); z-index: 1; pointer-events: none;
+    }
+
+    .orb-1 {
+      width: 45vw; height: 45vw;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, transparent 70%);
+      top: -15%; right: -10%;
+      animation: orbFloat1 15s ease-in-out infinite alternate;
+    }
+
+    .orb-2 {
+      width: 35vw; height: 35vw;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.25) 0%, transparent 70%);
+      bottom: 5%; left: -5%;
+      animation: orbFloat2 18s ease-in-out infinite alternate;
+    }
+
+    .orb-3 {
+      width: 25vw; height: 25vw;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
+      top: 40%; left: 30%;
+      animation: orbFloat3 12s ease-in-out infinite alternate;
+    }
+
+    .bg-wave .noise {
+      position: absolute; inset: 0; opacity: 0.15;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay; pointer-events: none; z-index: 2;
+    }
+
+    @keyframes waveMove1 {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(10%, 15%) scale(1.1) rotate(10deg); }
+      100% { transform: translate(-5%, 5%) scale(0.9) rotate(-5deg); }
+    }
+
+    @keyframes waveMove2 {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+      50% { transform: translate(-15%, -10%) scale(1.2); opacity: 1; }
+      100% { transform: translate(5%, -5%) scale(0.95); opacity: 0.7; }
+    }
+
+    @keyframes orbFloat1 {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+      100% { transform: translate(-15%, 20%) scale(1.3); opacity: 0.8; }
+    }
+
+    @keyframes orbFloat2 {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+      100% { transform: translate(20%, -15%) scale(1.4); opacity: 0.7; }
+    }
+
+    @keyframes orbFloat3 {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+      100% { transform: translate(-10%, -20%) scale(1.5); opacity: 0.5; }
+    }
+
+    /* ===== Page Layout ===== */
+    .page {
+      position: relative; z-index: 3;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; padding: 0 clamp(14px, 3vw, 32px) 80px;
+    }
+
+    /* ===== Header ===== */
+    .site-header {
+      width: 100%; max-width: 900px;
+      display: flex; align-items: center; justify-content: center;
+      position: sticky; top: 20px; z-index: 50; margin-bottom: 80px;
+    }
+
+    .nav-pill {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; height: 64px; padding: 0 8px 0 16px;
+      border-radius: 999px; background: rgba(10, 10, 12, 0.4);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand {
+      flex-shrink: 0; display: grid; place-items: center;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #fff; overflow: hidden;
+      transition: transform 0.25s ease;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+
+    .brand:hover { transform: scale(1.04); }
+    .brand img { width: 72%; height: 72%; object-fit: contain; }
+
+    .nav-links { display: flex; align-items: center; gap: clamp(16px, 2.5vw, 32px); }
+    .nav-link { font-size: 14px; font-weight: 500; color: var(--muted); transition: color 0.2s ease; }
+    .nav-link:hover, .nav-link.is-active { color: #fff; }
+
+    .sign-in {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 48px; padding: 0 24px; border-radius: 999px;
+      background: #fff; color: #000; font-size: 14px; font-weight: 600;
+      transition: transform 0.2s ease, opacity 0.2s, box-shadow 0.2s;
+    }
+
+    .sign-in:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+    .burger {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      gap: 5px; width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .burger span {
+      display: block; width: 18px; height: 1.5px;
+      background: #fff; border-radius: 2px;
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    /* ===== Hero Section ===== */
+    .hero {
+      width: 100%; max-width: 900px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 40px 0 100px;
+    }
+
+    /* =========================================
+       HEADLINE: ตัวอักษรสุ่มทิศทาง ไกลๆ ช้าๆ
+       ========================================= */
+    .headline {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 0.05em;
+      font-weight: 400; font-size: clamp(48px, 9vw, 110px);
+      letter-spacing: -0.02em; line-height: 1.1;
+      margin-bottom: 24px; perspective: 1000px;
+      min-height: 1.2em;
+    }
+
+    .char {
+      display: inline-block;
+      background: linear-gradient(180deg, #ffffff 20%, #a0a0a0 100%);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+      opacity: 0; visibility: hidden; /* ซ่อนไว้รอคิว */
+    }
+
+    .char.pop-in {
+      visibility: visible;
+      animation: bouncyRandomPop 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      animation-delay: var(--delay);
+    }
+
+    @keyframes bouncyRandomPop {
+      0% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.2) rotate(var(--tr));
+        filter: blur(15px);
+      }
+      60% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1.1) rotate(0deg);
+        filter: blur(0);
+      }
+      80% {
+        transform: translate(0, 0) scale(0.95) rotate(0deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        filter: blur(0);
+      }
+    }
+
+    .char.shimmer-ready::after {
+      content: attr(data-char);
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.9) 50%, transparent 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; animation: shimmer 3s infinite linear;
+      z-index: 1;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* =========================================
+       Subhead & CTA (ลบ Discord ออกแล้ว)
+       ========================================= */
+    .subhead {
+      max-width: 650px; font-size: clamp(16px, 2vw, 18px);
+      line-height: 1.6; color: #ccc; margin-bottom: 40px;
+    }
+
+    .cta-group {
+      display: flex; justify-content: center;
+      width: 100%; max-width: 500px; margin-bottom: 32px;
+    }
+
+    .cta-primary {
+      display: flex; align-items: center; justify-content: center;
+      /* ปรับให้กว้างขึ้นเพื่อให้ดูสมดุลเมื่อไม่มีปุ่ม Discord */
+      width: 100%; max-width: 280px; padding: 16px 24px;
+      border-radius: 999px; background: #fff; color: #000;
+      font-size: 15px; font-weight: 600;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,0.2);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.5);
+    }
+
+    /* =========================================
+       Live Status
+       ========================================= */
+    .live-status {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.5px; color: #22c55e;
+      text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+    }
+
+    .status-dot {
+      position: relative; width: 10px; height: 10px;
+      background: #22c55e; border-radius: 50%;
+      box-shadow: 0 0 10px #22c55e;
+    }
+
+    .status-dot::after {
+      content: ""; position: absolute; top: 50%; left: 50%;
+      width: 100%; height: 100%; background: #22c55e;
+      border-radius: 50%; transform: translate(-50%, -50%);
+      animation: pulseRing 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      z-index: -1;
+    }
+
+    @keyframes pulseRing {
+      0% { width: 100%; height: 100%; opacity: 0.8; }
+      100% { width: 300%; height: 300%; opacity: 0; }
+    }
+
+    /* ===== Stats Section ===== */
+    .stats-section {
+      width: 100%; max-width: 1000px; padding: 60px 20px;
+      margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+    .stat {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 6px;
+      background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1);
+      padding: 24px 16px; border-radius: 16px;
+      backdrop-filter: blur(10px); transition: background 0.3s, border-color 0.3s;
+    }
+
+    .stat:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255,255,255,0.3); }
+
+    .stat-icon {
+      font-size: clamp(22px, 3vw, 33px); color: #fff; line-height: 1;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    .stat-value {
+      font-size: clamp(18px, 2.2vw, 26px); font-weight: 500; color: #fff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label { font-size: 12px; color: #aaa; }
+
+    /* =========================================
+       Elements ทั่วไป: สุ่มทิศทางเหมือนกันหมด!
+       ========================================= */
+    .pop-element {
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(var(--tr));
+      filter: blur(10px);
+    }
+
+    .pop-element.pop-in {
+      visibility: visible;
+      animation: bouncyRandomPop 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      animation-delay: var(--delay);
+    }
+
+    /* ===== Mobile Responsive ===== */
+    @media (max-width: 900px) {
+      .nav-pill { display: none; }
+      .burger { display: flex; }
+      .site-header { justify-content: space-between; padding: 0 10px; }
+    }
+
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-wave">
+    <div class="green-orb orb-1"></div>
+    <div class="green-orb orb-2"></div>
+    <div class="green-orb orb-3"></div>
+    <div class="noise"></div>
+  </div>
+
+  <div class="page">
+    <!-- Header -->
+    <header class="site-header pop-element">
+      <div class="nav-pill">
+        <a href="#" class="brand" aria-label="Home">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 60%; height: 60%;">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#000"/>
+            <path d="M2 17L12 22L22 17" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <nav class="nav-links">
+          <a href="#" class="nav-link is-active">Home</a>
+          <a href="#" class="nav-link">Scripts</a>
+          <a href="#" class="nav-link">Pricing</a>
+          <a href="#" class="nav-link">Docs</a>
+        </nav>
+        <a href="#" class="sign-in">Get Started</a>
+      </div>
+      
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <h1 class="headline" id="dynamicHeadline" aria-label="999MS HUB"></h1>
+
+      <p class="subhead pop-element">
+        Elevate your gameplay with Roblox premium undetected scripts. Built for performance, security, and seamless execution across all your favorite experiences.
+      </p>
+
+      <!-- ปุ่ม Get Started เพียงปุ่มเดียว -->
+      <div class="cta-group pop-element">
+        <a href="#" class="cta-primary">Get Started</a>
+      </div>
+
+      <div class="live-status pop-element">
+        <span class="status-dot"></span> LIVE - 99.9% UPTIME
+      </div>
+    </main>
+
+    <!-- Stats Section -->
+    <section class="stats-section pop-element">
+      <div class="stats">
+        <div class="stat" data-target="120" data-suffix="ms" data-decimals="0">
+          <span class="stat-icon">&lt;</span>
+          <span class="stat-value">0ms</span>
+          <span class="stat-label">Inference Time</span>
+        </div>
+        <div class="stat" data-target="99.99" data-suffix="%" data-decimals="2">
+          <span class="stat-icon">%</span>
+          <span class="stat-value">0%</span>
+          <span class="stat-label">Platform Uptime</span>
+        </div>
+        <div class="stat" data-target="24" data-suffix="/7" data-decimals="0">
+          <span class="stat-icon">*</span>
+          <span class="stat-value">0/7</span>
+          <span class="stat-label">Autonomous Runtime</span>
+        </div>
+        <div class="stat" data-target="2.4" data-suffix="M" data-decimals="1">
+          <span class="stat-icon">#</span>
+          <span class="stat-value">0M</span>
+          <span class="stat-label">Context Windows</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ฟังก์ชันสำหรับสร้างค่าสุ่ม (ทิศทางเด้งไกลๆ)
+      function getFarRandomDirection() {
+        const tx = (Math.random() - 0.5) * 600; // สุ่มระหว่าง -300px ถึง 300px
+        const ty = (Math.random() - 0.5) * 600;
+        const tr = (Math.random() - 0.5) * 180; // สุ่มมุมเอียง
+        return { tx: `${tx}px`, ty: `${ty}px`, tr: `${tr}deg` };
+      }
+
+      // =========================================
+      // 1. สร้างตัวอักษรและสั่งให้เด้ง
+      // =========================================
+      const headlineEl = document.getElementById('dynamicHeadline');
+      const text = "999MS HUB";
+      
+      // สร้าง Element ไว้ก่อน (ยังไม่โผล่)
+      text.split("").forEach((char) => {
+        if (char === " ") {
+          const space = document.createElement('span');
+          space.innerHTML = "&nbsp;";
+          space.style.width = "0.4em";
+          headlineEl.appendChild(space);
+        } else {
+          const span = document.createElement('span');
+          span.className = 'char';
+          span.textContent = char;
+          span.setAttribute('data-char', char);
+          headlineEl.appendChild(span);
+        }
+      });
+
+      // รอให้เบราว์เซอร์วาดหน้าจอเสร็จก่อน 1 Tick แล้วค่อยสั่งแอนิเมชัน
+      setTimeout(() => {
+        const chars = headlineEl.querySelectorAll('.char');
+        chars.forEach((span, index) => {
+          const dir = getFarRandomDirection();
+          span.style.setProperty('--tx', dir.tx);
+          span.style.setProperty('--ty', dir.ty);
+          span.style.setProperty('--tr', dir.tr);
+          
+          // หน่วงเวลาให้มาทีละตัว (ช้าลง 0.15s ต่อตัว)
+          const delay = 0.2 + (index * 0.15); 
+          span.style.setProperty('--delay', `${delay}s`);
+          
+          span.classList.add('pop-in');
+
+          if (index === chars.length - 1) {
+            setTimeout(() => {
+              chars.forEach(c => c.classList.add('shimmer-ready'));
+            }, (delay + 2) * 1000); // รอให้ตัวสุดท้ายเด้งเสร็จก่อนค่อยวิ่งแสง
+          }
+        });
+      }, 50);
+
+      // =========================================
+      // 2. Elements อื่นๆ ให้เด้งแบบสุ่มทิศทางเหมือนกัน
+      // =========================================
+      const popElements = document.querySelectorAll('.pop-element');
+      
+      popElements.forEach((el, index) => {
+        // สุ่มทิศทางให้ Element นั้นๆ
+        const dir = getFarRandomDirection();
+        el.style.setProperty('--tx', dir.tx);
+        el.style.setProperty('--ty', dir.ty);
+        el.style.setProperty('--tr', dir.tr);
+        
+        // ให้เริ่มหลังจากตัวอักษรเริ่มโผล่ไปแล้วนิดนึง (เริ่มที่ 1.8 วินาที)
+        const delay = 1.8 + (index * 0.2);
+        el.style.setProperty('--delay', `${delay}s`);
+        
+        setTimeout(() => {
+          el.classList.add('pop-in');
+        }, 50);
+      });
+
+      // =========================================
+      // 3. Mobile Menu Toggle
+      // =========================================
+      const burger = document.getElementById("burger");
+      const navLinks = document.querySelector(".nav-links");
+      const signIn = document.querySelector(".sign-in");
+
+      if (burger) {
+        burger.addEventListener("click", () => {
+          const isExpanded = burger.getAttribute("aria-expanded") === "true";
+          burger.setAttribute("aria-expanded", !isExpanded);
+          
+          if (!isExpanded) {
+            navLinks.style.display = "flex";
+            navLinks.style.flexDirection = "column";
+            navLinks.style.position = "absolute";
+            navLinks.style.top = "70px";
+            navLinks.style.left = "0";
+            navLinks.style.width = "100%";
+            navLinks.style.background = "rgba(10,10,12,0.95)";
+            navLinks.style.padding = "20px";
+            navLinks.style.borderRadius = "16px";
+            navLinks.style.border = "1px solid rgba(255,255,255,0.1)";
+            signIn.style.display = "none";
+          } else {
+            navLinks.style.display = "";
+            signIn.style.display = "";
+          }
+        });
+      }
+
+      // =========================================
+      // 4. Stats Count-up Animation
+      // =========================================
+      const stats = document.querySelectorAll(".stat");
+      let started = false;
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+      function animateStat(el, index) {
+        const target = parseFloat(el.dataset.target);
+        const suffix = el.dataset.suffix || "";
+        const decimals = parseInt(el.dataset.decimals || "0", 10);
+        const valueEl = el.querySelector(".stat-value");
+        const duration = 1500 + index * 80;
+        const delay = 3500 + (index * 90); // รอให้ทุกอย่างเข้าที่ก่อน
+
+        setTimeout(() => {
+          const startTime = performance.now();
+          function frame(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = easeOutCubic(progress);
+            valueEl.textContent = (target * eased).toFixed(decimals) + suffix;
+            if (progress < 1) requestAnimationFrame(frame);
+            else valueEl.textContent = target.toFixed(decimals) + suffix;
+          }
+          requestAnimationFrame(frame);
+        }, delay);
+      }
+
+      function startCounters() {
+        if (started) return;
+        started = true;
+        stats.forEach(animateStat);
+      }
+
+      if ("IntersectionObserver" in window && stats.length) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              startCounters();
+              observer.disconnect();
+            }
+          });
+        }, { threshold: 0.25 });
+        observer.observe(stats[0]);
+      } else {
+        setTimeout(startCounters, 3500);
+      }
+    })();
+  </script>
+</body>
+</html>
